@@ -32,15 +32,15 @@ export async function seedAdmin(prisma: PrismaClient) {
 
       email:"apoooorvabd@gmail.com",
 
-      password:hashedPassword,
+      passwordHash:hashedPassword,
 
       role: "SUPER_ADMIN",
 
-      universityId: "cmsbhx1ym0000u5a8y7j8kkfd",
+      universityId: "cmtn6aslx00009kb3uhu10tsb",
 
-      collegeId: "cmsbi2mrp002xu548h2l6skyp",
+      collegeId: "cmtn6e9c1002b9kmckligwi0l",
 
-      courseId: "cmsbi7879008fu5i8i8ylotn2",
+      courseId: "cmtn6skc2005z9kj82xt37us4",
 
       currentSemester:5,
 

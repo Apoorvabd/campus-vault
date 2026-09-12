@@ -46,22 +46,15 @@ enum UploadType {
   DOCUMENT
 }
 
-enum ExamType {
-  MID_SEM
-  END_SEM
-  PRACTICAL
-  INTERNAL
-}
-
 enum Visibility {
   PUBLIC
   PREMIUM
 }
 
 enum ResourceSourceType {
-  HOSTED // File uploaded to Campus Vault (Cloudinary) — needs `upload`
-  EXTERNAL_LINK // File lives elsewhere (Drive, another site) — needs `externalUrl`
-  REFERENCE_ONLY // No file at all, only metadata (e.g. "I have this locally, ask me")
+  HOSTED
+  EXTERNAL_LINK
+  REFERENCE_ONLY
 }
 
 enum CollegeGender {
@@ -160,10 +153,9 @@ model CollegeCourse {
 model Subject {
   id String @id @default(cuid())
 
-  name String
-  code String
-
-  semester Int
+  name     String
+  code     String
+  semester Int?
   credits  Int
 
   type SubjectType
@@ -178,8 +170,12 @@ model Subject {
   updatedAt DateTime @updatedAt
 
   // Relations
-  course    Course     @relation(fields: [courseId], references: [id])
+  course Course @relation(fields: [courseId], references: [id])
+
   resources Resource[]
+
+  // User's private/local files linked to this subject
+  userFiles UserFile[]
 
   @@unique([courseId, code])
   @@index([courseId])
@@ -195,8 +191,8 @@ model User {
 
   username String @unique
 
-  email    String @unique
-  password String
+  email        String @unique
+  passwordHash String
 
   bio      String?
   headline String?
@@ -206,8 +202,8 @@ model User {
 
   role UserRole @default(STUDENT)
 
-  // Independent of `role` — grants permission to create Posts on the feed.
-  // Admins grant/revoke this per user; role alone should not decide posting rights.
+  // Independent of role.
+  // Admins can grant/revoke permission to create posts.
   canPost Boolean @default(false)
 
   universityId String
@@ -232,6 +228,9 @@ model User {
 
   uploadedResources Resource[] @relation("UploadedResources")
   approvedResources Resource[] @relation("ApprovedResources")
+
+  // User's private/local files
+  userFiles UserFile[]
 
   posts Post[]
 
@@ -279,20 +278,19 @@ model Upload {
 
   postCoverImages Post[]
 
+  // Optional uploaded copy of a user's private file
+  userFile UserFile?
+
   @@index([uploadedById])
   @@index([type])
 }
 
 model Resource {
-  id String @id @default(cuid())
-
+  id          String  @id @default(cuid())
   title       String
   description String?
 
   resourceType ResourceType
-  examType     ExamType?
-
-  academicSession String?
 
   visibility Visibility @default(PUBLIC)
 
@@ -302,10 +300,16 @@ model Resource {
 
   downloadCount Int @default(0)
 
-  // Where the actual file lives. HOSTED -> upload is required, externalUrl must be null.
-  // EXTERNAL_LINK -> externalUrl is required, upload must be null.
-  // REFERENCE_ONLY -> both are null (metadata-only entry, e.g. student's local copy).
-  // This tri-state is enforced in the service layer (Prisma cannot express XOR constraints).
+  // HOSTED:
+  //      upload is required and externalUrl should be null.
+  //
+  // EXTERNAL_LINK:
+  //      externalUrl is required and upload should be null.
+  //
+  // REFERENCE_ONLY:
+  //      both upload and externalUrl are null.
+  //
+  // These rules are enforced in the service layer.
   sourceType ResourceSourceType @default(HOSTED)
 
   externalUrl String?
@@ -333,6 +337,7 @@ model Resource {
   likes     Like[]
   bookmarks Bookmark[]
 
+  @@unique([subjectId, externalUrl])
   @@index([subjectId])
   @@index([uploadedById])
   @@index([approvedById])
@@ -340,6 +345,53 @@ model Resource {
   @@index([resourceType])
   @@index([sourceType])
   @@index([subjectId, status])
+}
+
+model UserFile {
+  id String @id @default(cuid())
+
+  // Owner of the private file
+  userId String
+
+  // Subject to which the user linked this file
+
+  subjectId String
+
+  // File information
+  name      String
+  mimeType  String?
+  extension String?
+  size      Int?
+
+  // Reference to the original file on the user's device.
+  //
+  // Example:
+  // content://...
+  //
+  // This does NOT store the actual file.
+  localUri String?
+
+  // Optional uploaded copy.
+  //
+  // If the user uploads the file to Campus Vault,
+  // this points to the Upload record which contains
+  // the Cloudinary/CDN URL.
+
+  uploadId String? @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  upload Upload? @relation(fields: [uploadId], references: [id])
+
+  @@index([userId])
+  @@index([subjectId])
+  @@index([userId, subjectId])
 }
 
 model Post {

@@ -14,6 +14,9 @@ node_modules/
 # Build Output
 # ==========================
 dist/
+
+# Scraped PYQ data (not source code, can be large / re-generated)
+scripts/output/
 build/
 
 # ==========================
