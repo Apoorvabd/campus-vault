@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { subjects } from "./../../../sources/course";
+import { subjects } from "./../../../sources/subjects";
 
 export async function seedSubject(prisma: PrismaClient) {
   console.log("Seeding subjects...");

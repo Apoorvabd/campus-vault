@@ -1,5 +1,5 @@
 import { colleges } from "./../../../sources/college";
-import { PrismaClient } from "@prisma/client";
+import { CollegeGender, PrismaClient } from "@prisma/client";
 
 export async function seedCollege(prisma: PrismaClient) {
   console.log("Seeding colleges...");
@@ -24,7 +24,7 @@ export async function seedCollege(prisma: PrismaClient) {
         update: {
           name: college.name,
           shortName: college.shortName,
-          gender: college.gender,
+          gender: college.gender as CollegeGender,
           address: college.address,
           universityId: university.id,
         },
@@ -33,7 +33,7 @@ export async function seedCollege(prisma: PrismaClient) {
           name: college.name,
           shortName: college.shortName,
           code: college.code,
-          gender: college.gender,
+          gender: college.gender as CollegeGender,
           address: college.address,
           universityId: university.id,
         },
