@@ -52,9 +52,9 @@ enum Visibility {
 }
 
 enum ResourceSourceType {
-  HOSTED
-  EXTERNAL_LINK
-  REFERENCE_ONLY
+  HOSTED // File uploaded to Campus Vault (Cloudinary) — needs `upload`
+  EXTERNAL_LINK // File lives elsewhere (Drive, another site) — needs `externalUrl`
+  REFERENCE_ONLY // No file at all, only metadata (e.g. "I have this locally, ask me")
 }
 
 enum CollegeGender {
@@ -202,8 +202,8 @@ model User {
 
   role UserRole @default(STUDENT)
 
-  // Independent of role.
-  // Admins can grant/revoke permission to create posts.
+  // Independent of `role` — grants permission to create Posts on the feed.
+  // Admins grant/revoke this per user; role alone should not decide posting rights.
   canPost Boolean @default(false)
 
   universityId String
@@ -300,16 +300,10 @@ model Resource {
 
   downloadCount Int @default(0)
 
-  // HOSTED:
-  //      upload is required and externalUrl should be null.
-  //
-  // EXTERNAL_LINK:
-  //      externalUrl is required and upload should be null.
-  //
-  // REFERENCE_ONLY:
-  //      both upload and externalUrl are null.
-  //
-  // These rules are enforced in the service layer.
+  // Where the actual file lives. HOSTED -> upload is required, externalUrl must be null.
+  // EXTERNAL_LINK -> externalUrl is required, upload must be null.
+  // REFERENCE_ONLY -> both are null (metadata-only entry, e.g. student's local copy).
+  // This tri-state is enforced in the service layer (Prisma cannot express XOR constraints).
   sourceType ResourceSourceType @default(HOSTED)
 
   externalUrl String?
