@@ -1,6 +1,12 @@
 import express, { Express, Request, Response } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import { globalErrorHandler, notFoundHandler } from "./middleware";
+import autroutes from "./routes";
+// app.ts me temporarily (ya routes/index.ts me)
+import { z } from "zod";
+import { validate } from "./middleware";
+import routes from "./routes";
 
 const app: Express = express();
 
@@ -21,5 +27,11 @@ app.get("/", (req: Request, res: Response) => {
     message: "Campus Vault API is running 🚀",
   });
 });
+
+app.use("/api/v1", routes);
+
+
+app.use(notFoundHandler);
+app.use(globalErrorHandler);
 
 export default app;
