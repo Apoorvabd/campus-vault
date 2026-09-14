@@ -4,6 +4,7 @@ export class ApiResponse<T> {
     public readonly message: string;
     public readonly data?: T | null;
     public readonly meta?: Record<string, any>;
+    public readonly success: boolean = true;
 
     constructor(
         statusCode: number,
