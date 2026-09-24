@@ -18,5 +18,4 @@ router.use("/subjects", subjectsRoutes);
 router.use("/resources", resourceRoutes);
 router.use("/test", testRoutes);
 
-
 export default router;
