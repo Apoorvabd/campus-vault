@@ -3,7 +3,7 @@ import { resources } from "./../../../sources/resources";
 
 // System account used for bulk-imported PYQs.
 // (uploadedById / approvedById are required fields on Resource.)
-const SYSTEM_USER_ID = "cmto7v5he00019k3bt8ev0q2e";
+const SYSTEM_USER_ID = "cmu34n6dr00019kihwsk561es";
 
 export async function seedResource(prisma: PrismaClient) {
   console.log("Seeding resources (PYQs)...");

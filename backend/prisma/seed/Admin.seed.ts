@@ -36,11 +36,11 @@ export async function seedAdmin(prisma: PrismaClient) {
 
       role: "SUPER_ADMIN",
 
-      universityId: "cmtn6aslx00009kb3uhu10tsb",
+      universityId: "cmu34ecar00019kxadldh8gn2",
 
-      collegeId: "cmtn6e9c1002b9kmckligwi0l",
+      collegeId: "cmu34ecvi00049kxarwxvztj4",
 
-      courseId: "cmtn6skc2005z9kj82xt37us4",
+      courseId: "cmu34eexq00409kxamowp8h1w",
 
       currentSemester:5,
 

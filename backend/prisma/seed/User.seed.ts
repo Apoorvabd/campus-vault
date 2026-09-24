@@ -20,7 +20,7 @@ export async function seedUser(prisma: PrismaClient) {
 
 
     update:{
-      role: "SUPER_ADMIN",
+      role: "STUDENT",
     },
 
 
@@ -34,14 +34,13 @@ export async function seedUser(prisma: PrismaClient) {
       
       email:"mrapoorvchaturvedi7@gmail.com",
 
-      password:hashedPassword,
+      passwordHash: hashedPassword,
 
+      universityId: "cmu34ecar00019kxadldh8gn2",
 
-      universityId: "cmsbhx1ym0000u5a8y7j8kkfd",
+      collegeId: "cmu34ecvi00049kxarwxvztj4",
 
-      collegeId: "cmsbi2mrp002xu548h2l6skyp",
-
-      courseId: "cmsbi7879008fu5i8i8ylotn2",
+      courseId: "cmu34eexq00409kxamowp8h1w",
 
       currentSemester:5,
 
