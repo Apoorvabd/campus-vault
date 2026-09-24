@@ -2,6 +2,7 @@ import {Router} from 'express';
 import { register, login, refreshToken, getMe, logout } from './auth.controller';
 import { authenticate ,validate} from '../../middleware';
 import { registerSchema, loginSchema , refreshTokenSchema} from './auth.validation';
+
 const router = Router();
 
 router.post('/register', validate({body: registerSchema}), register);
