@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Campus Vault — Design System</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root{
+    --primary:#2F6FED;
+    --primary-light:#E8F0FE;
+    --text-primary:#0F172A;
+    --text-secondary:#64748B;
+    --text-muted:#94A3B8;
+    --surface:#FFFFFF;
+    --background:#F4F6FA;
+    --border:#E2E8F0;
+    --success:#16A34A;
+    --warning:#F5A623;
+    --error:#EF4444;
+    --accent-purple:#8B5CF6;
+    --accent-teal:#14B8A6;
+    --accent-orange:#F97316;
+    --accent-pink:#EC4899;
+
+    --radius-pill:999px;
+    --radius-card:16px;
+    --radius-input:12px;
+    --radius-iconbox:12px;
+
+    --space-1:4px;
+    --space-2:8px;
+    --space-3:12px;
+    --space-4:16px;
+    --space-5:24px;
+    --space-6:32px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--background);
+    color:var(--text-primary);
+    padding-bottom:80px;
+  }
+  header.page-head{
+    background:var(--surface);
+    border-bottom:1px solid var(--border);
+    padding:28px var(--space-6);
+    position:sticky;top:0;z-index:10;
+  }
+  header.page-head h1{margin:0;font-size:24px;}
+  header.page-head p{margin:6px 0 0;color:var(--text-secondary);font-size:14px;}
+
+  nav.toc{
+    display:flex;gap:18px;flex-wrap:wrap;
+    padding:14px var(--space-6);
+    background:var(--surface);
+    border-bottom:1px solid var(--border);
+    font-size:13px;
+    position:sticky;top:78px;z-index:9;
+  }
+  nav.toc a{color:var(--primary);text-decoration:none;font-weight:600;}
+
+  section{padding:var(--space-6);max-width:1100px;margin:0 auto;}
+  section h2{font-size:19px;margin-bottom:4px;}
+  section .section-sub{color:var(--text-secondary);font-size:13px;margin-bottom:var(--space-5);}
+
+  .grid{display:grid;gap:var(--space-4);}
+  .grid-colors{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));}
+  .grid-components{grid-template-columns:repeat(auto-fill,minmax(260px,1fr));}
+
+  .swatch-card{
+    background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-card);
+    overflow:hidden;
+  }
+  .swatch-fill{height:70px;}
+  .swatch-info{padding:var(--space-3) var(--space-4);}
+  .swatch-info .name{font-weight:700;font-size:13px;}
+  .swatch-info .token{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--text-secondary);}
+  .swatch-info .usage{font-size:11px;color:var(--text-muted);margin-top:4px;}
+
+  .type-row{
+    background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-card);
+    padding:var(--space-4) var(--space-5);margin-bottom:var(--space-3);
+    display:flex;align-items:baseline;justify-content:space-between;gap:var(--space-4);flex-wrap:wrap;
+  }
+  .type-row .label{font-size:11px;color:var(--text-secondary);font-family:ui-monospace,monospace;min-width:150px;}
+  .type-row .sample{flex:1;}
+
+  .scale-row{display:flex;align-items:center;gap:var(--space-4);margin-bottom:var(--space-3);}
+  .scale-box{background:var(--primary-light);border:1px dashed var(--primary);}
+  .scale-label{font-family:ui-monospace,monospace;font-size:12px;color:var(--text-secondary);width:90px;}
+
+  .card-demo{
+    background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-card);
+    padding:var(--space-4);
+  }
+  .card-demo .card-label{font-size:11px;color:var(--text-muted);margin-bottom:8px;font-family:ui-monospace,monospace;}
+
+  .btn{
+    display:inline-flex;align-items:center;gap:6px;
+    border-radius:var(--radius-pill);
+    padding:12px 20px;font-weight:600;font-size:14px;border:none;cursor:pointer;
+  }
+  .btn-primary{background:var(--primary);color:#fff;}
+  .btn-outline{background:#fff;border:1px solid var(--border);color:var(--text-primary);}
+  .btn-small{padding:6px 14px;font-size:12px;background:var(--primary);color:#fff;}
+
+  .input-demo{
+    display:flex;flex-direction:column;gap:4px;margin-bottom:var(--space-3);
+  }
+  .input-demo label{font-size:12px;font-weight:700;}
+  .input-demo input{
+    border:1px solid var(--border);border-radius:var(--radius-input);
+    padding:12px 14px;font-size:14px;color:var(--text-primary);background:#fff;
+  }
+  .input-demo input::placeholder{color:var(--text-muted);}
+
+  .chip{
+    display:inline-flex;align-items:center;gap:4px;
+    border-radius:var(--radius-pill);
+    padding:4px 10px;font-size:11px;font-weight:700;
+  }
+  .chip-pyq{background:var(--primary-light);color:var(--primary);}
+  .chip-notes{background:#F3E8FF;color:var(--accent-purple);}
+  .chip-verified{background:#F0FDF4;color:var(--success);border:1px solid var(--success);}
+
+  .avatar{
+    width:40px;height:40px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-weight:700;font-size:14px;position:relative;flex-shrink:0;
+  }
+  .avatar .dot{
+    position:absolute;bottom:-1px;right:-1px;width:10px;height:10px;border-radius:50%;
+    background:var(--success);border:2px solid #fff;
+  }
+
+  .icon-box{
+    width:44px;height:44px;border-radius:var(--radius-iconbox);
+    display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;
+  }
+
+  .navbar-demo{
+    display:flex;justify-content:space-around;background:#fff;border:1px solid var(--border);
+    border-radius:var(--radius-card);padding:10px 0;
+  }
+  .navbar-demo .nav-item{
+    display:flex;flex-direction:column;align-items:center;gap:2px;
+    font-size:10px;color:var(--text-muted);
+  }
+  .navbar-demo .nav-item.active{color:var(--primary);font-weight:700;}
+
+  .file-map{
+    background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-card);
+    padding:var(--space-5);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;
+    white-space:pre;overflow-x:auto;line-height:1.6;
+  }
+  .file-map .comment{color:var(--text-secondary);}
+
+  .resource-card-demo{
+    background:#fff;border:1px solid var(--border);border-radius:var(--radius-card);padding:var(--space-4);
+  }
+  .resource-card-demo .top-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+  .resource-card-demo h4{margin:6px 0;font-size:15px;}
+  .resource-card-demo .meta{color:var(--text-secondary);font-size:12px;margin-bottom:10px;}
+  .resource-card-demo .uploader-row{display:flex;align-items:center;gap:8px;justify-content:space-between;}
+  .uploader-name{font-size:12px;font-weight:600;}
+</style>
+</head>
+<body>
+
+<header class="page-head">
+  <h1>🎓 Campus Vault — Design System</h1>
+  <p>Single source of truth for colors, typography, spacing and reusable components. Sync this with <code>mobile/lib/core/theme/</code> and <code>mobile/lib/core/widgets/</code>.</p>
+</header>
+
+<nav class="toc">
+  <a href="#colors">Colors</a>
+  <a href="#typography">Typography</a>
+  <a href="#spacing">Spacing & Radius</a>
+  <a href="#components">Components</a>
+  <a href="#filemap">File Map</a>
+</nav>
+
+<section id="colors">
+  <h2>Colors</h2>
+  <div class="section-sub">Every color used in the app must come from this list — never hardcode a hex in a screen.</div>
+  <div class="grid grid-colors">
+
+    <div class="swatch-card">
+      <div class="swatch-fill" style="background:var(--primary)"></div>
+      <div class="swatch-info"><div class="name">Primary</div><div class="token">#2F6FED</div><div class="usage">Buttons, active tab, links, active nav icon</div></div>
+    </div>
+    <div class="swatch-card">
+      <div class="swatch-fill" style="background:var(--primary-light)"></div>
+      <div class="swatch-info"><div class="name">Primary Light</div><div class="token">#E8F0FE</div><div class="usage">Icon backgrounds, semester badge bg</div></div>
+    </div>
+    <div class="swatch-card">
+      <div class="swatch-fill" style="background:var(--text-primary)"></div>
+      <div class="swatch-info"><div class="name">Text Primary</div><div class="token">#0F172A</div><div class="usage">Headings, bold names</div></div>
+    </div>
+    <div class="swatch-card">
+      <div class="swatch-fill" style="background:var(--text-secondary)"></div>
+      <div class="swatch-info"><div class="name">Text Secondary</div><div class="token">#64748B</div><div class="usage">Subtitles, meta text</div></div>
+    </div>
+    <div class="swatch-card">
+      <div class="swatch-fill" style="background:var(--text-muted)"></div>
+      <div class="swatch-info"><div class="name">Text Muted</div><div class="token">#94A3B8</div><div class="usage">Placeholders, footer text</div></div>
+    </div>
+    <div class="swatch-card">
+      <div class="swatch-fill" style="background:var(--surface);border-bottom:1px solid var(--border)"></div>
+      <div class="swatch-info"><div class="name">Surface</div><div class="token">#FFFFFF</div><div class="usage">Card backgrounds</div></div>
+    </div>
+    <div class="swatch-card">
+      <div class="swatch-fill" style="background:var(--background)"></div>
+      <div class="swatch-info"><div class="name">Background</div><div class="token">#F4F6FA</div><div class="usage">Screen background</div></div>
+    </div>
+    <div class="swatch-card">
+      <div class="swatch-fill" style="background:var(--border)"></div>
+      <div class="swatch-info"><div class="name">Border</div><div class="token">#E2E8F0</div><div class="usage">Card borders, input borders, dividers</div></div>
+    </div>
+    <div class="swatch-card">
+      <div class="swatch-fill" style="background:var(--success)"></div>
+      <div class="swatch-info"><div class="name">Success</div><div class="token">#16A34A</div><div class="usage">Verified badge, online dot</div></div>
+    </div>
+    <div class="swatch-card">
+      <div class="swatch-fill" style="background:var(--warning)"></div>
+      <div class="swatch-info"><div class="name">Warning</div><div class="token">#F5A623</div><div class="usage">Star ratings</div></div>
+    </div>
+    <div class="swatch-card">
+      <div class="swatch-fill" style="background:var(--error)"></div>
+      <div class="swatch-info"><div class="name">Error</div><div class="token">#EF4444</div><div class="usage">PDF icon bg, urgent marker</div></div>
+    </div>
+    <div class="swatch-card">
+      <div class="swatch-fill" style="background:var(--accent-purple)"></div>
+      <div class="swatch-info"><div class="name">Accent Purple</div><div class="token">#8B5CF6</div><div class="usage">NOTES badge, subject icon</div></div>
+    </div>
+    <div class="swatch-card">
+      <div class="swatch-fill" style="background:var(--accent-teal)"></div>
+      <div class="swatch-info"><div class="name">Accent Teal</div><div class="token">#14B8A6</div><div class="usage">Subject icon variant</div></div>
+    </div>
+    <div class="swatch-card">
+      <div class="swatch-fill" style="background:var(--accent-orange)"></div>
+      <div class="swatch-info"><div class="name">Accent Orange</div><div class="token">#F97316</div><div class="usage">Subject icon variant</div></div>
+    </div>
+    <div class="swatch-card">
+      <div class="swatch-fill" style="background:var(--accent-pink)"></div>
+      <div class="swatch-info"><div class="name">Accent Pink</div><div class="token">#EC4899</div><div class="usage">Avatar background variant</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="typography">
+  <h2>Typography</h2>
+  <div class="section-sub">One scale, used everywhere. No screen should invent its own font size.</div>
+
+  <div class="type-row"><div class="label">displayBold · 28px/Bold</div><div class="sample" style="font-size:28px;font-weight:800;">Your campus, tailored.</div></div>
+  <div class="type-row"><div class="label">h1 · 22px/Bold</div><div class="sample" style="font-size:22px;font-weight:700;">Sign in to Campus Vault</div></div>
+  <div class="type-row"><div class="label">h2 · 17px/SemiBold</div><div class="sample" style="font-size:17px;font-weight:600;">Your Subjects</div></div>
+  <div class="type-row"><div class="label">bodySemiBold · 15px/SemiBold</div><div class="sample" style="font-size:15px;font-weight:600;">Database Management Systems</div></div>
+  <div class="type-row"><div class="label">bodyMedium · 14px/Regular</div><div class="sample" style="font-size:14px;color:var(--text-secondary);">Direct access to curated class notes and guides.</div></div>
+  <div class="type-row"><div class="label">caption · 12px/Regular</div><div class="sample" style="font-size:12px;color:var(--text-muted);">124 downloads · 4.2 MB</div></div>
+  <div class="type-row"><div class="label">buttonText · 15px/SemiBold</div><div class="sample" style="font-size:15px;font-weight:600;color:var(--primary);">Sign In</div></div>
+  <div class="type-row"><div class="label">overline · 11px/Bold/UPPER</div><div class="sample" style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--text-secondary);">OR CONTINUE WITH</div></div>
+</section>
+
+<section id="spacing">
+  <h2>Spacing & Radius</h2>
+  <div class="section-sub">4/8/12/16/24/32 spacing scale. Pill / card / input / icon-box radii.</div>
+
+  <div style="margin-bottom:28px;">
+    <div class="scale-row"><div class="scale-label">4px</div><div class="scale-box" style="width:4px;height:20px;"></div></div>
+    <div class="scale-row"><div class="scale-label">8px</div><div class="scale-box" style="width:8px;height:20px;"></div></div>
+    <div class="scale-row"><div class="scale-label">12px</div><div class="scale-box" style="width:12px;height:20px;"></div></div>
+    <div class="scale-row"><div class="scale-label">16px</div><div class="scale-box" style="width:16px;height:20px;"></div></div>
+    <div class="scale-row"><div class="scale-label">24px</div><div class="scale-box" style="width:24px;height:20px;"></div></div>
+    <div class="scale-row"><div class="scale-label">32px</div><div class="scale-box" style="width:32px;height:20px;"></div></div>
+  </div>
+
+  <div class="grid grid-components">
+    <div class="card-demo"><div class="card-label">radius-pill (999)</div><div class="btn btn-primary">Sign In</div></div>
+    <div class="card-demo"><div class="card-label">radius-card (16)</div><div style="background:var(--background);border-radius:16px;padding:20px;text-align:center;font-size:12px;color:var(--text-secondary);">Card corner</div></div>
+    <div class="card-demo"><div class="card-label">radius-input (12)</div><input style="border:1px solid var(--border);border-radius:12px;padding:10px;width:100%;" placeholder="Input corner"></div>
+    <div class="card-demo"><div class="card-label">radius-iconbox (12)</div><div class="icon-box" style="background:var(--primary-light);">🎓</div></div>
+  </div>
+</section>
+
+<section id="components">
+  <h2>Components</h2>
+  <div class="section-sub">Every reusable widget, named exactly as it should be in code.</div>
+
+  <div class="grid grid-components">
+
+    <div class="card-demo">
+      <div class="card-label">AppButton — primary</div>
+      <button class="btn btn-primary">Sign In →</button>
+    </div>
+
+    <div class="card-demo">
+      <div class="card-label">AppButton — outline</div>
+      <button class="btn btn-outline">🔵 Google Workspace SSO</button>
+    </div>
+
+    <div class="card-demo">
+      <div class="card-label">AppButton — small pill</div>
+      <button class="btn btn-small">👁 Preview</button>
+    </div>
+
+    <div class="card-demo">
+      <div class="card-label">AppTextField</div>
+      <div class="input-demo">
+        <label>Roll No. or University Email</label>
+        <input placeholder="e.g., 21CS042 or student@univ.edu">
+      </div>
+    </div>
+
+    <div class="card-demo">
+      <div class="card-label">StatusChip — variants</div>
+      <span class="chip chip-pyq">PYQ</span>
+      <span class="chip chip-notes">NOTES</span>
+      <span class="chip chip-verified">✓ Verified</span>
+    </div>
+
+    <div class="card-demo">
+      <div class="card-label">AvatarCircle (+ online dot)</div>
+      <div style="display:flex;gap:10px;">
+        <div class="avatar" style="background:var(--primary);">SK<span class="dot"></span></div>
+        <div class="avatar" style="background:var(--accent-pink);">PS</div>
+        <div class="avatar" style="background:var(--accent-teal);">RK</div>
+      </div>
+    </div>
+
+    <div class="card-demo">
+      <div class="card-label">SubjectTile</div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div class="icon-box" style="background:var(--primary-light);color:var(--primary);">📁</div>
+        <div style="flex:1;">
+          <div style="font-weight:600;font-size:14px;">Database Management Systems</div>
+          <div style="font-size:12px;color:var(--text-secondary);">42 resources · Verified</div>
+        </div>
+        <div class="icon-box" style="width:32px;height:32px;background:var(--primary-light);color:var(--primary);">→</div>
+      </div>
+    </div>
+
+    <div class="card-demo" style="grid-column:span 2;">
+      <div class="card-label">ResourceCard</div>
+      <div class="resource-card-demo">
+        <div class="top-row">
+          <span class="chip chip-pyq">PYQ</span>
+          <span style="color:var(--text-muted);">🔖</span>
+        </div>
+        <h4>DBMS End-Semester Question Paper 2024 (Sol.)</h4>
+        <div class="meta">Delhi University · B.Voc Software Dev · Sem 5 &nbsp;·&nbsp; PDF · 4.2 MB &nbsp;·&nbsp; ⭐ 4.8</div>
+        <div class="uploader-row">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="avatar" style="width:28px;height:28px;font-size:11px;background:var(--primary);">RM</div>
+            <span class="uploader-name">Rohit M. (Topper '23)</span>
+          </div>
+          <button class="btn btn-small">👁 Preview</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-demo">
+      <div class="card-label">SegmentedTabs</div>
+      <div style="display:flex;background:var(--background);border-radius:999px;padding:4px;">
+        <div style="flex:1;text-align:center;padding:8px;border-radius:999px;background:#fff;font-weight:700;font-size:13px;">Community</div>
+        <div style="flex:1;text-align:center;padding:8px;border-radius:999px;color:var(--text-secondary);font-size:13px;">Resources</div>
+      </div>
+    </div>
+
+    <div class="card-demo">
+      <div class="card-label">ProgressStepHeader</div>
+      <div style="font-size:11px;font-weight:700;color:var(--primary);letter-spacing:1px;">STEP 1 OF 2</div>
+      <div style="background:var(--border);height:6px;border-radius:99px;margin:8px 0;overflow:hidden;">
+        <div style="background:var(--primary);width:50%;height:100%;"></div>
+      </div>
+      <div style="font-size:11px;color:var(--text-secondary);text-align:right;">50% Completed</div>
+    </div>
+
+    <div class="card-demo" style="grid-column:span 2;">
+      <div class="card-label">BottomNavBar (⚠ unify item set — see notes below)</div>
+      <div class="navbar-demo">
+        <div class="nav-item active">🏠<span>Home</span></div>
+        <div class="nav-item">📚<span>Subjects</span></div>
+        <div class="nav-item">❓<span>Requests</span></div>
+        <div class="nav-item">🔖<span>Saved</span></div>
+        <div class="nav-item">👤<span>Profile</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="margin-top:20px;padding:16px 20px;background:#FFF7ED;border:1px solid var(--accent-orange);border-radius:12px;font-size:13px;">
+    ⚠️ <strong>Inconsistency found:</strong> your screens use two different bottom-nav item sets (Home/Exam Mode/Saved/Add Document vs Home/Subjects/Requests/Saved/Profile). Pick one final 5-item set before building screens.
+  </div>
+</section>
+
+<section id="filemap">
+  <h2>File Map</h2>
+  <div class="section-sub">Where each part of this system lives in the Flutter project, so you can edit it yourself later.</div>
+  <div class="file-map">mobile/lib/core/theme/
+├── app_colors.dart        <span class="comment">// Colors section above</span>
+├── app_text_styles.dart   <span class="comment">// Typography section above</span>
+├── app_spacing.dart        <span class="comment">// Spacing scale</span>
+├── app_radius.dart          <span class="comment">// Radius scale</span>
+└── app_theme.dart           <span class="comment">// combines all into ThemeData</span>
+
+mobile/lib/core/widgets/
+├── app_button.dart          <span class="comment">// AppButton (primary/outline/small)</span>
+├── app_text_field.dart      <span class="comment">// AppTextField</span>
+├── app_card.dart              <span class="comment">// AppCard</span>
+├── status_chip.dart          <span class="comment">// StatusChip (PYQ/NOTES/Verified)</span>
+├── avatar_circle.dart        <span class="comment">// AvatarCircle</span>
+├── segmented_tabs.dart      <span class="comment">// SegmentedTabs</span>
+├── subject_tile.dart          <span class="comment">// SubjectTile</span>
+├── resource_card.dart        <span class="comment">// ResourceCard</span>
+├── bottom_nav_bar.dart      <span class="comment">// BottomNavBar</span>
+├── progress_step_header.dart <span class="comment">// ProgressStepHeader</span>
+├── search_bar.dart            <span class="comment">// SearchBar</span>
+└── section_header.dart      <span class="comment">// SectionHeader</span>
+
+docs/design-system.html   <span class="comment">// THIS file — visual reference, keep in sync</span></div>
+</section>
+
+</body>
+</html>
