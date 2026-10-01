@@ -45,15 +45,23 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: false,
         fillColor: AppColors.surface,
-        hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.textMuted),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        hintStyle: AppTextStyles.bodyMedium.copyWith(
+          color: AppColors.textMuted,
+        ),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 14,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadius.input),
           borderSide: const BorderSide(color: AppColors.border),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadius.input),
-          borderSide: BorderSide(color: const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0.5), width: 1.9),
+          borderSide: BorderSide(
+            color: const Color.fromARGB(255, 0, 0, 0).withValues(alpha: 0.5),
+            width: 1.9,
+          ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadius.input),

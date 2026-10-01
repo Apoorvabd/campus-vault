@@ -8,7 +8,6 @@ import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../Auth/presentation/registration_step1_screen.dart';
 
-
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -42,20 +41,24 @@ class _LoginScreenState extends State<LoginScreen> {
                     color: AppColors.primaryLight,
                     borderRadius: BorderRadius.circular(AppRadius.iconBox),
                   ),
-                  child: const Icon(Icons.school, color: AppColors.primary, size: 32),
+                  child: const Icon(
+                    Icons.school,
+                    color: AppColors.primary,
+                    size: 32,
+                  ),
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),
               Text(
                 'Sign in to Campus Vault',
                 textAlign: TextAlign.center,
-                style: AppTextStyles.h1.copyWith(fontSize:30),
+                style: AppTextStyles.h1.copyWith(fontSize: 25),
               ),
               const SizedBox(height: AppSpacing.xs),
               Text(
                 'Enter your  credentials to continue',
                 textAlign: TextAlign.center,
-                style: AppTextStyles.bodyMedium.copyWith(fontSize:18),
+                style: AppTextStyles.bodyMedium.copyWith(fontSize: 15),
               ),
               const SizedBox(height: AppSpacing.xl),
               // yahan aage build karenge
@@ -72,8 +75,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       label: 'Password',
                       hint: 'Enter your password',
                       obscureText: _obscurePassword,
-                      suffixIcon: _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                      onSuffixTap: () => setState(() => _obscurePassword = !_obscurePassword),
+                      suffixIcon: _obscurePassword
+                          ? Icons.visibility_off
+                          : Icons.visibility,
+                      onSuffixTap: () =>
+                          setState(() => _obscurePassword = !_obscurePassword),
                       trailingLabel: 'Forgot password?',
                       onTrailingLabelTap: () {
                         // TODO: navigate to forgot password screen
@@ -85,21 +91,27 @@ class _LoginScreenState extends State<LoginScreen> {
                         Checkbox(
                           value: _rememberDevice,
                           activeColor: AppColors.primary,
-                          onChanged: (value) => setState(() => _rememberDevice = value ?? false),
+                          onChanged: (value) =>
+                              setState(() => _rememberDevice = value ?? false),
                         ),
-                        Text('Remember this device', style: AppTextStyles.bodyMedium),
+                        Text(
+                          'Remember this device',
+                          style: AppTextStyles.bodyMedium,
+                        ),
                       ],
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     AppButton(
                       label: 'Sign In',
-                      fontSize:22,
-                      radius:8,
+                      fontSize: 16,
+                      radius: 8,
                       icon: Icons.arrow_forward,
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const SignupStep1Screen()),
+                          MaterialPageRoute(
+                            builder: (context) => const SignupStep1Screen(),
+                          ),
                         );
                       },
                     ),
@@ -112,8 +124,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: [
                   const Expanded(child: Divider(color: AppColors.border)),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
-                    child: Text('OR CONTINUE WITH', style: AppTextStyles.caption),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.sm,
+                    ),
+                    child: Text(
+                      'OR CONTINUE WITH',
+                      style: AppTextStyles.caption,
+                    ),
                   ),
                   const Expanded(child: Divider(color: AppColors.border)),
                 ],
@@ -125,19 +142,21 @@ class _LoginScreenState extends State<LoginScreen> {
                 label: 'Google Workspace SSO',
                 variant: AppButtonVariant.outline,
                 icon: Icons.g_mobiledata,
-                fontSize:20,
-                radius:8,
+                fontSize: 20,
+                radius: 8,
                 onPressed: () {
                   // TODO: Google SSO flow
                 },
               ),
-              const SizedBox(height:80),
+              const SizedBox(height: 80),
               Center(
                 child: GestureDetector(
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const SignupStep1Screen()),
+                      MaterialPageRoute(
+                        builder: (context) => const SignupStep1Screen(),
+                      ),
                     );
                   },
                   child: RichText(
@@ -148,9 +167,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
                         TextSpan(
                           text: 'Register with email. →',
-                          style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600),
+                          style: TextStyle(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-
                       ],
                     ),
                   ),
@@ -161,9 +182,16 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.lock_outline, size: 14, color: AppColors.textMuted),
+                    const Icon(
+                      Icons.lock_outline,
+                      size: 14,
+                      color: AppColors.textMuted,
+                    ),
                     const SizedBox(width: 4),
-                    Text('256-bit encrypted academic session', style: AppTextStyles.caption),
+                    Text(
+                      '256-bit encrypted academic session',
+                      style: AppTextStyles.caption,
+                    ),
                   ],
                 ),
               ),

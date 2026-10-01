@@ -21,6 +21,7 @@ class ResourceCard extends StatelessWidget {
     this.onAction,
     this.onBookmark,
     this.bookmarked = false,
+    this.verified = false,
   });
 
   final String badgeLabel;
@@ -32,6 +33,7 @@ class ResourceCard extends StatelessWidget {
   final VoidCallback? onAction;
   final VoidCallback? onBookmark;
   final bool bookmarked;
+  final bool verified;
 
   @override
   Widget build(BuildContext context) {
@@ -66,10 +68,25 @@ class ResourceCard extends StatelessWidget {
               AvatarCircle(name: uploaderName, size: 28),
               const SizedBox(width: AppSpacing.sm),
               Expanded(
-                child: Text(
-                  uploaderName,
-                  style: AppTextStyles.bodySemiBold.copyWith(fontSize: 12),
-                  overflow: TextOverflow.ellipsis,
+                child: Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        uploaderName,
+                        style: AppTextStyles.bodySemiBold.copyWith(
+                          fontSize: 12,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    if (verified) ...[
+                      const SizedBox(width: 6),
+                      const StatusChip(
+                        label: '✓',
+                        variant: StatusChipVariant.verified,
+                      ),
+                    ],
+                  ],
                 ),
               ),
               AppButton(

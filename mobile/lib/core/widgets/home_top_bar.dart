@@ -12,6 +12,11 @@ class HomeTopBar extends StatelessWidget implements PreferredSizeWidget {
     this.onSearchTap,
     this.onNotificationsTap,
     this.searchController,
+    this.readOnly = true,
+    this.autofocus = false,
+    this.onChanged,
+    this.onSubmitted,
+    this.showBackButton = false,
   });
 
   final VoidCallback? onMenuTap;
@@ -19,13 +24,25 @@ class HomeTopBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onNotificationsTap;
   final TextEditingController? searchController;
 
+  /// When true (default) the search field just opens [SearchScreen] on tap
+  /// (used on Home). Set to false to let this bar's own field be typed in
+  /// directly (used on the Search screen itself).
+  final bool readOnly;
+  final bool autofocus;
+  final ValueChanged<String>? onChanged;
+  final ValueChanged<String>? onSubmitted;
+
+  /// Shows a back arrow instead of the hamburger menu — for screens that
+  /// were pushed on top of Home (e.g. Search) rather than being a root tab.
+  final bool showBackButton;
+
   @override
   Size get preferredSize => const Size.fromHeight(72);
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      toolbarHeight: 68,
+      toolbarHeight: 58,
       leadingWidth: 60,
       elevation: 2,
       titleSpacing: 0,
@@ -37,12 +54,18 @@ class HomeTopBar extends StatelessWidget implements PreferredSizeWidget {
             borderRadius: BorderRadius.all(Radius.circular(AppRadius.input)),
           ),
           child: IconButton(
-            icon: const Icon(Icons.menu, color: AppColors.textPrimary, size: 30),
-            onPressed: onMenuTap,
+            icon: Icon(
+              showBackButton ? Icons.arrow_back : Icons.menu,
+              color: AppColors.textPrimary,
+              size: showBackButton ? 26 : 30,
+            ),
+            onPressed: showBackButton
+                ? () => Navigator.maybePop(context)
+                : onMenuTap,
           ),
         ),
       ),
-      
+
       title: Container(
         decoration: BoxDecoration(
           color: AppColors.background,
@@ -51,17 +74,30 @@ class HomeTopBar extends StatelessWidget implements PreferredSizeWidget {
         ),
         child: TextField(
           controller: searchController,
-          style: const TextStyle(fontSize: 18, color: AppColors.textPrimary),
+          readOnly: readOnly,
+          autofocus: autofocus,
+          onTap: onSearchTap,
+          onChanged: onChanged,
+          onSubmitted: onSubmitted,
+          textInputAction: TextInputAction.search,
+          style: const TextStyle(fontSize: 14, color: AppColors.textPrimary),
           decoration: InputDecoration(
             hintText: 'Search notes, PYQs...',
-            hintStyle: const TextStyle(fontSize: 16, color: AppColors.textMuted),
-            prefixIcon: const Icon(Icons.search, color: AppColors.textMuted, size: 20),
+            hintStyle: const TextStyle(
+              fontSize: 13,
+              color: AppColors.textMuted,
+            ),
+            prefixIcon: const Icon(
+              Icons.search,
+              color: AppColors.textMuted,
+              size: 20,
+            ),
             border: InputBorder.none,
             enabledBorder: InputBorder.none,
             focusedBorder: InputBorder.none,
             filled: false,
             isDense: true,
-            contentPadding: const EdgeInsets.symmetric(vertical: 12),
+            contentPadding: const EdgeInsets.symmetric(vertical: 13),
           ),
         ),
       ),
@@ -70,16 +106,22 @@ class HomeTopBar extends StatelessWidget implements PreferredSizeWidget {
         Container(
           decoration: BoxDecoration(
             color: AppColors.background,
-            
+
             borderRadius: BorderRadius.all(Radius.circular(AppRadius.pill)),
           ),
-          margin: const EdgeInsets.only(left: AppSpacing.md, right: AppSpacing.md),
+          margin: const EdgeInsets.only(
+            left: AppSpacing.md,
+            right: AppSpacing.md,
+          ),
           child: IconButton(
-            icon: const Icon(Icons.notifications, color: AppColors.textPrimary, size: 28),
+            icon: const Icon(
+              Icons.notifications,
+              color: AppColors.textPrimary,
+              size: 28,
+            ),
             onPressed: onNotificationsTap,
           ),
         ),
-       
       ],
     );
   }

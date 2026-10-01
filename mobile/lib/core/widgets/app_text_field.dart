@@ -39,7 +39,10 @@ class AppTextField extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(label, style: AppTextStyles.bodySemiBold.copyWith(fontSize: 17)),
+            Text(
+              label,
+              style: AppTextStyles.bodySemiBold.copyWith(fontSize: 15),
+            ),
             if (trailingLabel != null)
               GestureDetector(
                 onTap: onTrailingLabelTap,
@@ -48,7 +51,7 @@ class AppTextField extends StatelessWidget {
                   style: AppTextStyles.bodyMedium.copyWith(
                     color: AppColors.primary,
                     fontWeight: FontWeight.w600,
-                    fontSize: 16,
+                    fontSize: 14,
                   ),
                 ),
               ),
@@ -59,12 +62,18 @@ class AppTextField extends StatelessWidget {
           controller: controller,
           obscureText: obscureText,
           keyboardType: keyboardType,
-          style: AppTextStyles.bodySemiBold.copyWith(fontWeight: FontWeight.w400),
+          style: AppTextStyles.bodySemiBold.copyWith(
+            fontWeight: FontWeight.w400,
+          ),
           decoration: InputDecoration(
             hintText: hint,
             suffixIcon: suffixIcon != null
                 ? IconButton(
-                    icon: Icon(suffixIcon, color: AppColors.textMuted, size: 20),
+                    icon: Icon(
+                      suffixIcon,
+                      color: AppColors.textMuted,
+                      size: 20,
+                    ),
                     onPressed: onSuffixTap,
                   )
                 : null,

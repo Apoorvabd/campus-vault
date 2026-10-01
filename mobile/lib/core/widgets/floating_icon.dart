@@ -47,7 +47,11 @@ class _FloatingIconState extends State<FloatingIcon>
           color: AppColors.primaryLight,
           shape: BoxShape.circle,
         ),
-        child: Icon(widget.icon, color: AppColors.primary, size: widget.size * 0.5),
+        child: Icon(
+          widget.icon,
+          color: AppColors.primary,
+          size: widget.size * 0.5,
+        ),
       ),
     );
   }

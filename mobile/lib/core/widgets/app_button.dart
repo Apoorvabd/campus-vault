@@ -32,7 +32,7 @@ class AppButton extends StatelessWidget {
   final bool expand;
   final double? radius;
   final double? fontSize;
-  final Color? textColor;   // ← naya
+  final Color? textColor; // ← naya
   final double? verticalPadding;
 
   @override
@@ -41,61 +41,65 @@ class AppButton extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-
         Text(
           label,
           style: (fontSize != null || textColor != null)
               ? AppTextStyles.buttonText.copyWith(
-            fontSize: fontSize,
-            color: textColor ??
-                (variant == AppButtonVariant.outline
-                    ? AppColors.textPrimary
-                    : Colors.white),
-          )
+                  fontSize: fontSize,
+                  color:
+                      textColor ??
+                      (variant == AppButtonVariant.outline
+                          ? AppColors.textPrimary
+                          : Colors.white),
+                )
               : null,
         ),
-        const SizedBox(width:12),
+        const SizedBox(width: 12),
         if (icon != null) ...[
-          Icon(icon, size: variant == AppButtonVariant.small ? 16 : 26),
+          Icon(icon, size: variant == AppButtonVariant.small ? 14 : 22),
           const SizedBox(width: 8),
         ],
-
       ],
     );
 
     final Widget button = switch (variant) {
       AppButtonVariant.primary => ElevatedButton(
-    onPressed: onPressed,
-    style: (radius != null || verticalPadding != null)
-        ? ElevatedButton.styleFrom(
-            shape: radius != null
-                ? RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))
-                : null,
-            padding: verticalPadding != null
-                ? EdgeInsets.symmetric(horizontal: 20, vertical: verticalPadding!)
-                : null,
-          )
-        : null,
-    child: child,
-  ),
+        onPressed: onPressed,
+        style: (radius != null || verticalPadding != null)
+            ? ElevatedButton.styleFrom(
+                shape: radius != null
+                    ? RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      )
+                    : null,
+                padding: verticalPadding != null
+                    ? EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: verticalPadding!,
+                      )
+                    : null,
+              )
+            : null,
+        child: child,
+      ),
       AppButtonVariant.outline => OutlinedButton(
-          onPressed: onPressed,
+        onPressed: onPressed,
 
-          child: child,
-        ),
+        child: child,
+      ),
       AppButtonVariant.small => ElevatedButton(
-          onPressed: onPressed,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primary,
-            foregroundColor: Colors.white,
-            textStyle: AppTextStyles.buttonText.copyWith(fontSize: 12),
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            shape: RoundedRectangleBorder(
-              // borderRadius: BorderRadius.circular(AppRadius.pill),
-            ),
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primary,
+          foregroundColor: Colors.white,
+          textStyle: AppTextStyles.buttonText.copyWith(fontSize: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          shape: RoundedRectangleBorder(
+            // borderRadius: BorderRadius.circular(AppRadius.pill),
           ),
-          child: child,
         ),
+        child: child,
+      ),
     };
 
     if (!expand) return button;
