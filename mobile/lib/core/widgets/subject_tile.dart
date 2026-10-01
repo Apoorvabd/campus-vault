@@ -56,7 +56,11 @@ class SubjectTile extends StatelessWidget {
               color: AppColors.primaryLight,
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.arrow_forward, color: AppColors.primary, size: 16),
+            child: const Icon(
+              Icons.arrow_forward,
+              color: AppColors.primary,
+              size: 16,
+            ),
           ),
         ],
       ),

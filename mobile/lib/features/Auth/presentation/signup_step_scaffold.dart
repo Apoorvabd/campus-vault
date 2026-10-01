@@ -36,7 +36,10 @@ class SignupStepScaffold extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              ProgressStepHeader(currentStep: currentStep, totalSteps: totalSteps),
+              ProgressStepHeader(
+                currentStep: currentStep,
+                totalSteps: totalSteps,
+              ),
               const SizedBox(height: AppSpacing.lg),
               const Center(child: FloatingIcon(icon: Icons.school, size: 80)),
               const SizedBox(height: AppSpacing.lg),

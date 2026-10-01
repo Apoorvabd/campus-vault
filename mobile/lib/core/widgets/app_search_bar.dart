@@ -12,12 +12,16 @@ class AppSearchBar extends StatelessWidget {
     this.hint = 'Search notes, PYQs...',
     this.onFilterTap,
     this.activeFilterCount = 0,
+    this.onSubmitted,
+    this.autofocus = false,
   });
 
   final TextEditingController? controller;
   final String hint;
   final VoidCallback? onFilterTap;
   final int activeFilterCount;
+  final ValueChanged<String>? onSubmitted;
+  final bool autofocus;
 
   @override
   Widget build(BuildContext context) {
@@ -38,9 +42,10 @@ class AppSearchBar extends StatelessWidget {
                 Expanded(
                   child: TextField(
                     controller: controller,
-                    decoration: InputDecoration.collapsed(
-                      hintText: hint,
-                    ),
+                    autofocus: autofocus,
+                    textInputAction: TextInputAction.search,
+                    onSubmitted: onSubmitted,
+                    decoration: InputDecoration.collapsed(hintText: hint),
                   ),
                 ),
               ],
@@ -73,7 +78,10 @@ class AppSearchBar extends StatelessWidget {
                     color: AppColors.error,
                     shape: BoxShape.circle,
                   ),
-                  constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
+                  constraints: const BoxConstraints(
+                    minWidth: 18,
+                    minHeight: 18,
+                  ),
                   child: Text(
                     '$activeFilterCount',
                     textAlign: TextAlign.center,

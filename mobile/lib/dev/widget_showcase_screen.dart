@@ -50,7 +50,11 @@ class _WidgetShowcaseScreenState extends State<WidgetShowcaseScreen> {
               children: [
                 SizedBox(
                   width: double.infinity,
-                  child: AppButton(label: 'Sign In', icon: Icons.arrow_forward, onPressed: () {}),
+                  child: AppButton(
+                    label: 'Sign In',
+                    icon: Icons.arrow_forward,
+                    onPressed: () {},
+                  ),
                 ),
                 SizedBox(
                   width: double.infinity,
@@ -83,8 +87,11 @@ class _WidgetShowcaseScreenState extends State<WidgetShowcaseScreen> {
                   label: 'Password',
                   hint: 'Enter your password',
                   obscureText: _obscurePassword,
-                  suffixIcon: _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                  onSuffixTap: () => setState(() => _obscurePassword = !_obscurePassword),
+                  suffixIcon: _obscurePassword
+                      ? Icons.visibility_off
+                      : Icons.visibility,
+                  onSuffixTap: () =>
+                      setState(() => _obscurePassword = !_obscurePassword),
                   trailingLabel: 'Forgot password?',
                   onTrailingLabelTap: () {},
                 ),
@@ -98,7 +105,10 @@ class _WidgetShowcaseScreenState extends State<WidgetShowcaseScreen> {
               children: [
                 StatusChip(label: 'PYQ', variant: StatusChipVariant.pyq),
                 StatusChip(label: 'NOTES', variant: StatusChipVariant.notes),
-                StatusChip(label: '✓ Verified', variant: StatusChipVariant.verified),
+                StatusChip(
+                  label: '✓ Verified',
+                  variant: StatusChipVariant.verified,
+                ),
               ],
             ),
           ),
@@ -156,7 +166,11 @@ class _WidgetShowcaseScreenState extends State<WidgetShowcaseScreen> {
           ),
           _ShowcaseSection(
             title: 'SectionHeader',
-            child: SectionHeader(title: 'Trending in Sem 5', trailing: 'TOP RATED', onTrailingTap: () {}),
+            child: SectionHeader(
+              title: 'Trending in Sem 5',
+              trailing: 'TOP RATED',
+              onTrailingTap: () {},
+            ),
           ),
           const SizedBox(height: AppSpacing.xxl),
         ],

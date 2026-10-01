@@ -28,22 +28,40 @@ class LandingScreen extends StatelessWidget {
                         height: 36,
                         decoration: BoxDecoration(
                           color: AppColors.primaryLight,
-                          borderRadius: BorderRadius.circular(AppRadius.iconBox),
+                          borderRadius: BorderRadius.circular(
+                            AppRadius.iconBox,
+                          ),
                         ),
-                        child: const Icon(Icons.school, color: AppColors.primary, size: 28),
+                        child: const Icon(
+                          Icons.school,
+                          color: AppColors.primary,
+                          size: 28,
+                        ),
                       ),
                       const SizedBox(width: AppSpacing.sm),
-                      Text('StudyForge', style: AppTextStyles.bodySemiBold.copyWith(fontSize: 22)),
+                      Text(
+                        'StudyForge',
+                        style: AppTextStyles.bodySemiBold.copyWith(
+                          fontSize: 22,
+                        ),
+                      ),
                     ],
                   ),
                   TextButton(
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const LoginScreen()),
+                        MaterialPageRoute(
+                          builder: (context) => const LoginScreen(),
+                        ),
                       );
                     },
-                    child: Text('Sign In', style: AppTextStyles.bodySemiBold.copyWith(color: AppColors.primary)),
+                    child: Text(
+                      'Sign In',
+                      style: AppTextStyles.bodySemiBold.copyWith(
+                        color: AppColors.primary,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -57,31 +75,35 @@ class LandingScreen extends StatelessWidget {
               Spacer(flex: 2),
               RichText(
                 text: TextSpan(
-                  style: AppTextStyles.displayBold.copyWith(fontSize:50),
+                  style: AppTextStyles.displayBold.copyWith(fontSize: 40),
                   children: [
                     const TextSpan(text: 'Your campus, '),
-                    TextSpan(text: 'tailored to your semester.',
-                        style: TextStyle(color: AppColors.primary)),
+                    TextSpan(
+                      text: 'tailored to your semester.',
+                      style: TextStyle(color: AppColors.primary),
+                    ),
                   ],
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
               Text(
                 'Direct access to curated class notes, previous year questions,'
-                    ' and verified guides curated for your specific subject.',
-                style: AppTextStyles.bodyMedium.copyWith(fontSize:19),
+                ' and verified guides curated for your specific subject.',
+                style: AppTextStyles.bodyMedium.copyWith(fontSize: 16),
               ),
               Spacer(flex: 2),
               AppButton(
                 icon: Icons.arrow_forward,
                 label: 'See How It Works',
                 radius: 12,
-                fontSize: 22,
-                verticalPadding: 17,
+                fontSize: 18,
+                verticalPadding: 14,
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const LoginScreen()),
+                    MaterialPageRoute(
+                      builder: (context) => const LoginScreen(),
+                    ),
                   );
                 },
               ),

@@ -8,7 +8,6 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import './registration_step2_screen.dart';
 
-
 class SignupStep1Screen extends StatefulWidget {
   const SignupStep1Screen({super.key});
 
@@ -36,9 +35,19 @@ class _SignupStep1ScreenState extends State<SignupStep1Screen> {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Expanded(child: AppTextField(label: 'First Name', hint: 'e.g. Alex')),
+                    const Expanded(
+                      child: AppTextField(
+                        label: 'First Name',
+                        hint: 'e.g. Alex',
+                      ),
+                    ),
                     const SizedBox(width: AppSpacing.md),
-                    const Expanded(child: AppTextField(label: 'Last Name', hint: 'e.g. Sharma')),
+                    const Expanded(
+                      child: AppTextField(
+                        label: 'Last Name',
+                        hint: 'e.g. Sharma',
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: AppSpacing.md),
@@ -54,21 +63,26 @@ class _SignupStep1ScreenState extends State<SignupStep1Screen> {
                   label: 'Password',
                   hint: 'At least 8 characters',
                   obscureText: _obscurePassword,
-                  suffixIcon: _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                  onSuffixTap: () => setState(() => _obscurePassword = !_obscurePassword),
+                  suffixIcon: _obscurePassword
+                      ? Icons.visibility_off
+                      : Icons.visibility,
+                  onSuffixTap: () =>
+                      setState(() => _obscurePassword = !_obscurePassword),
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 AppButton(
                   label: 'Next Step',
                   icon: Icons.arrow_forward,
-                  fontSize:22,
-                  radius:8,
-                 onPressed: () {
-                      Navigator.push(
-                          context,
-                           MaterialPageRoute(builder: (context) => const SignupStep2Screen()),
-                      );
-},
+                  fontSize: 16,
+                  radius: 8,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SignupStep2Screen(),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
@@ -84,7 +98,10 @@ class _SignupStep1ScreenState extends State<SignupStep1Screen> {
                     const TextSpan(text: 'Already have an account? '),
                     TextSpan(
                       text: 'Sign In',
-                      style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600),
+                      style: TextStyle(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ],
                 ),

@@ -21,30 +21,49 @@ class AppBottomNavBar extends StatelessWidget {
 
   static const items = [
     BottomNavItem(icon: Icons.home_rounded, label: 'Home'),
-    BottomNavItem(icon: Icons.menu_book_rounded, label: 'Subjects'),
-    BottomNavItem(icon: Icons.help_outline_rounded, label: 'Requests'),
-    BottomNavItem(icon: Icons.bookmark_border_rounded, label: 'Saved'),
+    BottomNavItem(icon: Icons.school_outlined, label: 'Exam Mode'),
+    BottomNavItem(icon: Icons.add_circle_outline, label: 'Add'),
+    BottomNavItem(icon: Icons.bookmark_border, label: 'Saved'),
     BottomNavItem(icon: Icons.person_outline_rounded, label: 'Profile'),
   ];
 
   @override
   Widget build(BuildContext context) {
-    return BottomNavigationBar(
-      currentIndex: currentIndex,
-      onTap: onTap,
-      type: BottomNavigationBarType.fixed,
-      backgroundColor: AppColors.surface,
-      selectedItemColor: AppColors.primary,
-      unselectedItemColor: AppColors.textMuted,
-      showUnselectedLabels: true,
-      selectedLabelStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700),
-      unselectedLabelStyle: const TextStyle(fontSize: 10),
-      items: items
-          .map((item) => BottomNavigationBarItem(
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.textPrimary.withValues(alpha: 0.1),
+            blurRadius: 16,
+            offset: const Offset(0, -4),
+          ),
+        ],
+      ),
+      child: BottomNavigationBar(
+        currentIndex: currentIndex,
+        onTap: onTap,
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: AppColors.surface,
+        elevation: 8,
+        selectedItemColor: AppColors.primary,
+        unselectedItemColor: AppColors.textPrimary,
+        showUnselectedLabels: true,
+        iconSize: 24,
+        selectedLabelStyle: const TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w700,
+        ),
+        unselectedLabelStyle: const TextStyle(fontSize: 11),
+        items: items
+            .map(
+              (item) => BottomNavigationBarItem(
                 icon: Icon(item.icon),
                 label: item.label,
-              ))
-          .toList(),
+              ),
+            )
+            .toList(),
+      ),
     );
   }
 }
