@@ -6,6 +6,7 @@ import collegeRoutes from "../modules/college/college.routes";
 import courseRoutes from "../modules/course/course.routes";
 import subjectsRoutes from "../modules/subjects/subjects.routes";
 import resourceRoutes from "../modules/resourses/resourses.routes";
+import postsRoutes from "../modules/posts/posts.routes";
 import testRoutes from "../routes/test-route";
 
 const router = Router();
@@ -16,6 +17,7 @@ router.use("/colleges", collegeRoutes);
 router.use("/courses", courseRoutes);
 router.use("/subjects", subjectsRoutes);
 router.use("/resources", resourceRoutes);
+router.use("/posts", postsRoutes);
 router.use("/test", testRoutes);
 
 export default router;

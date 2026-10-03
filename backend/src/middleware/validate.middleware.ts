@@ -46,10 +46,7 @@ export const validate = (schemas: ValidateSchemas) => {
           errors.push(`${issue.path.join(".")}: ${issue.message}`);
         });
       } else {
-        // Express 5 gotcha — agar `req.query = result.data` error de
-        // ("Cannot set property query"), to iski jagah ye line use karna:
-        // (req as any).validatedQuery = result.data;
-        req.query = result.data as any;
+        req.validatedQuery = result.data;
       }
     }
 
