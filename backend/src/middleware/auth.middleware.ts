@@ -30,6 +30,7 @@ export const authenticate = async (
       email: true,
       username: true,
       role: true,
+      canPost: true,
       isActive: true,
       isVerified: true,
       universityId: true,
