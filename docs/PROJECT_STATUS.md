@@ -1,4 +1,4 @@
-# Campus Vault — Project Status
+# Semester Forge — Project Status
 
 _Last updated: 2026-09-10_
 
