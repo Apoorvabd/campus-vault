@@ -95,7 +95,7 @@ async function request(
       redirect: "manual",
       headers: {
         "User-Agent":
-          "Mozilla/5.0 (compatible; CampusVaultPyqSync/1.0; personal-use-scraper)",
+          "Mozilla/5.0 (compatible; SemesterForgePyqSync/1.0; personal-use-scraper)",
         Cookie: jar.header(),
         ...(currentInit.headers || {}),
       },

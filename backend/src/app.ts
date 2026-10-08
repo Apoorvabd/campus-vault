@@ -24,7 +24,7 @@ app.use(cookieParser());
 app.get("/", (req: Request, res: Response) => {
   res.status(200).json({
     success: true,
-    message: "Campus Vault API is running 🚀",
+    message: "Semester Forge API is running 🚀",
   });
 });
 

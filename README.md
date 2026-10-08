@@ -1,19 +1,19 @@
-# Campus Vault Backend
+# Semester Forge Backend
 
-Backend API for **Campus Vault** — a community-driven platform for university students to access and contribute Previous Year Question Papers (PYQs), Notes, Syllabus, Lab Manuals, and academic updates.
+Backend API for **Semester Forge** — a community-driven platform for university students to access and contribute Previous Year Question Papers (PYQs), Notes, Syllabus, Lab Manuals, and academic updates.
 
 ---
 
 ## 📌 What This Actually Is
 
-Campus Vault started as a simple idea — "give Delhi University students an easy place to download PYQs" — but a plain PYQ-download site is a solved problem (dupyq.online already does it, and copying it is a dead end). The idea has since grown into something narrower and harder to copy: **an exam-companion app**, not just a paper repository.
+Semester Forge started as a simple idea — "give Delhi University students an easy place to download PYQs" — but a plain PYQ-download site is a solved problem (dupyq.online already does it, and copying it is a dead end). The idea has since grown into something narrower and harder to copy: **an exam-companion app**, not just a paper repository.
 
 The real value isn't the PYQs themselves — it's that a student's *entire semester's worth of scattered material* lives against the subject it belongs to, so exam week is "open the app," not "search four Telegram groups and a Drive folder."
 
 This is built around **two pillars** that intentionally use different trust models instead of one merged system:
 
 - **The Vault** — findability, low-noise, high-trust. Official PYQs (18,000+ already seeded from the DU Question Paper Bank), notes, syllabi and lab manuals, gated by an approval workflow so junk doesn't drown out real material. A resource can live three ways:
-  - **Hosted** — uploaded to Campus Vault's own storage (Cloudinary)
+  - **Hosted** — uploaded to Semester Forge's own storage (Cloudinary)
   - **External link** — points elsewhere (Drive, another site)
   - **Reference only** — pure metadata, no file, for "I have this locally, ask me" or crowdsourcing demand before a real upload exists
 
@@ -184,4 +184,4 @@ npm run prisma:studio
 
 ## 🎯 Vision
 
-Campus Vault aims to become a centralized academic platform where students can discover, contribute, and share quality educational resources while maintaining content quality through an approval workflow and role-based moderation — built around one core moment: opening the app the week before an exam and finding an entire semester's worth of material already waiting, organized by subject, in one place.
+Semester Forge aims to become a centralized academic platform where students can discover, contribute, and share quality educational resources while maintaining content quality through an approval workflow and role-based moderation — built around one core moment: opening the app the week before an exam and finding an entire semester's worth of material already waiting, organized by subject, in one place.

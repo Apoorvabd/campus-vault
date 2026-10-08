@@ -44,7 +44,11 @@ export const findUserByUsername = async (username: string) => {
 
 
 export const createUser = async (
-  userData: Omit<RegisterInput, "password"> & { passwordHash: string }
+  userData: Omit<RegisterInput, "password" | "username"> & {
+    username: string;
+    passwordHash: string;
+    canPost: boolean;
+  }
 ) => {
   return prisma.user.create({
     data: userData,

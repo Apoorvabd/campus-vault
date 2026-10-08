@@ -16,11 +16,17 @@ import {
   updatePost,
 } from "./posts.repository";
 
-const presentPost = <T extends { likes?: { id: string }[] }>(post: T) => {
-  const { likes, ...postData } = post;
+// Turns the per-user `likes` / `bookmarks` arrays (0 or 1 rows) into booleans
+export const presentPost = <
+  T extends { likes?: { id: string }[]; bookmarks?: { id: string }[] }
+>(
+  post: T
+) => {
+  const { likes, bookmarks, ...postData } = post;
   return {
     ...postData,
     ...(likes ? { isLiked: likes.length > 0 } : {}),
+    ...(bookmarks ? { isBookmarked: bookmarks.length > 0 } : {}),
   };
 };
 

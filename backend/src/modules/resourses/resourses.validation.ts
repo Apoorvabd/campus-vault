@@ -10,6 +10,8 @@ const resourceTypeEnum = z.enum([
   "OTHER",
 ]);
 
+const statusEnum = z.enum(["PENDING", "APPROVED", "REJECTED"]);
+
 const sourceTypeEnum = z.enum(["HOSTED", "EXTERNAL_LINK", "REFERENCE_ONLY"]);
 
 export const createResourceSchema = z
@@ -43,3 +45,26 @@ export const createResourceSchema = z
 export const rejectResourceSchema = z.object({
   rejectionReason: z.string().min(1, "Rejection reason is required"),
 });
+
+export const listResourcesQuerySchema = z.object({
+  subjectId: z.string().min(1).optional(),
+  courseId: z.string().min(1).optional(),
+  semester: z.coerce.number().int().min(1).max(12).optional(),
+  resourceType: resourceTypeEnum.optional(),
+  status: statusEnum.optional(),
+  search: z.string().trim().max(100).optional(),
+  sort: z.enum(["recent", "downloads"]).default("recent"),
+  // "true" = only my own uploads (any status). z.coerce.boolean() would treat "false" as true.
+  mine: z
+    .enum(["true", "false"])
+    .transform((value) => value === "true")
+    .optional(),
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(50).default(20),
+});
+
+export const resourceIdParamsSchema = z.object({
+  id: z.string().min(1, "Resource ID is required"),
+});
+
+export type ListResourcesQuery = z.infer<typeof listResourcesQuerySchema>;

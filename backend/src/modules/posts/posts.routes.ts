@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { authenticate, validate } from "../../middleware";
+import { authenticate, optionalAuthenticate, validate } from "../../middleware";
 import { upload } from "../../middleware/upload.middleware";
 import {
   commentParamsSchema,
@@ -27,7 +27,12 @@ import {
 
 const router = Router();
 
-router.get("/", validate({ query: listPostsQuerySchema }), listPosts);
+router.get(
+  "/",
+  optionalAuthenticate,
+  validate({ query: listPostsQuerySchema }),
+  listPosts
+);
 router.get(
   "/:id",
   authenticate,
@@ -60,6 +65,7 @@ router.delete(
 
 router.get(
   "/:id/comments",
+  optionalAuthenticate,
   validate({ params: postIdParamsSchema, query: listCommentsQuerySchema }),
   listComments
 );

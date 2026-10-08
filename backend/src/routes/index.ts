@@ -7,6 +7,8 @@ import courseRoutes from "../modules/course/course.routes";
 import subjectsRoutes from "../modules/subjects/subjects.routes";
 import resourceRoutes from "../modules/resourses/resourses.routes";
 import postsRoutes from "../modules/posts/posts.routes";
+import profileRoutes from "../modules/profile/profile.routes";
+import bookmarksRoutes from "../modules/bookmarks/bookmarks.routes";
 import testRoutes from "../routes/test-route";
 
 const router = Router();
@@ -18,6 +20,8 @@ router.use("/courses", courseRoutes);
 router.use("/subjects", subjectsRoutes);
 router.use("/resources", resourceRoutes);
 router.use("/posts", postsRoutes);
+router.use("/profile", profileRoutes);
+router.use("/bookmarks", bookmarksRoutes);
 router.use("/test", testRoutes);
 
 export default router;

@@ -1,5 +1,7 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  // One SQL query with JOINs instead of one query per relation (fewer round trips)
+  previewFeatures = ["relationJoins"]
 }
 
 datasource db {
@@ -52,7 +54,7 @@ enum Visibility {
 }
 
 enum ResourceSourceType {
-  HOSTED // File uploaded to Campus Vault (Cloudinary) — needs `upload`
+  HOSTED // File uploaded to Semester Forge (Cloudinary) — needs `upload`
   EXTERNAL_LINK // File lives elsewhere (Drive, another site) — needs `externalUrl`
   REFERENCE_ONLY // No file at all, only metadata (e.g. "I have this locally, ask me")
 }
@@ -212,6 +214,12 @@ model User {
 
   currentSemester Int
 
+  // The user's own subject picks for `subjectsSemester`: DSC + GE + DSE + SEC + VAC + AEC.
+  // Empty / unconfirmed = fall back to the course's DSC subjects for currentSemester.
+  selectedSubjectIds  String[]  @default([])
+  subjectsSemester    Int?
+  subjectsConfirmedAt DateTime?
+
   isVerified Boolean @default(false)
   isActive   Boolean @default(true)
 
@@ -367,7 +375,7 @@ model UserFile {
 
   // Optional uploaded copy.
   //
-  // If the user uploads the file to Campus Vault,
+  // If the user uploads the file to Semester Forge,
   // this points to the Upload record which contains
   // the Cloudinary/CDN URL.
 
