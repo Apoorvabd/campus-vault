@@ -13,6 +13,13 @@ import testRoutes from "../routes/test-route";
 
 const router = Router();
 
+// Cheap "are you awake?" check: no auth, no database. The mobile app calls it
+// as soon as the welcome screen shows, so a sleeping host (Render free tier)
+// is already starting up by the time the user logs in or registers.
+router.get("/health", (_req, res) => {
+  res.status(200).json({ success: true, status: "ok" });
+});
+
 router.use("/auth", authRoutes);
 router.use("/universities", universityRoutes);
 router.use("/colleges", collegeRoutes);
