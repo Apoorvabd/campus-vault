@@ -67,7 +67,7 @@ export const createResourceService = async (
     externalUrl: input.sourceType === "EXTERNAL_LINK" ? input.externalUrl : null,
     uploadId,
     uploadedById,
-    status: "PENDING",
+    status: "APPROVED", // TODO: change to PENDING once we have an approval workflow
   });
 
   // Re-read with upload / subject / uploader so the client gets a complete card
