@@ -1,6 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
-        android:label="mobile"
+        android:label="Semester Forge"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
@@ -40,6 +41,15 @@
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
+        </intent>
+        <!-- url_launcher: open https links / PDFs in a browser or viewer -->
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <data android:scheme="https"/>
+        </intent>
+        <!-- url_launcher: lets the app check for an in-app browser (Custom Tabs) -->
+        <intent>
+            <action android:name="android.support.customtabs.action.CustomTabsService"/>
         </intent>
     </queries>
 </manifest>
