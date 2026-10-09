@@ -8,6 +8,9 @@ class AppColors {
   static const Color primary = Color(0xFF2F6FED);
   static const Color primaryLight = Color(0xFFE8F0FE);
 
+  /// Dark slate-blue hero card (profile card on Home).
+  static const Color profileCard = Color(0xFF44527F);
+
   static const Color textPrimary = Color(0xFF0F172A);
   static const Color textSecondary = Color(0xFF64748B);
   static const Color textMuted = Color(0xFF94A3B8);

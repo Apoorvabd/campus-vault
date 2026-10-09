@@ -4,9 +4,11 @@ import {
   createResourceService,
   listResourcesService,
   getResourceByIdService,
+  recordDownloadService,
   approveResourceService,
   rejectResourceService,
 } from "./resourses.service";
+import type { ListResourcesQuery } from "./resourses.validation";
 
 export const createResource = asyncHandler(async (req: Request, res: Response) => {
   const resource = await createResourceService(req.body, req.file, req.user!.id);
@@ -20,17 +22,13 @@ export const createResource = asyncHandler(async (req: Request, res: Response) =
   );
 });
 
-export const listResources = asyncHandler(async (req: Request, res: Response) => {
-  const { subjectId, resourceType, status, search, page, limit } = req.query;
+const viewerOf = (req: Request) =>
+  req.user ? { id: req.user.id, role: req.user.role } : undefined;
 
-  const result = await listResourcesService({
-    subjectId: subjectId as string | undefined,
-    resourceType: resourceType as any,
-    status: status as any,
-    search: search as string | undefined,
-    page: page ? Number(page) : undefined,
-    limit: limit ? Number(limit) : undefined,
-  });
+export const listResources = asyncHandler(async (req: Request, res: Response) => {
+  const query = req.validatedQuery as ListResourcesQuery;
+
+  const result = await listResourcesService(query, viewerOf(req));
 
   res.status(200).json(
     sendResponse(res, {
@@ -43,13 +41,31 @@ export const listResources = asyncHandler(async (req: Request, res: Response) =>
 });
 
 export const getResource = asyncHandler(async (req: Request, res: Response) => {
-  const resource = await getResourceByIdService(req.params.id as string);
+  const resource = await getResourceByIdService(
+    req.params.id as string,
+    viewerOf(req)
+  );
 
   res.status(200).json(
     sendResponse(res, {
       statusCode: 200,
       message: "Resource fetched successfully.",
       data: { resource },
+    })
+  );
+});
+
+export const recordDownload = asyncHandler(async (req: Request, res: Response) => {
+  const result = await recordDownloadService(
+    req.params.id as string,
+    viewerOf(req)!
+  );
+
+  res.status(200).json(
+    sendResponse(res, {
+      statusCode: 200,
+      message: "Download recorded.",
+      data: result,
     })
   );
 });

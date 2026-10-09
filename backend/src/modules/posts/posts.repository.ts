@@ -1,7 +1,7 @@
 import { Prisma } from "@prisma/client";
 import prisma from "../../config/prisma";
 
-const postInclude = (userId?: string) => ({
+export const postInclude = (userId?: string) => ({
   author: {
     select: {
       id: true,
@@ -12,14 +12,18 @@ const postInclude = (userId?: string) => ({
     },
   },
   coverImage: true,
-  _count: { select: { comments: true, likes: true } },
+  _count: { select: { comments: true, likes: true, bookmarks: true } },
   ...(userId
-    ? { likes: { where: { userId }, select: { id: true } } }
+    ? {
+        likes: { where: { userId }, select: { id: true } },
+        bookmarks: { where: { userId }, select: { id: true } },
+      }
     : {}),
 });
 
 export const createPost = async (data: Prisma.PostUncheckedCreateInput) => {
   return prisma.post.create({
+    relationLoadStrategy: "join",
     data,
     include: postInclude(data.authorId),
   });
@@ -27,6 +31,7 @@ export const createPost = async (data: Prisma.PostUncheckedCreateInput) => {
 
 export const findPostById = async (postId: string, userId?: string) => {
   return prisma.post.findUnique({
+    relationLoadStrategy: "join",
     where: { id: postId },
     include: postInclude(userId),
   });
@@ -56,6 +61,7 @@ export const findPosts = async (filters: {
   };
 
   const posts = await prisma.post.findMany({
+    relationLoadStrategy: "join",
     where,
     ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
     take: limit + 1,
@@ -112,6 +118,7 @@ export const findCommentsByPostId = async (
 ) => {
   const where = { postId };
   const comments = await prisma.comment.findMany({
+    relationLoadStrategy: "join",
     where,
     ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
     take: limit + 1,

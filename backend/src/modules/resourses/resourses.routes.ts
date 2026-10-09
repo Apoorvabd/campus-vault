@@ -1,11 +1,21 @@
 import { Router } from "express";
-import { authenticate, authorize, validate } from "../../middleware";
+import {
+  authenticate,
+  authorize,
+  optionalAuthenticate,
+  validate,
+} from "../../middleware";
 import { upload } from "../../middleware/upload.middleware";
-import { createResourceSchema, rejectResourceSchema } from "./resourses.validation";
+import {
+  createResourceSchema,
+  listResourcesQuerySchema,
+  rejectResourceSchema,
+} from "./resourses.validation";
 import {
   createResource,
   listResources,
   getResource,
+  recordDownload,
   approveResource,
   rejectResource,
 } from "./resourses.controller";
@@ -22,8 +32,14 @@ router.post(
   createResource
 );
 
-router.get("/", listResources);
-router.get("/:id", getResource);
+router.get(
+  "/",
+  optionalAuthenticate,
+  validate({ query: listResourcesQuerySchema }),
+  listResources
+);
+router.get("/:id", optionalAuthenticate, getResource);
+router.post("/:id/download", authenticate, recordDownload);
 
 router.patch(
   "/:id/approve",

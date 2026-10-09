@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/progress_step_header.dart';
-import '../../../core/widgets/floating_icon.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 /// Shared shell for the signup flow — AppBar, back button, progress
 /// header and heading are identical across Step 1 and Step 2; only the
@@ -28,7 +28,7 @@ class SignupStepScaffold extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         leading: const BackButton(),
-        title: const Text('Campus Vault'),
+        title: const Text('Create Your Account'),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -36,17 +36,22 @@ class SignupStepScaffold extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              const SizedBox(height: AppSpacing.sm),
+              Center(
+                child: SvgPicture.asset(
+                  'assets/images/semesterforge_logo_full.svg',
+                  height: 130,
+                ),
+              ),
               ProgressStepHeader(
                 currentStep: currentStep,
                 totalSteps: totalSteps,
               ),
-              const SizedBox(height: AppSpacing.lg),
-              const Center(child: FloatingIcon(icon: Icons.school, size: 80)),
-              const SizedBox(height: AppSpacing.lg),
-              Text(title, style: AppTextStyles.h1),
-              const SizedBox(height: AppSpacing.xs),
-              Text(subtitle, style: AppTextStyles.bodyMedium),
-              const SizedBox(height: AppSpacing.xl),
+              const SizedBox(height: AppSpacing.sm),
+              // Text(title, style: AppTextStyles.h1),
+              // const SizedBox(height: AppSpacing.xs),
+              // Text(subtitle, style: AppTextStyles.bodyMedium),
+              // const SizedBox(height: AppSpacing.xl),
               child,
             ],
           ),

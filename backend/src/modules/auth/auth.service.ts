@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import { Prisma } from '@prisma/client';
+import { randomInt } from 'node:crypto';
 import { generateRefreshToken, generateAccessToken ,verifyRefreshToken} from './../../config/jwt';
 import { findUserByEmail, createUser, findUserByUsername, findUserById } from './auth.repository';
 import { RegisterInput, AuthTokens } from './auth.types';
@@ -13,14 +14,49 @@ export const registerUser = async (
     throw new AppError('User with this email already exists', 409);
   }
 
-  const existingUsername = await findUserByUsername(input.username);
-  if (existingUsername) {
+  const requestedUsername = input.username?.trim().toLowerCase();
+  if (requestedUsername && await findUserByUsername(requestedUsername)) {
     throw new AppError('User with this username already exists', 409);
   }
 
   const hashedPassword = await bcrypt.hash(input.password, 10);
-  const { password: _password, ...userInput } = input;
-  const user = await createUser({ ...userInput, passwordHash: hashedPassword });
+  const { password: _password, username: _username, ...userInput } = input;
+  const usernamePrefix = input.firstName
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z]/g, '')
+    .slice(0, 3)
+    .toLowerCase()
+    .padEnd(3, 'x');
+
+  let user;
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    const username =
+      requestedUsername ?? `${usernamePrefix}${randomInt(1000, 10000)}`;
+    try {
+      user = await createUser({
+        ...userInput,
+        username,
+        passwordHash: hashedPassword,
+        canPost: true,
+      });
+      break;
+    } catch (error) {
+      const isUsernameCollision =
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2002' &&
+        String(error.meta?.target).toLowerCase().includes('username');
+      if (requestedUsername || !isUsernameCollision || attempt === 19) {
+        if (isUsernameCollision) {
+          throw new AppError('User with this username already exists', 409);
+        }
+        throw error;
+      }
+    }
+  }
+  if (!user) {
+    throw new AppError('Could not generate a unique username. Please try again.', 503);
+  }
   
   const tokens: AuthTokens = { 
     accessToken: generateAccessToken(
@@ -59,8 +95,11 @@ export const loginUser= async (email:string , password:string): Promise<{user:an
         )
       };
 
+    // passwordHash must never leave the server
+    const { passwordHash: _passwordHash, ...safeUser } = user;
+
     return {
-        user,
+        user: safeUser,
         tokens,
     };
 }

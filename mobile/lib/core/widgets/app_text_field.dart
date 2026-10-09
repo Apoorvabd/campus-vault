@@ -19,6 +19,7 @@ class AppTextField extends StatelessWidget {
     this.trailingLabel,
     this.onTrailingLabelTap,
     this.keyboardType,
+    this.compact = true,
   });
 
   final String label;
@@ -31,6 +32,9 @@ class AppTextField extends StatelessWidget {
   final VoidCallback? onTrailingLabelTap;
   final TextInputType? keyboardType;
 
+  /// Shorter field with tighter padding (used on the Sign In card).
+  final bool compact;
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -41,7 +45,7 @@ class AppTextField extends StatelessWidget {
           children: [
             Text(
               label,
-              style: AppTextStyles.bodySemiBold.copyWith(fontSize: 15),
+              style: AppTextStyles.bodySemiBold.copyWith(fontSize: 14),
             ),
             if (trailingLabel != null)
               GestureDetector(
@@ -57,7 +61,7 @@ class AppTextField extends StatelessWidget {
               ),
           ],
         ),
-        const SizedBox(height: AppSpacing.sm),
+        SizedBox(height: compact ? AppSpacing.xs : AppSpacing.sm),
         TextField(
           controller: controller,
           obscureText: obscureText,
@@ -66,6 +70,10 @@ class AppTextField extends StatelessWidget {
             fontWeight: FontWeight.w400,
           ),
           decoration: InputDecoration(
+            isDense: compact,
+            contentPadding: compact
+                ? const EdgeInsets.symmetric(horizontal: 14, vertical: 10)
+                : null,
             hintText: hint,
             suffixIcon: suffixIcon != null
                 ? IconButton(
@@ -74,6 +82,7 @@ class AppTextField extends StatelessWidget {
                       color: AppColors.textMuted,
                       size: 20,
                     ),
+                    visualDensity: compact ? VisualDensity.compact : null,
                     onPressed: onSuffixTap,
                   )
                 : null,

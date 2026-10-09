@@ -45,12 +45,17 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: false,
         fillColor: AppColors.surface,
+        isDense: true,
+        suffixIconConstraints: const BoxConstraints(
+          minHeight: 36,
+          minWidth: 40,
+        ),
         hintStyle: AppTextStyles.bodyMedium.copyWith(
           color: AppColors.textMuted,
         ),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 14,
-          vertical: 14,
+          vertical: 10,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadius.input),

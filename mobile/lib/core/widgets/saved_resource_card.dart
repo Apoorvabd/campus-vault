@@ -43,6 +43,8 @@ class SavedResourceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppCard(
+      // Compact padding: the default 16 on every side made these cards tall
+      padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -69,9 +71,9 @@ class SavedResourceCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.sm),
+          const SizedBox(height: 6),
           Text(title, style: AppTextStyles.h2.copyWith(fontSize: 16)),
-          const SizedBox(height: 4),
+          const SizedBox(height: 2),
           Text(
             subject,
             style: AppTextStyles.bodySemiBold.copyWith(
@@ -79,9 +81,11 @@ class SavedResourceCard extends StatelessWidget {
               fontSize: 13,
             ),
           ),
-          const SizedBox(height: 2),
-          Text('• $meta', style: AppTextStyles.caption),
-          const SizedBox(height: AppSpacing.md),
+          if (meta.isNotEmpty) ...[
+            const SizedBox(height: 1),
+            Text('• $meta', style: AppTextStyles.caption),
+          ],
+          const SizedBox(height: 6),
           Row(
             children: [
               const Icon(
@@ -96,14 +100,18 @@ class SavedResourceCard extends StatelessWidget {
                 icon: Icon(actionIcon, size: 16, color: Colors.white),
                 label: Text(
                   actionLabel,
-                  style: AppTextStyles.buttonText.copyWith(fontSize: 13),
+                  style: AppTextStyles.buttonText.copyWith(fontSize: 14),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   elevation: 0,
+                  // Material pads buttons to a 48 px touch target, which made
+                  // the bottom row of the card tall; shrink it to the content.
+                  minimumSize: const Size(0, 36),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.md,
-                    vertical: AppSpacing.sm,
+                    horizontal: AppSpacing.lg,
+                    vertical: 8,
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(999),

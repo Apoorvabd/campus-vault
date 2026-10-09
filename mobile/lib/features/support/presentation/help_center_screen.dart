@@ -18,7 +18,7 @@ class HelpCenterScreen extends StatelessWidget {
   static const _faqs = [
     _Faq(
       'How do I upload a resource?',
-      'Tap the Add tab on the bottom nav, fill in the course, semester and subject, attach your file and choose whether to save it to Campus Vault or keep it locally.',
+      'Tap the Add tab on the bottom nav, fill in the course, semester and subject, attach your file and choose whether to save it to Semester Forge or keep it locally.',
     ),
     _Faq(
       'Why was my document rejected?',
@@ -26,11 +26,11 @@ class HelpCenterScreen extends StatelessWidget {
     ),
     _Faq(
       'How does offline storage work?',
-      'When you save a document with an offline copy, Campus Vault keeps a private copy on your device so you can open it without internet — it never leaves your phone unless you also share it to the Vault.',
+      'When you save a document with an offline copy, Semester Forge keeps a private copy on your device so you can open it without internet — it never leaves your phone unless you also share it to the Vault.',
     ),
     _Faq(
       'How do I earn XP?',
-      'You earn XP by uploading resources to Campus Vault, getting upvotes from batchmates, and maintaining a good contributor rating.',
+      'You earn XP by uploading resources to Semester Forge, getting upvotes from batchmates, and maintaining a good contributor rating.',
     ),
     _Faq(
       'How do I report inappropriate content?',
@@ -81,7 +81,7 @@ class HelpCenterScreen extends StatelessWidget {
                 Text('Still need help?', style: AppTextStyles.bodySemiBold),
                 const SizedBox(height: 4),
                 Text(
-                  'Email us at support@campusvault.app',
+                  'Email us at support@semesterforge.app',
                   style: AppTextStyles.caption,
                 ),
               ],

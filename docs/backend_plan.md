@@ -1,4 +1,4 @@
-# Campus Vault — Backend Execution Plan (Day-wise)
+# Semester Forge — Backend Execution Plan (Day-wise)
 
 > Ye file **sirf tumhare liye day-wise TODO** hai — har din khol lo, jo likha hai wahi likho, agle din agla item. Jo ho chuka hai wo neeche sirf **✅ list** me hai (bina explanation ke), poori detailing sirf **abhi jo karna hai** uski hai.
 >
@@ -81,7 +81,7 @@ Postman se teeno `sourceType` test karo. Phir ek chhota "Browse PYQs" list scree
 
 ## 4. WEEK 4 — UserFile module (core feature — local binding)
 
-Ye woh feature hai jo Campus Vault ko "sirf ek aur PYQ site" hone se bachata hai.
+Ye woh feature hai jo Semester Forge ko "sirf ek aur PYQ site" hone se bachata hai.
 
 ### UserFile: types + validation (~2 hrs)
 Fields: `name` (required), `subjectId` (required), `localUri?` (device path/content-uri — file nahi, sirf reference), `mimeType?`, `extension?`, `size?`. Upload optional hai — student pehle sirf "mere paas hai" bind kare, baad me chahe to real copy upload kare (`uploadId` tab fill hoga).

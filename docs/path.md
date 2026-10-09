@@ -1,6 +1,6 @@
-# Campus Vault Backend — Complete Project Roadmap
+# Semester Forge Backend — Complete Project Roadmap
 
-> **Project:** Campus Vault
+> **Project:** Semester Forge
 > **Backend:** Node.js + Express + TypeScript
 > **Database:** PostgreSQL
 > **ORM:** Prisma
@@ -13,7 +13,7 @@
 
 # 1. Project Goal
 
-Campus Vault is a university-focused platform where students can:
+Semester Forge is a university-focused platform where students can:
 
 * Find colleges, courses and subjects
 * Upload academic resources
@@ -162,7 +162,7 @@ Prisma CLI 6.19.3
 
 # 6. Database Schema — COMPLETED
 
-The database schema has been designed around the Campus Vault requirements.
+The database schema has been designed around the Semester Forge requirements.
 
 Important entities include:
 
@@ -918,7 +918,7 @@ AEC
 
 # 28. Resource Module — CORE FEATURE
 
-This is the heart of Campus Vault.
+This is the heart of Semester Forge.
 
 Resource types:
 

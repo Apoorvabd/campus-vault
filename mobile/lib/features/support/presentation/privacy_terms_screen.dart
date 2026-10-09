@@ -22,17 +22,17 @@ class PrivacyTermsScreen extends StatelessWidget {
           const _Section(
             title: 'What we collect',
             body:
-                'Your name, college email, course, semester and college are used to personalize your feed and verify your academic standing. Documents you upload are stored either privately on your device (Save Locally) or shared to Campus Vault, depending on the option you choose at upload time.',
+                'Your name, college email, course, semester and college are used to personalize your feed and verify your academic standing. Documents you upload are stored either privately on your device (Save Locally) or shared to Semester Forge, depending on the option you choose at upload time.',
           ),
           const _Section(
             title: 'How we use it',
             body:
-                'Academic details help match you with the right subjects and batchmates. Uploaded resources shared to Campus Vault are shown to other verified students from your course and semester.',
+                'Academic details help match you with the right subjects and batchmates. Uploaded resources shared to Semester Forge are shown to other verified students from your course and semester.',
           ),
           const _Section(
             title: 'Sharing',
             body:
-                'We never sell your personal data. Resources you save locally never leave your device unless you explicitly choose to share them to Campus Vault.',
+                'We never sell your personal data. Resources you save locally never leave your device unless you explicitly choose to share them to Semester Forge.',
           ),
           const _Section(
             title: 'Your controls',
@@ -45,12 +45,12 @@ class PrivacyTermsScreen extends StatelessWidget {
           const _Section(
             title: 'Academic Integrity',
             body:
-                'Campus Vault is built for genuine peer-to-peer academic resource sharing. Uploading plagiarized, copyrighted, or exam-leaked material is strictly prohibited and may result in account suspension.',
+                'Semester Forge is built for genuine peer-to-peer academic resource sharing. Uploading plagiarized, copyrighted, or exam-leaked material is strictly prohibited and may result in account suspension.',
           ),
           const _Section(
             title: 'Content ownership',
             body:
-                'You retain ownership of resources you upload. By sharing to Campus Vault, you grant other verified students in your course a license to view and download it for personal academic use.',
+                'You retain ownership of resources you upload. By sharing to Semester Forge, you grant other verified students in your course a license to view and download it for personal academic use.',
           ),
           const _Section(
             title: 'Community conduct',
