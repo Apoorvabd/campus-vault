@@ -1,4 +1,4 @@
-# Campus Vault — Vault + Social Feed: How They Fit in One App
+# Semester Forge — Vault + Social Feed: How They Fit in One App
 
 > **Purpose of this doc:** you already have a full backend roadmap in [`path.md`](./path.md).
 > That doc tells you *the order to build things in*. This doc answers a narrower question you
@@ -15,8 +15,8 @@
 
 **Pillar A — The Vault (utility, low-noise, high-trust)**
 Students store and retrieve PYQs, notes, syllabi, lab manuals. A document either:
-- lives on Campus Vault's own storage (Cloudinary), or
-- lives elsewhere on the internet (Drive link, another site) and Campus Vault just indexes/points to it, or
+- lives on Semester Forge's own storage (Cloudinary), or
+- lives elsewhere on the internet (Drive link, another site) and Semester Forge just indexes/points to it, or
 - lives only on the student's device and they simply want it *discoverable* (metadata entry, no file at all — "ping me if you have this").
 
 This pillar's job is **findability and trust**: search, filter by course/subject/semester, and an
@@ -73,7 +73,7 @@ a "metadata-only, lives on the student's machine" entry.
 
 ```prisma
 enum ResourceSourceType {
-  HOSTED         // File uploaded to Campus Vault (Cloudinary) — needs `upload`
+  HOSTED         // File uploaded to Semester Forge (Cloudinary) — needs `upload`
   EXTERNAL_LINK  // File lives elsewhere (Drive, another site) — needs `externalUrl`
   REFERENCE_ONLY // No file at all, only metadata (e.g. "I have this locally, ask me")
 }
