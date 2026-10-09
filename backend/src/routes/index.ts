@@ -29,6 +29,6 @@ router.use("/resources", resourceRoutes);
 router.use("/posts", postsRoutes);
 router.use("/profile", profileRoutes);
 router.use("/bookmarks", bookmarksRoutes);
-router.use("/test", testRoutes);
+// router.use("/test", testRoutes);
 
 export default router;
