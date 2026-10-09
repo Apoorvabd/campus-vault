@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_spacing.dart';
+import 'app_logo.dart';
 
 /// Top bar used on Home/Resources-style screens: hamburger menu,
 /// a wide inline search field, and a notification bell.
@@ -37,17 +38,21 @@ class HomeTopBar extends StatelessWidget implements PreferredSizeWidget {
   final bool showBackButton;
 
   @override
-  Size get preferredSize => const Size.fromHeight(72);
+  Size get preferredSize => const Size.fromHeight(62);
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      toolbarHeight: 58,
-      leadingWidth: 60,
+      toolbarHeight: 50,
+      leadingWidth: 64,
       elevation: 2,
       titleSpacing: 0,
       shadowColor: AppColors.textPrimary.withValues(alpha: 0),
-      leading: Center(
+      // Root tabs show the brand mark (the old hamburger had no menu behind
+      // it); pushed screens such as Search keep the back arrow.
+      leading: !showBackButton && onMenuTap == null
+          ? const Center(child: AppLogo.mark(height: 38))
+          : Center(
         child: Container(
           decoration: BoxDecoration(
             color: AppColors.background,
@@ -80,24 +85,28 @@ class HomeTopBar extends StatelessWidget implements PreferredSizeWidget {
           onChanged: onChanged,
           onSubmitted: onSubmitted,
           textInputAction: TextInputAction.search,
-          style: const TextStyle(fontSize: 14, color: AppColors.textPrimary),
+          style: const TextStyle(fontSize: 15, color: AppColors.textPrimary),
           decoration: InputDecoration(
             hintText: 'Search notes, PYQs...',
             hintStyle: const TextStyle(
-              fontSize: 13,
+              fontSize: 14,
               color: AppColors.textMuted,
             ),
             prefixIcon: const Icon(
               Icons.search,
               color: AppColors.textMuted,
-              size: 20,
+              size: 22,
             ),
             border: InputBorder.none,
             enabledBorder: InputBorder.none,
             focusedBorder: InputBorder.none,
             filled: false,
             isDense: true,
-            contentPadding: const EdgeInsets.symmetric(vertical: 13),
+            contentPadding: const EdgeInsets.symmetric(vertical: 10),
+            prefixIconConstraints: const BoxConstraints(
+              minWidth: 42,
+              minHeight: 38,
+            ),
           ),
         ),
       ),
@@ -114,10 +123,13 @@ class HomeTopBar extends StatelessWidget implements PreferredSizeWidget {
             right: AppSpacing.md,
           ),
           child: IconButton(
+            // Smaller bell and tap area, so the logo and search get the room
+            iconSize: 22,
+            padding: const EdgeInsets.all(8),
+            constraints: const BoxConstraints(minWidth: 38, minHeight: 38),
             icon: const Icon(
               Icons.notifications,
               color: AppColors.textPrimary,
-              size: 28,
             ),
             onPressed: onNotificationsTap,
           ),

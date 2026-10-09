@@ -32,17 +32,17 @@ class ProgressStepHeader extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppRadius.pill),
           child: LinearProgressIndicator(
             value: _progress,
-            minHeight: 6,
+            minHeight: 5,
             backgroundColor: AppColors.border,
             valueColor: const AlwaysStoppedAnimation(AppColors.primary),
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 3),
         Align(
           alignment: Alignment.centerRight,
           child: Text(
             '${(_progress * 100).round()}% Completed',
-            style: AppTextStyles.caption,
+            style: AppTextStyles.caption.copyWith(fontSize: 12, color: AppColors.textSecondary),
           ),
         ),
       ],

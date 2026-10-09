@@ -1,20 +1,42 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
+import '../../../core/data/posts_repository.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_radius.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/avatar_circle.dart';
+import '../../community/bloc/create_post_cubit.dart';
+import '../../profile/bloc/profile_cubit.dart';
 
-/// "Share Post" composer — close/title/Post action bar, audience + course
-/// pills, a growing text area, and an attached-document preview.
-class CreatePostScreen extends StatefulWidget {
-  const CreatePostScreen({super.key});
+/// The "Create Post" tab: author header, title + content fields and an
+/// optional cover image. Calls [onPosted] once the post is created.
+class PostComposerPage extends StatelessWidget {
+  const PostComposerPage({super.key, this.onPosted});
+
+  final VoidCallback? onPosted;
 
   @override
-  State<CreatePostScreen> createState() => _CreatePostScreenState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => CreatePostCubit(context.read<PostsRepository>()),
+      child: _PostComposerView(onPosted: onPosted),
+    );
+  }
 }
 
-class _CreatePostScreenState extends State<CreatePostScreen> {
+class _PostComposerView extends StatefulWidget {
+  const _PostComposerView({this.onPosted});
+
+  final VoidCallback? onPosted;
+
+  @override
+  State<_PostComposerView> createState() => _PostComposerViewState();
+}
+
+class _PostComposerViewState extends State<_PostComposerView> {
   final _titleController = TextEditingController();
   final _bodyController = TextEditingController();
 
@@ -31,314 +53,237 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     super.dispose();
   }
 
+  Future<void> _pickCover() async {
+    final picked = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 1600,
+      imageQuality: 85,
+    );
+    if (picked != null && mounted) {
+      context.read<CreatePostCubit>().setCover(picked.path);
+    }
+  }
+
+  void _submit() => context.read<CreatePostCubit>().submit(
+    title: _titleController.text,
+    content: _bodyController.text,
+  );
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.close, color: AppColors.textPrimary),
-          onPressed: () => Navigator.maybePop(context),
-        ),
-        title: const Text('Share Post'),
-        centerTitle: true,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: AppSpacing.md),
-            child: ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.lg,
-                  vertical: AppSpacing.xs,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppRadius.pill),
-                ),
-                elevation: 0,
-              ),
-              child: const Text('Post'),
+    final profile = context.watch<ProfileCubit>().state.profile;
+    final name = profile?.fullName ?? '';
+    final subtitle = profile == null
+        ? ''
+        : '${profile.courseName} · ${profile.collegeLabel}';
+
+    return BlocConsumer<CreatePostCubit, CreatePostState>(
+      listener: (context, state) {
+        if (state.created) {
+          _titleController.clear();
+          _bodyController.clear();
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(const SnackBar(content: Text('Posted')));
+          widget.onPosted?.call();
+        }
+        if (state.error != null) {
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(SnackBar(content: Text(state.error!)));
+        }
+      },
+      builder: (context, state) =>
+          _buildBody(context, state, name, subtitle, profile?.avatarUrl),
+    );
+  }
+
+  Widget _buildBody(
+    BuildContext context,
+    CreatePostState state,
+    String name,
+    String subtitle,
+    String? avatarUrl,
+  ) {
+    return Column(
+      children: [
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              AppSpacing.lg,
+              AppSpacing.lg,
+              0,
             ),
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.lg,
-                AppSpacing.lg,
-                AppSpacing.lg,
-                0,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const AvatarCircle(name: 'Aryan Sharma', size: 48),
-                      const SizedBox(width: AppSpacing.md),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Wrap(
-                              crossAxisAlignment: WrapCrossAlignment.center,
-                              children: [
-                                Text(
-                                  'Aryan Sharma',
-                                  style: AppTextStyles.bodySemiBold.copyWith(
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                const SizedBox(width: 6),
-                                Text('•', style: AppTextStyles.caption),
-                                const SizedBox(width: 6),
-                                Text(
-                                  'DU North',
-                                  style: AppTextStyles.bodyMedium,
-                                ),
-                              ],
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    AvatarCircle(name: name, size: 48, imageUrl: avatarUrl),
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            name,
+                            style: AppTextStyles.bodySemiBold.copyWith(
+                              fontSize: 16,
                             ),
-                            const SizedBox(height: AppSpacing.xs),
-                            Wrap(
-                              spacing: AppSpacing.sm,
-                              runSpacing: AppSpacing.xs,
-                              children: const [
-                                _SelectorPill(
-                                  icon: Icons.public,
-                                  label: 'Anyone',
-                                ),
-                                _SelectorPill(
-                                  icon: Icons.school_outlined,
-                                  label: 'CS501 · DBMS',
-                                ),
-                              ],
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          if (subtitle.isNotEmpty)
+                            Text(
+                              subtitle,
+                              style: AppTextStyles.bodyMedium,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                          ],
-                        ),
+                        ],
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.xl),
-                  TextField(
-                    controller: _titleController,
-                    maxLines: 1,
-                    style: AppTextStyles.h1,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.xl),
+                TextField(
+                  controller: _titleController,
+                  maxLines: 1,
+                  style: AppTextStyles.h1,
+                  decoration:
+                      const InputDecoration.collapsed(
+                        hintText: 'Add a title',
+                        hintStyle: TextStyle(
+                          color: AppColors.textMuted,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 22,
+                        ),
+                      ).copyWith(
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        disabledBorder: InputBorder.none,
+                      ),
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                Expanded(
+                  child: TextField(
+                    controller: _bodyController,
+                    maxLines: null,
+                    expands: true,
+                    maxLength: 20000,
+                    textAlignVertical: TextAlignVertical.top,
+                    style: AppTextStyles.bodySemiBold.copyWith(
+                      fontWeight: FontWeight.w400,
+                      fontSize: 17,
+                    ),
                     decoration:
                         const InputDecoration.collapsed(
-                          hintText: 'Add a title',
-                          hintStyle: TextStyle(
-                            color: AppColors.textMuted,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 22,
-                          ),
+                          hintText:
+                              'What do you want to talk to your campus peers about?',
+                          hintStyle: TextStyle(color: AppColors.textMuted),
                         ).copyWith(
                           enabledBorder: InputBorder.none,
                           focusedBorder: InputBorder.none,
                           disabledBorder: InputBorder.none,
                         ),
+                    buildCounter:
+                        (
+                          context, {
+                          required currentLength,
+                          required isFocused,
+                          maxLength,
+                        }) => null,
                   ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Expanded(
-                    child: TextField(
-                      controller: _bodyController,
-                      maxLines: null,
-                      expands: true,
-                      maxLength: 1000,
-                      textAlignVertical: TextAlignVertical.top,
-                      style: AppTextStyles.bodySemiBold.copyWith(
-                        fontWeight: FontWeight.w400,
-                        fontSize: 17,
+                ),
+                const SizedBox(height: AppSpacing.md),
+                if (state.coverPath != null)
+                  Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(AppRadius.card),
+                        child: Image.file(
+                          File(state.coverPath!),
+                          height: 140,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
                       ),
-                      decoration:
-                          const InputDecoration.collapsed(
-                            hintText:
-                                'What do you want to talk to your campus peers about?',
-                            hintStyle: TextStyle(color: AppColors.textMuted),
-                          ).copyWith(
-                            enabledBorder: InputBorder.none,
-                            focusedBorder: InputBorder.none,
-                            disabledBorder: InputBorder.none,
+                      Positioned(
+                        top: 4,
+                        right: 4,
+                        child: IconButton.filled(
+                          style: IconButton.styleFrom(
+                            backgroundColor: Colors.black54,
                           ),
-                      buildCounter:
-                          (
-                            context, {
-                            required currentLength,
-                            required isFocused,
-                            maxLength,
-                          }) => null,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  Container(
-                    padding: const EdgeInsets.all(AppSpacing.md),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF3F4F6),
-                      borderRadius: BorderRadius.circular(AppRadius.card),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryLight,
-                            borderRadius: BorderRadius.circular(
-                              AppRadius.iconBox,
-                            ),
-                          ),
-                          child: const Icon(
-                            Icons.picture_as_pdf_outlined,
-                            color: AppColors.primary,
-                            size: 26,
-                          ),
-                        ),
-                        const SizedBox(width: AppSpacing.md),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'DBMS_Unit3_QuickNotes.pdf',
-                                style: AppTextStyles.bodySemiBold.copyWith(
-                                  fontSize: 14,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                '1.8 MB · PDF Document · Verified CS',
-                                style: AppTextStyles.caption,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(
-                            Icons.remove_red_eye_outlined,
-                            color: AppColors.textSecondary,
-                            size: 20,
-                          ),
-                          onPressed: () {},
-                          visualDensity: VisualDensity.compact,
-                        ),
-                        IconButton(
                           icon: const Icon(
                             Icons.close,
-                            color: AppColors.textSecondary,
-                            size: 20,
+                            color: Colors.white,
+                            size: 18,
                           ),
-                          onPressed: () {},
-                          visualDensity: VisualDensity.compact,
+                          onPressed: context
+                              .read<CreatePostCubit>()
+                              .removeCover,
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: AppSpacing.sm),
-                ],
-              ),
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.md,
-              vertical: AppSpacing.sm,
-            ),
-            decoration: const BoxDecoration(
-              border: Border(top: BorderSide(color: Color(0xFFE5E7EB))),
-            ),
-            child: Row(
-              children: [
-                IconButton(
-                  icon: const Icon(
-                    Icons.image_outlined,
-                    color: AppColors.textSecondary,
-                  ),
-                  onPressed: () {},
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryLight,
-                    borderRadius: BorderRadius.circular(AppRadius.input),
-                  ),
-                  child: IconButton(
-                    icon: const Icon(
-                      Icons.description_outlined,
-                      color: AppColors.primary,
-                    ),
-                    onPressed: () {},
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(
-                    Icons.bar_chart_outlined,
-                    color: AppColors.textSecondary,
-                  ),
-                  onPressed: () {},
-                ),
-                IconButton(
-                  icon: const Icon(Icons.tag, color: AppColors.textSecondary),
-                  onPressed: () {},
-                ),
-                IconButton(
-                  icon: const Icon(Icons.link, color: AppColors.textSecondary),
-                  onPressed: () {},
-                ),
-                const Spacer(),
-                Text(
-                  '${_bodyController.text.length}/1000',
-                  style: AppTextStyles.bodyMedium.copyWith(fontSize: 13),
-                ),
+                const SizedBox(height: AppSpacing.sm),
               ],
             ),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SelectorPill extends StatelessWidget {
-  const _SelectorPill({required this.icon, required this.label});
-
-  final IconData icon;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: 4,
-      ),
-      decoration: BoxDecoration(
-        color: AppColors.primaryLight,
-        borderRadius: BorderRadius.circular(AppRadius.pill),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 14, color: AppColors.primary),
-          const SizedBox(width: 4),
-          Text(
-            label,
-            style: AppTextStyles.bodySemiBold.copyWith(
-              fontSize: 13,
-              color: AppColors.primary,
-            ),
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.sm,
           ),
-          const SizedBox(width: 2),
-          const Icon(
-            Icons.keyboard_arrow_down,
-            size: 14,
-            color: AppColors.primary,
+          decoration: const BoxDecoration(
+            border: Border(top: BorderSide(color: Color(0xFFE5E7EB))),
           ),
-        ],
-      ),
+          child: Row(
+            children: [
+              IconButton(
+                tooltip: 'Add cover image',
+                icon: const Icon(
+                  Icons.image_outlined,
+                  color: AppColors.primary,
+                ),
+                onPressed: state.isSubmitting ? null : _pickCover,
+              ),
+              const SizedBox(width: AppSpacing.xs),
+              Text(
+                '${_bodyController.text.length}/20000',
+                style: AppTextStyles.bodyMedium.copyWith(fontSize: 13),
+              ),
+              const Spacer(),
+              // "Post" lives here now that the tab has no app bar of its own
+              ElevatedButton(
+                onPressed: state.isSubmitting ? null : _submit,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.xl,
+                    vertical: AppSpacing.sm,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppRadius.pill),
+                  ),
+                  elevation: 0,
+                ),
+                child: state.isSubmitting
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Text('Post'),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

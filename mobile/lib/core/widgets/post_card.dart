@@ -33,6 +33,10 @@ class PostCard extends StatelessWidget {
     this.onLike,
     this.onComment,
     this.onBookmark,
+    this.authorAvatarUrl,
+    this.coverImageUrl,
+    this.onDelete,
+    this.compact = false,
   });
 
   final String authorName;
@@ -51,16 +55,35 @@ class PostCard extends StatelessWidget {
   final VoidCallback? onLike;
   final VoidCallback? onComment;
   final VoidCallback? onBookmark;
+  final String? authorAvatarUrl;
+  final String? coverImageUrl;
+
+  /// When set (own posts), a "..." menu with Delete appears in the author row.
+  final VoidCallback? onDelete;
+
+  /// Tighter padding and gaps (used on the Saved screen).
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
+    final gap = compact ? AppSpacing.sm : AppSpacing.md;
     return AppCard(
+      // Feed cards get a slightly stronger edge than the default hairline
+      borderColor: compact ? AppColors.border : const Color(0xFFCBD5E1),
+      padding: compact
+          ? const EdgeInsets.fromLTRB(14, 10, 14, 8)
+          : const EdgeInsets.all(AppSpacing.lg),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              AvatarCircle(name: authorName, size: 36, online: online),
+              AvatarCircle(
+                name: authorName,
+                size: compact ? 32 : 36,
+                online: online,
+                imageUrl: authorAvatarUrl,
+              ),
               const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Column(
@@ -77,12 +100,36 @@ class PostCard extends StatelessWidget {
                   ],
                 ),
               ),
+              if (onDelete != null)
+                PopupMenuButton<String>(
+                  icon: const Icon(
+                    Icons.more_horiz,
+                    color: AppColors.textMuted,
+                  ),
+                  onSelected: (_) => onDelete!(),
+                  itemBuilder: (_) => const [
+                    PopupMenuItem(value: 'delete', child: Text('Delete post')),
+                  ],
+                ),
             ],
           ),
-          const SizedBox(height: AppSpacing.md),
+          SizedBox(height: gap),
           Text(title, style: AppTextStyles.h2.copyWith(fontSize: 15)),
           const SizedBox(height: 4),
           Text(body, style: AppTextStyles.bodyMedium),
+          if (coverImageUrl != null) ...[
+            SizedBox(height: gap),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.network(
+                coverImageUrl!,
+                width: double.infinity,
+                height: 180,
+                fit: BoxFit.cover,
+                errorBuilder: (_, _, _) => const SizedBox.shrink(),
+              ),
+            ),
+          ],
           if (hashtags.isNotEmpty) ...[
             const SizedBox(height: AppSpacing.sm),
             Wrap(
@@ -101,7 +148,7 @@ class PostCard extends StatelessWidget {
             ),
           ],
           if (attachment != null) ...[
-            const SizedBox(height: AppSpacing.md),
+            SizedBox(height: gap),
             Container(
               padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
@@ -138,9 +185,9 @@ class PostCard extends StatelessWidget {
               ),
             ),
           ],
-          const SizedBox(height: AppSpacing.md),
+          SizedBox(height: gap),
           const Divider(color: AppColors.border, height: 1),
-          const SizedBox(height: AppSpacing.sm),
+          SizedBox(height: compact ? 6 : AppSpacing.sm),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [

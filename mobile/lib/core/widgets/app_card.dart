@@ -12,6 +12,7 @@ class AppCard extends StatelessWidget {
     this.padding = const EdgeInsets.all(AppSpacing.lg),
     this.onTap,
     this.elevated = false,
+    this.borderColor = AppColors.border,
   });
 
   final Widget child;
@@ -23,6 +24,9 @@ class AppCard extends StatelessWidget {
   /// Home profile header card).
   final bool elevated;
 
+  /// Color of the hairline border (a bit darker makes the edges stand out).
+  final Color borderColor;
+
   @override
   Widget build(BuildContext context) {
     final content = Container(
@@ -30,7 +34,7 @@ class AppCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppRadius.card),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: borderColor),
         boxShadow: elevated
             ? [
                 BoxShadow(

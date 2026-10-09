@@ -1,38 +1,96 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../app_navigation.dart';
+import '../../../core/data/bookmarks_repository.dart';
+import '../../../core/data/resources_repository.dart';
+import '../../../core/models/resource.dart';
+import '../../../core/models/subject.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_radius.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_shell_scaffold.dart';
-import '../../../core/widgets/resource_card.dart';
+import '../../../core/widgets/model_cards.dart';
+import '../../../core/widgets/state_views.dart';
+import '../../local_vault/bloc/local_vault_cubit.dart';
+import '../../local_vault/bloc/local_vault_state.dart';
+import '../../local_vault/data/local_vault_item.dart';
+import '../../local_vault/presentation/local_vault_actions.dart';
+import '../../resources/bloc/resource_list_cubit.dart';
+import '../../resources/bloc/resource_list_state.dart';
+import '../../resources/resource_actions.dart';
 import '../../upload/presentation/create_document_screen.dart';
-import '../data/subject_data.dart';
+import '../subject_style.dart';
+import '../../../core/widgets/skeleton.dart';
 
 /// Subject Detail — opened by tapping a subject on the Resources tab.
-/// Shows only the user's own items for that subject: downloaded PDFs,
-/// bookmarks and locally saved files.
+/// Shows every resource listed for that subject plus the files the user saved
+/// on this device for it. Filterable by type.
 class SubjectDetailScreen extends StatefulWidget {
   const SubjectDetailScreen({super.key, required this.subject});
 
-  final SubjectInfo subject;
+  final Subject subject;
 
   @override
   State<SubjectDetailScreen> createState() => _SubjectDetailScreenState();
 }
 
 class _SubjectDetailScreenState extends State<SubjectDetailScreen> {
-  ResourceSource? _filter;
+  late final ResourceListCubit _cubit;
+  final _scroll = ScrollController();
+  ResourceType? _filter; // null = All
 
-  SubjectInfo get _s => widget.subject;
+  Subject get _s => widget.subject;
+
+  @override
+  void initState() {
+    super.initState();
+    _cubit = ResourceListCubit(
+      context.read<ResourcesRepository>(),
+      context.read<BookmarksRepository>(),
+    );
+    _scroll.addListener(() {
+      if (_scroll.position.pixels > _scroll.position.maxScrollExtent - 300) {
+        _cubit.loadMore();
+      }
+    });
+    _load();
+  }
+
+  void _load() => _cubit.load(ResourceQuery(subjectId: _s.id, type: _filter));
+
+  void _setFilter(ResourceType? type) {
+    if (type == _filter) return;
+    setState(() => _filter = type);
+    _load();
+  }
+
+  @override
+  void dispose() {
+    _scroll.dispose();
+    _cubit.close();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final visible = _filter == null
-        ? _s.resources
-        : _s.resources.where((r) => r.source == _filter).toList();
+    return BlocProvider.value(
+      value: _cubit,
+      child: BlocConsumer<ResourceListCubit, ResourceListState>(
+        listener: (context, state) {
+          if (state.actionError != null) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.actionError!)));
+          }
+        },
+        builder: (context, state) => _buildScaffold(context, state),
+      ),
+    );
+  }
 
+  Widget _buildScaffold(BuildContext context, ResourceListState state) {
     return AppShellScaffold(
       currentIndex: 0,
       showBackButton: true,
@@ -44,96 +102,139 @@ class _SubjectDetailScreenState extends State<SubjectDetailScreen> {
         }
         goToTab(context, index);
       },
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const CreateDocumentScreen()),
-        ),
-        backgroundColor: AppColors.primary,
-        icon: const Icon(Icons.add, color: Colors.white),
-        label: Text(
-          'Upload to ${_s.shortName}',
-          style: const TextStyle(color: Colors.white),
-        ),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        children: [
-          _buildHeaderCard(),
-          const SizedBox(height: AppSpacing.lg),
-          SizedBox(
-            height: 38,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: ResourceSource.values.length + 1,
-              separatorBuilder: (context, index) =>
-                  const SizedBox(width: AppSpacing.sm),
-              itemBuilder: (context, index) {
-                final source = index == 0
-                    ? null
-                    : ResourceSource.values[index - 1];
-                final selected = source == _filter;
-                final label = source == null
-                    ? 'All (${_s.resources.length})'
-                    : '${source.label} (${_s.countOf(source)})';
-                return GestureDetector(
-                  onTap: () => setState(() => _filter = source),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.lg,
-                    ),
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: selected ? AppColors.primary : AppColors.surface,
-                      border: selected
-                          ? null
-                          : Border.all(color: AppColors.border),
-                      borderRadius: BorderRadius.circular(AppRadius.pill),
-                    ),
-                    child: Text(
-                      label,
-                      style: AppTextStyles.bodySemiBold.copyWith(
-                        fontSize: 13,
-                        color: selected ? Colors.white : AppColors.textPrimary,
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          Text(
-            '${visible.length} ${visible.length == 1 ? 'item' : 'items'}',
-            style: AppTextStyles.bodySemiBold,
-          ),
-          const SizedBox(height: AppSpacing.md),
-          for (final resource in visible) ...[
-            ResourceCard(
-              badgeLabel: resource.category.badge,
-              badgeVariant: resource.category.variant,
-              title: resource.title,
-              meta: resource.meta,
-              uploaderName: resource.uploader,
-              verified: resource.verified,
-              bookmarked: resource.source == ResourceSource.bookmarked,
-              actionLabel: switch (resource.source) {
-                ResourceSource.downloaded => 'Open Reader',
-                ResourceSource.local => 'View Offline',
-                ResourceSource.bookmarked => 'View PDF',
-              },
-              onBookmark: () {},
-              onAction: () {},
-            ),
+      body: RefreshIndicator(
+        onRefresh: _cubit.refresh,
+        child: ListView(
+          controller: _scroll,
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          children: [
+            _buildHeaderCard(state),
+            const SizedBox(height: AppSpacing.lg),
+            _buildFilterChips(),
+            const SizedBox(height: AppSpacing.lg),
+            _buildResourcesHeader(state),
             const SizedBox(height: AppSpacing.md),
+            ..._buildList(context, state),
+            const SizedBox(height: 80),
           ],
-          const SizedBox(height: 80),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildHeaderCard() {
+  /// "Resources (3)" on the left, the dashed "Add resource" button on the right.
+  Widget _buildResourcesHeader(ResourceListState state) {
+    final loaded = state.hasLoaded && state.error == null;
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            loaded ? 'Resources (${state.total})' : 'Resources',
+            style: AppTextStyles.bodySemiBold.copyWith(fontSize: 16),
+          ),
+        ),
+        _AddResourceButton(
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => CreateDocumentScreen(initialSubject: _s),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFilterChips() {
+    final types = <ResourceType?>[null, ...ResourceType.values];
+    return SizedBox(
+      height: 38,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: types.length,
+        separatorBuilder: (context, index) =>
+            const SizedBox(width: AppSpacing.sm),
+        itemBuilder: (context, index) {
+          final type = types[index];
+          final selected = type == _filter;
+          return GestureDetector(
+            onTap: () => _setFilter(type),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: selected ? AppColors.primary : AppColors.surface,
+                border: selected ? null : Border.all(color: AppColors.border),
+                borderRadius: BorderRadius.circular(AppRadius.pill),
+              ),
+              child: Text(
+                type?.label ?? 'All',
+                style: AppTextStyles.bodySemiBold.copyWith(
+                  fontSize: 13,
+                  color: selected ? Colors.white : AppColors.textPrimary,
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  /// Files saved on this device for this subject (and the chosen type).
+  List<LocalVaultItem> _localItems(LocalVaultState vault) => [
+    for (final i in vault.items)
+      if (i.subjectId == _s.id && (_filter == null || i.type == _filter)) i,
+  ];
+
+  List<Widget> _buildList(BuildContext context, ResourceListState state) {
+    if (state.isLoading || !state.hasLoaded)
+      return [const SkeletonResourceList()];
+    if (state.error != null) {
+      return [ErrorView(message: state.error!, onRetry: _load)];
+    }
+    final local = _localItems(context.watch<LocalVaultCubit>().state);
+    if (state.items.isEmpty && local.isEmpty) {
+      return [
+        EmptyView(
+          title: 'No resources yet',
+          message: _filter == null
+              ? 'Nothing has been added for this subject yet. Be the first to add one.'
+              : 'No ${_filter!.label} for this subject yet.',
+          icon: Icons.folder_open_outlined,
+        ),
+      ];
+    }
+    final repository = context.read<ResourcesRepository>();
+    return [
+      if (local.isNotEmpty) ...[
+        Text(
+          'On this device (${local.length})',
+          style: AppTextStyles.bodySemiBold,
+        ),
+        const SizedBox(height: AppSpacing.md),
+        for (final item in local) ...[
+          localVaultCardFor(context, item),
+          const SizedBox(height: AppSpacing.md),
+        ],
+      ],
+      if (state.items.isNotEmpty) ...[
+        for (final resource in state.items) ...[
+          resourceCardFor(
+            resource,
+            onAction: () => openResource(context, repository, resource),
+            onBookmark: () => _cubit.toggleBookmark(resource),
+          ),
+          const SizedBox(height: AppSpacing.md),
+        ],
+        if (state.isLoadingMore) const SkeletonResourceList(count: 1),
+      ],
+    ];
+  }
+
+  Widget _buildHeaderCard(ResourceListState state) {
+    final style = SubjectStyle.of(_s);
     return AppCard(
       elevated: true,
       child: Column(
@@ -146,68 +247,43 @@ class _SubjectDetailScreenState extends State<SubjectDetailScreen> {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: _s.color.withValues(alpha: 0.12),
+                  color: style.color.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(AppRadius.iconBox),
                 ),
-                child: Icon(_s.icon, color: _s.color, size: 22),
+                child: Icon(style.icon, color: style.color, size: 22),
               ),
               const SizedBox(width: AppSpacing.md),
               Expanded(child: Text(_s.name, style: AppTextStyles.h1)),
             ],
           ),
           const SizedBox(height: AppSpacing.md),
-          Wrap(
-            spacing: AppSpacing.sm,
-            runSpacing: AppSpacing.xs,
-            crossAxisAlignment: WrapCrossAlignment.center,
+          // Code on the left, type + semester badges pushed to the right
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
                 _s.code,
                 style: AppTextStyles.bodySemiBold.copyWith(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w800,
                   color: AppColors.textSecondary,
                 ),
               ),
-              Text('•', style: AppTextStyles.caption),
-              _MiniChip(label: _s.type, color: _s.color),
-              _MiniChip(
-                label: 'Semester ${_s.semester}',
-                color: AppColors.primary,
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Row(
-            children: [
-              const Icon(
-                Icons.school_outlined,
-                size: 16,
-                color: AppColors.textMuted,
-              ),
-              const SizedBox(width: 6),
-              Text(_s.course, style: AppTextStyles.bodyMedium),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          Row(
-            children: [
-              Expanded(
-                child: _StatBox(
-                  value: '${_s.countOf(ResourceSource.local)}',
-                  label: 'Locally Saved',
-                ),
-              ),
               const SizedBox(width: AppSpacing.sm),
               Expanded(
-                child: _StatBox(
-                  value: '${_s.countOf(ResourceSource.downloaded)}',
-                  label: 'Downloaded',
-                ),
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                child: _StatBox(
-                  value: '${_s.countOf(ResourceSource.bookmarked)}',
-                  label: 'Bookmarked',
+                child: Wrap(
+                  alignment: WrapAlignment.end,
+                  spacing: AppSpacing.sm,
+                  runSpacing: AppSpacing.xs,
+                  children: [
+                    _MiniChip(label: _s.type, color: style.color),
+                    _MiniChip(
+                      label: _s.semester == null
+                          ? 'All semesters'
+                          : 'Semester ${_s.semester}',
+                      color: AppColors.primary,
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -227,7 +303,7 @@ class _MiniChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(AppRadius.pill),
@@ -235,8 +311,8 @@ class _MiniChip extends StatelessWidget {
       child: Text(
         label,
         style: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w700,
+          fontSize: 14,
+          fontWeight: FontWeight.w800,
           color: color,
         ),
       ),
@@ -244,27 +320,69 @@ class _MiniChip extends StatelessWidget {
   }
 }
 
-class _StatBox extends StatelessWidget {
-  const _StatBox({required this.value, required this.label});
+/// Outlined button with a dashed accent border: "+ Add resource".
+class _AddResourceButton extends StatelessWidget {
+  const _AddResourceButton({required this.onTap});
 
-  final String value;
-  final String label;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-      decoration: BoxDecoration(
-        color: AppColors.primaryLight.withValues(alpha: 0.4),
-        borderRadius: BorderRadius.circular(AppRadius.input),
-      ),
-      child: Column(
-        children: [
-          Text(value, style: AppTextStyles.bodySemiBold.copyWith(fontSize: 16)),
-          const SizedBox(height: 2),
-          Text(label, style: AppTextStyles.caption.copyWith(fontSize: 12)),
-        ],
+    return GestureDetector(
+      onTap: onTap,
+      child: CustomPaint(
+        painter: _DashedBorderPainter(
+          color: AppColors.primary,
+          radius: AppRadius.input,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.add, size: 18, color: AppColors.primary),
+              const SizedBox(width: 6),
+              Text(
+                'Add resource',
+                style: AppTextStyles.bodySemiBold.copyWith(
+                  fontSize: 14,
+                  color: AppColors.primary,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
+}
+
+class _DashedBorderPainter extends CustomPainter {
+  const _DashedBorderPainter({required this.color, required this.radius});
+
+  final Color color;
+  final double radius;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.4;
+    final path = Path()
+      ..addRRect(
+        RRect.fromRectAndRadius(Offset.zero & size, Radius.circular(radius)),
+      );
+    for (final metric in path.computeMetrics()) {
+      var distance = 0.0;
+      while (distance < metric.length) {
+        canvas.drawPath(metric.extractPath(distance, distance + 5), paint);
+        distance += 9; // 5 drawn, 4 gap
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _DashedBorderPainter old) =>
+      old.color != color || old.radius != radius;
 }

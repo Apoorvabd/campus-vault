@@ -1,25 +1,16 @@
 import 'package:flutter/material.dart';
-import 'features/home/presentation/homescreen.dart';
-import 'features/saved/presentation/saved_screen.dart';
-import 'features/profile/presentation/profile_screen.dart';
+import 'core/navigation/tab_shell.dart';
 import 'features/search/presentation/search_screen.dart';
-import 'features/upload/presentation/create_document_screen.dart';
 
-/// Switches between the bottom-nav tabs that are wired up so far
-/// (Exam Mode isn't built yet, so that index no-ops).
+/// Switches the bottom-nav tab (Exam Mode isn't built yet, so index 1 no-ops).
+/// Inside the shell it just changes the tab. From a screen pushed on top of
+/// the shell (e.g. Subject Detail) it first closes back to the shell.
 void goToTab(BuildContext context, int index) {
-  final Widget? screen = switch (index) {
-    0 => const HomeScreen(),
-    2 => const CreateDocumentScreen(),
-    3 => const SavedScreen(),
-    4 => const ProfileScreen(),
-    _ => null,
-  };
-  if (screen == null) return;
-  Navigator.pushReplacement(
-    context,
-    MaterialPageRoute(builder: (context) => screen),
-  );
+  if (index == 1) return;
+  mainTabIndex.value = index;
+  if (!TabShellScope.isInside(context)) {
+    Navigator.of(context).popUntil((route) => route.isFirst);
+  }
 }
 
 /// Opens the Search screen with a fast fade so the keyboard feels instant.

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../navigation/tab_shell.dart';
 import 'bottom_nav_bar.dart';
 import 'home_top_bar.dart';
 
@@ -24,6 +25,10 @@ class AppShellScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Inside MainShell the top bar + bottom nav already exist: draw the body only
+    if (TabShellScope.isInside(context)) {
+      return Scaffold(floatingActionButton: floatingActionButton, body: body);
+    }
     return Scaffold(
       appBar: HomeTopBar(
         onSearchTap: onSearchTap,
