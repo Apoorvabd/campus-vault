@@ -1,0 +1,97 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0b1030;
+  --foreground: #f4f4f5;
+  --muted: #aab1d1;
+  --brand: #2f6fed;
+  --amber: #f5a623;
+  --violet: #8b5cf6;
+  --teal: #14b8a6;
+  --pink: #ec4899;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-brand: var(--brand);
+  --color-amber: var(--amber);
+  --color-violet: var(--violet);
+  --color-teal: var(--teal);
+  --color-pink: var(--pink);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark;
+}
+
+body {
+  background:
+    radial-gradient(55rem 40rem at 0% 0%, rgba(99, 102, 241, 0.22), transparent 70%),
+    radial-gradient(50rem 40rem at 100% 35%, rgba(139, 92, 246, 0.2), transparent 70%),
+    radial-gradient(50rem 40rem at 0% 70%, rgba(20, 184, 166, 0.14), transparent 70%),
+    radial-gradient(45rem 35rem at 100% 100%, rgba(236, 72, 153, 0.14), transparent 70%),
+    var(--background);
+  background-attachment: fixed;
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: rgba(47, 111, 237, 0.4);
+}
+
+/* Gradient text helpers */
+.grad-cool {
+  background: linear-gradient(120deg, #ffffff 0%, #c7d2fe 45%, #a5b4fc 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.grad-warm {
+  background: linear-gradient(120deg, #a5b4fc 0%, #f0abfc 45%, #fda4af 80%, #fcd34d 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.grad-title {
+  background: linear-gradient(180deg, #ffffff 30%, #b6c2f5 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* FAQ accordion marker */
+details > summary { list-style: none; }
+details > summary::-webkit-details-marker { display: none; }
+details[open] .faq-plus { transform: rotate(45deg); }
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes marquee {
+  to { transform: translateX(-50%); }
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee var(--speed, 40s) linear infinite;
+}
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float, .marquee-track { animation: none; }
+  html { scroll-behavior: auto; }
+}
