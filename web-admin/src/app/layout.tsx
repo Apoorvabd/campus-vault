@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist } from "next/font/google";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL } from "@/lib/site";
 import "./globals.css";
 
@@ -8,31 +8,17 @@ const geistSans = Geist({
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: { default: SITE_TITLE, template: `%s | ${SITE_NAME}` },
   description: SITE_DESCRIPTION,
   applicationName: SITE_NAME,
-  keywords: [
-    "DU PYQ",
-    "DU previous year question papers",
-    "Delhi University question papers",
-    "DU notes",
-    "DU syllabus",
-    "DU lab manuals",
-    "DU exam preparation",
-    "semester wise PYQ",
-    "UPC wise question papers",
-    "DU student app",
-    "Semester Forge",
-  ],
   category: "education",
   alternates: { canonical: "/" },
+  // Set NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION to the token from Google Search Console (optional).
+  verification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+    ? { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION }
+    : undefined,
   robots: { index: true, follow: true },
   openGraph: {
     type: "website",
@@ -50,7 +36,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0b1030",
+  themeColor: "#020309",
   colorScheme: "dark",
 };
 
@@ -58,7 +44,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en-IN"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

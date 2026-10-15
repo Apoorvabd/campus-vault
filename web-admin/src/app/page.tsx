@@ -1,11 +1,14 @@
-import Image from "next/image";
 import { Counter } from "@/components/Counter";
 import { Nav } from "@/components/Nav";
-import { HeroPhone } from "@/components/HeroPhone";
+import { Footer } from "@/components/Footer";
+import { Particles } from "@/components/Particles";
+import { PhoneCarousel } from "@/components/PhoneCarousel";
 import { Phone } from "@/components/Phone";
 import { Reveal } from "@/components/Reveal";
+import { ShakeHeading } from "@/components/ShakeHeading";
 import { Statement } from "@/components/Statement";
-import { FAQ, SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
+import Link from "next/link";
+import { FAQ, GITHUB_URL, SITE_DESCRIPTION, SITE_NAME, SITE_URL, SUPPORT_EMAIL } from "@/lib/site";
 
 const features = [
   {
@@ -14,8 +17,8 @@ const features = [
     title: "Your subjects, sorted for you.",
     body: "Pick your course and semester once. Every subject shows up with its code and type, and opens straight to its papers, notes and syllabus.",
     points: ["Search notes and PYQs from one bar", "Subjects grouped by your semester", "Bookmark anything for later"],
-    src: "/screens/subjects.png",
-    alt: "Semester Forge Resources tab listing the student's subjects for the semester",
+    src: "/screens/subjects.webp",
+    alt: "SemesterForge Resources tab listing the student's subjects for the semester",
     glow: "bg-brand/45",
     accent: "text-[#8fb0ff]",
   },
@@ -25,7 +28,7 @@ const features = [
     title: "Add what helped you, from anywhere.",
     body: "Upload a PDF, pick photos from your gallery, snap a page with the camera or paste a Drive link. Everything is reviewed by an admin before others see it.",
     points: ["Files, photos, camera or link", "Reviewed before it goes public", "Earn credit when it helps others"],
-    src: "/screens/add.png",
+    src: "/screens/add.webp",
     alt: "Add Document screen with Files, Photos, Camera and Link options",
     glow: "bg-violet/40",
     accent: "text-[#b69cff]",
@@ -36,7 +39,7 @@ const features = [
     title: "Tagged right, found fast.",
     body: "Give it a title, pick the subject and mark it as a PYQ, notes, syllabus, reference book, assignment or lab manual. Clean tags are what keep the Vault easy to search.",
     points: ["PYQ, notes, syllabus, lab manual and more", "Linked to the exact subject", "Optional description for exam year or unit"],
-    src: "/screens/form.png",
+    src: "/screens/form.webp",
     alt: "Add Document form with title, subject and category fields",
     glow: "bg-teal/35",
     accent: "text-[#5eead4]",
@@ -47,21 +50,36 @@ const features = [
     title: "Your course, your college, your credit.",
     body: "Your profile keeps your course, semester and college in one place, with your uploads, posts and likes counted. Requests and contributor badges are coming right behind it.",
     points: ["Uploads, posts and likes at a glance", "Resource requests", "Contributor badges"],
-    src: "/screens/profile.png",
+    src: "/screens/profile.webp",
     alt: "Profile screen showing course, semester, college and upload stats",
     glow: "bg-pink/35",
     accent: "text-[#f9a8d4]",
   },
 ];
 
-const moreColors = ["from-brand/25", "from-violet/25", "from-teal/25", "from-pink/25"];
-
 const duCourses = ["B.A. (Hons)", "B.Com (Hons)", "B.Sc. (Hons)", "B.Voc", "B.Tech", "BBA", "Programme courses", "70+ colleges"];
 
 const jsonLd = {
   "@context": "https://schema.org",
   "@graph": [
-    { "@type": "WebSite", "@id": `${SITE_URL}/#website`, url: SITE_URL, name: SITE_NAME, description: SITE_DESCRIPTION, inLanguage: "en-IN" },
+    {
+      "@type": "Organization",
+      "@id": `${SITE_URL}/#organization`,
+      name: SITE_NAME,
+      url: SITE_URL,
+      logo: { "@type": "ImageObject", url: `${SITE_URL}/apple-icon`, width: 180, height: 180 },
+      sameAs: [GITHUB_URL],
+      contactPoint: { "@type": "ContactPoint", contactType: "customer support", email: SUPPORT_EMAIL },
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${SITE_URL}/#website`,
+      url: SITE_URL,
+      name: SITE_NAME,
+      description: SITE_DESCRIPTION,
+      inLanguage: "en-IN",
+      publisher: { "@id": `${SITE_URL}/#organization` },
+    },
     {
       "@type": "SoftwareApplication",
       name: SITE_NAME,
@@ -70,6 +88,7 @@ const jsonLd = {
       description: SITE_DESCRIPTION,
       audience: { "@type": "EducationalAudience", educationalRole: "student" },
       url: SITE_URL,
+      publisher: { "@id": `${SITE_URL}/#organization` },
     },
     {
       "@type": "FAQPage",
@@ -91,8 +110,6 @@ const stats = [
   { n: 18000, s: "+", label: "Papers indexed" },
   { n: 70, s: "+", label: "Colleges" },
 ];
-
-const statColors = ["from-brand/30", "from-violet/30", "from-teal/30", "from-pink/30"];
 
 const chips = [
   "Previous year papers", "Notes", "Syllabus", "Lab manuals", "Exam Mode", "Bookmarks",
@@ -134,37 +151,43 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
       />
+      <Particles />
       <Nav />
 
       {/* HERO */}
-      <section className="relative flex min-h-[100svh] flex-col items-center px-6 pt-36 text-center">
-        <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[900px] bg-[radial-gradient(60%_50%_at_50%_0%,rgba(99,102,241,0.4),transparent_70%),radial-gradient(40%_35%_at_85%_20%,rgba(236,72,153,0.22),transparent_70%),radial-gradient(35%_30%_at_10%_30%,rgba(20,184,166,0.2),transparent_70%)]" />
-        <Reveal>
-          <p className="mx-auto mb-6 inline-block rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs text-white/70">
-            DU PYQs, notes &amp; syllabus in one app
-          </p>
-        </Reveal>
-        <Reveal delay={60}>
-          <h1 className="mx-auto max-w-4xl text-5xl leading-[1.02] font-bold tracking-tight sm:text-7xl lg:text-[5.5rem]">
-            <span className="grad-title">Your whole semester.</span>
-            <br />
-            <span className="grad-warm">One app.</span>
-          </h1>
-        </Reveal>
-        <Reveal delay={120}>
-          <p className="mx-auto mt-6 max-w-xl text-lg text-muted">
-            Delhi University previous year question papers (PYQs), notes, syllabi and your own files, organised by course and subject, so exam week starts with opening the app.
-          </p>
-        </Reveal>
-        <Reveal delay={180}>
-          <div id="get-app" className="mt-9 flex flex-wrap items-center justify-center gap-3 scroll-mt-32">
-            <StoreBadge sub="Download for" label="Android (APK)" />
-            <StoreBadge sub="Coming to" label="iPhone" />
+      <section className="relative flex min-h-[100svh] items-center px-6 pt-32 pb-16 lg:pt-24">
+        <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[900px] bg-[radial-gradient(60%_50%_at_30%_0%,rgba(79,70,229,0.3),transparent_70%),radial-gradient(40%_35%_at_90%_30%,rgba(190,24,93,0.18),transparent_70%),radial-gradient(35%_30%_at_5%_40%,rgba(13,148,136,0.15),transparent_70%)]" />
+        <div className="mx-auto grid w-full max-w-6xl items-center gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-6">
+          <div className="text-center lg:pl-14 lg:text-left">
+            <div className="hero-in">
+              <ShakeHeading className="max-w-3xl font-bold tracking-tight">
+                <span className="mx-auto mb-6 block w-fit rounded-full border border-white/20 bg-[#0d1030] px-4 py-1.5 text-xs font-medium tracking-normal text-white shadow-[0_8px_24px_-10px_rgba(0,0,0,0.8)] lg:mx-0">
+                  DU PYQs, notes &amp; syllabus in one app
+                </span>
+                <span className="grad-title block text-[2.06rem] leading-tight font-semibold sm:text-[2.475rem] lg:text-[2.86rem]">
+                  Your whole semester.
+                </span>
+                <span className="grad-warm mt-1 block text-[4.05rem] leading-[0.95] sm:text-[5.4rem] lg:text-[6.75rem]">One app</span>
+              </ShakeHeading>
+            </div>
+            <div className="hero-in" style={{ "--d": "120ms" } as React.CSSProperties}>
+              <p className="mx-auto mt-6 max-w-xl text-lg text-muted lg:mx-0">
+                Delhi University previous year question papers (PYQs), notes, syllabi and your own files, organised by course and subject, so exam week starts with opening the app.
+              </p>
+            </div>
+            <div className="hero-in" style={{ "--d": "180ms" } as React.CSSProperties}>
+              <div id="get-app" className="mt-9 flex scroll-mt-32 flex-wrap items-center justify-center gap-3 lg:justify-start">
+                <StoreBadge sub="Download for" label="Android (APK)" />
+                <StoreBadge sub="Coming to" label="iPhone" />
+              </div>
+              <p className="mt-3 text-xs text-white/40">Download link going live soon</p>
+            </div>
           </div>
-          <p className="mt-3 text-xs text-white/40">Download link going live soon</p>
-        </Reveal>
 
-        <HeroPhone />
+          <div className="hero-in" style={{ "--d": "250ms" } as React.CSSProperties}>
+            <PhoneCarousel />
+          </div>
+        </div>
       </section>
 
       {/* STATEMENT */}
@@ -217,7 +240,7 @@ export default function Home() {
         <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {more.map(([t, b], i) => (
             <Reveal key={t} delay={i * 60} lift className="h-full">
-              <div className={`h-full rounded-3xl border border-white/10 bg-gradient-to-b ${moreColors[i]} to-white/[0.02] p-6 transition hover:border-white/25`}>
+              <div className="card-flat float-card h-full rounded-3xl p-6" style={{ animationDelay: `${(i % 4) * 0.7}s` }}>
                 <h3 className="font-semibold">{t}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted">{b}</p>
               </div>
@@ -248,7 +271,7 @@ export default function Home() {
         <div className="mt-14 grid grid-cols-2 gap-4 lg:grid-cols-4">
           {stats.map((s, i) => (
             <Reveal key={s.label} lift className="h-full">
-              <div className={`rounded-3xl border border-white/10 bg-gradient-to-b ${statColors[i]} to-transparent p-8 text-center`}>
+              <div className="card-flat float-card rounded-3xl p-8 text-center" style={{ animationDelay: `${i * 0.8}s` }}>
                 <p className="text-4xl font-bold tracking-tight sm:text-5xl">
                   <Counter to={s.n} suffix={s.s} />
                 </p>
@@ -261,14 +284,14 @@ export default function Home() {
 
       {/* FOR DU STUDENTS */}
       <section id="du" className="mx-auto max-w-6xl scroll-mt-28 px-6 pb-32">
-        <div className="grid items-center gap-12 rounded-[2rem] border border-white/10 bg-gradient-to-br from-indigo-500/20 via-fuchsia-500/10 to-teal-400/15 p-8 sm:p-14 lg:grid-cols-2">
+        <div className="card-flat grid items-center gap-12 rounded-[2rem] p-8 sm:p-14 lg:grid-cols-2">
           <Reveal>
             <p className="text-sm font-medium text-[#5eead4]">Made for Delhi University</p>
             <h2 className="grad-title mt-3 text-4xl leading-tight font-bold tracking-tight sm:text-5xl">
               DU PYQs, notes and syllabus, by subject.
             </h2>
             <p className="mt-5 text-lg text-muted">
-              Looking for DU previous year question papers? Semester Forge keeps them next to your notes, syllabus and lab manuals, grouped by course, semester and UPC, so you stop hunting across groups and drives.
+              Looking for DU previous year question papers? SemesterForge keeps them next to your notes, syllabus and lab manuals, grouped by course, semester and UPC, so you stop hunting across groups and drives.
             </p>
           </Reveal>
           <Reveal delay={100}>
@@ -294,13 +317,13 @@ export default function Home() {
             This is just the start.
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-center text-muted">
-            Semester Forge grows with the students using it. Here is what we are building next.
+            SemesterForge grows with the students using it. Here is what we are building next.
           </p>
         </Reveal>
         <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {roadmap.map((r, i) => (
             <Reveal key={r.title} delay={(i % 4) * 60} lift className="h-full">
-              <div className="h-full rounded-3xl border border-white/10 bg-white/[0.05] p-6">
+              <div className="card-flat float-card h-full rounded-3xl p-6" style={{ animationDelay: `${(i % 4) * 0.7}s` }}>
                 <span className={`rounded-full px-3 py-1 text-xs font-medium ${tagStyle[r.tag]}`}>{r.tag}</span>
                 <h3 className="mt-4 text-lg font-semibold">{r.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted">{r.body}</p>
@@ -318,7 +341,7 @@ export default function Home() {
         <div className="mt-12 space-y-3">
           {FAQ.map((f, i) => (
             <Reveal key={f.q} delay={i * 40}>
-              <details className="group rounded-2xl border border-white/10 bg-white/[0.05] px-6 py-5 transition open:border-white/25 open:bg-white/[0.08]">
+              <details className="card-flat group rounded-2xl px-6 py-5 open:border-white/25">
                 <summary className="flex cursor-pointer items-center justify-between gap-4 text-left font-medium">
                   <h3 className="text-base font-medium sm:text-lg">{f.q}</h3>
                   <span className="faq-plus grid h-7 w-7 shrink-0 place-items-center rounded-full bg-gradient-to-br from-indigo-500 to-pink-500 text-lg leading-none transition-transform">+</span>
@@ -328,11 +351,18 @@ export default function Home() {
             </Reveal>
           ))}
         </div>
+        <p className="mt-8 text-center text-sm text-muted">
+          More answers about uploads, XP and reports are in the{" "}
+          <Link href="/help" className="text-[#a5b4fc] underline-offset-4 hover:underline">
+            SemesterForge Help Center
+          </Link>
+          .
+        </p>
       </section>
 
       {/* CTA */}
       <section className="relative px-6 pb-28 text-center">
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-[500px] bg-[radial-gradient(50%_60%_at_50%_100%,rgba(139,92,246,0.4),transparent_70%)]" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-[500px] bg-[radial-gradient(50%_60%_at_50%_100%,rgba(109,40,217,0.3),transparent_70%)]" />
         <Reveal>
           <h2 className="grad-warm mx-auto max-w-3xl text-5xl leading-tight font-bold tracking-tight sm:text-6xl">
             Walk into exam week ready.
@@ -344,18 +374,7 @@ export default function Home() {
         </Reveal>
       </section>
 
-      {/* FOOTER */}
-      <footer className="border-t border-white/10 px-6 py-10">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 text-sm text-white/50 sm:flex-row">
-          <div className="flex items-center gap-2.5">
-            <span className="grid h-7 w-7 place-items-center rounded-md bg-white">
-              <Image src="/logo.svg" alt="" width={18} height={14} />
-            </span>
-            <span className="font-medium text-white/80">Semester Forge</span>
-          </div>
-          <p>A community project for students. © 2026</p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
