@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0b1030;
+  --background: #020309;
   --foreground: #f4f4f5;
   --muted: #aab1d1;
   --brand: #2f6fed;
@@ -31,11 +31,11 @@ html {
 
 body {
   background:
-    radial-gradient(55rem 40rem at 0% 0%, rgba(99, 102, 241, 0.22), transparent 70%),
-    radial-gradient(50rem 40rem at 100% 35%, rgba(139, 92, 246, 0.2), transparent 70%),
-    radial-gradient(50rem 40rem at 0% 70%, rgba(20, 184, 166, 0.14), transparent 70%),
-    radial-gradient(45rem 35rem at 100% 100%, rgba(236, 72, 153, 0.14), transparent 70%),
-    var(--background);
+    radial-gradient(60rem 42rem at 0% 0%, rgba(67, 56, 202, 0.2), transparent 70%),
+    radial-gradient(52rem 42rem at 100% 30%, rgba(109, 40, 217, 0.18), transparent 70%),
+    radial-gradient(52rem 40rem at 0% 72%, rgba(13, 148, 136, 0.1), transparent 70%),
+    radial-gradient(48rem 38rem at 100% 100%, rgba(190, 24, 93, 0.13), transparent 70%),
+    linear-gradient(180deg, #030410 0%, #020309 45%, #030410 100%);
   background-attachment: fixed;
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, sans-serif;
@@ -66,6 +66,31 @@ body {
   color: transparent;
 }
 
+/* Cards: one flat colour (no gradient), lifted off the background with a soft shadow. */
+.card-flat {
+  background: #0a0c1c;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow:
+    0 22px 50px -18px rgba(0, 0, 0, 0.7),
+    0 2px 0 rgba(255, 255, 255, 0.03) inset;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.card-flat:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow:
+    0 30px 60px -18px rgba(0, 0, 0, 0.75),
+    0 2px 0 rgba(255, 255, 255, 0.05) inset;
+}
+
+/* A slow, tiny float upward and back, so cards feel like they hover above the page. */
+@keyframes card-drift {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+.float-card {
+  animation: card-drift 6s ease-in-out infinite;
+}
+
 /* FAQ accordion marker */
 details > summary { list-style: none; }
 details > summary::-webkit-details-marker { display: none; }
@@ -92,6 +117,6 @@ details[open] .faq-plus { transform: rotate(45deg); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-float, .marquee-track { animation: none; }
+  .animate-float, .marquee-track, .float-card { animation: none; }
   html { scroll-behavior: auto; }
 }
