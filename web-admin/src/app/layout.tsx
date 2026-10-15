@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     "semester wise PYQ",
     "UPC wise question papers",
     "DU student app",
-    "Semester Forge",
+    "SemesterForge",
   ],
   category: "education",
   alternates: { canonical: "/" },
