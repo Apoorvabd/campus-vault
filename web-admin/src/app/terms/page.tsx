@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { LegalPage, SectionList } from "@/components/LegalPage";
 import { LAST_UPDATED, TERMS } from "@/lib/legal";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Terms of Service",
-  description: "The rules for using SemesterForge: academic integrity, content ownership and community conduct.",
-  alternates: { canonical: "/terms" },
-};
+  description:
+    "The rules for using the SemesterForge app: academic integrity, content ownership, community conduct and account termination.",
+  path: "/terms",
+});
 
 export default function TermsPage() {
   return (

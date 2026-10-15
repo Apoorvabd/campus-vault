@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from "react";
 
 export function Counter({ to, suffix = "" }: { to: number; suffix?: string }) {
   const ref = useRef<HTMLSpanElement>(null);
-  const [value, setValue] = useState(0);
+  // Starts at the real number so crawlers and no-JS visitors see it; the count-up replays when it scrolls into view.
+  const [value, setValue] = useState(to);
 
   useEffect(() => {
     const el = ref.current;
@@ -12,6 +13,7 @@ export function Counter({ to, suffix = "" }: { to: number; suffix?: string }) {
     const io = new IntersectionObserver(([entry]) => {
       if (!entry.isIntersecting) return;
       io.disconnect();
+      setValue(0);
       const start = performance.now();
       const duration = 900;
       const tick = (now: number) => {

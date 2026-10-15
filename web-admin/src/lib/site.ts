@@ -3,10 +3,10 @@ export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://semesterfo
 
 export const SITE_NAME = "SemesterForge";
 
-export const SITE_TITLE = "SemesterForge: DU PYQs, Notes & Syllabus for Delhi University Students";
+export const SITE_TITLE = "SemesterForge: DU Notes, PYQs & Syllabus App for Students";
 
 export const SITE_DESCRIPTION =
-  "Delhi University (DU) previous year question papers, notes, syllabus and lab manuals organised by course, subject and semester. 118 courses, 5,500+ subjects, one Android app for exam week.";
+  "SemesterForge is a student app for University of Delhi: find PYQs, notes, syllabus and lab manuals by course and subject, and keep your own files for exam week.";
 
 export const FAQ = [
   {

@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { LegalPage, SectionList } from "@/components/LegalPage";
 import { LAST_UPDATED, PRIVACY } from "@/lib/legal";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Privacy Policy",
-  description: "What SemesterForge collects, how it is used, and the controls you have over your data.",
-  alternates: { canonical: "/privacy" },
-};
+  description:
+    "What the SemesterForge app collects, how it is used, who it is shared with, and the controls you have over your data.",
+  path: "/privacy",
+});
 
 export default function PrivacyPage() {
   return (

@@ -42,7 +42,7 @@ export function Footer() {
 
           {columns.map((col) => (
             <nav key={col.title} aria-label={col.title}>
-              <h2 className="text-sm font-semibold text-white">{col.title}</h2>
+              <p className="text-sm font-semibold text-white">{col.title}</p>
               <ul className="mt-4 space-y-3 text-sm text-white/55">
                 {col.links.map(([label, href]) => (
                   <li key={href}>
@@ -56,7 +56,7 @@ export function Footer() {
           ))}
 
           <div>
-            <h2 className="text-sm font-semibold text-white">Contact</h2>
+            <p className="text-sm font-semibold text-white">Contact</p>
             <ul className="mt-4 space-y-3 text-sm text-white/55">
               <li>
                 <a href={`mailto:${SUPPORT_EMAIL}`} className="transition hover:text-white">

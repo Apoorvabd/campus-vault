@@ -7,7 +7,8 @@ import { Phone } from "@/components/Phone";
 import { Reveal } from "@/components/Reveal";
 import { ShakeHeading } from "@/components/ShakeHeading";
 import { Statement } from "@/components/Statement";
-import { FAQ, SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
+import Link from "next/link";
+import { FAQ, GITHUB_URL, SITE_DESCRIPTION, SITE_NAME, SITE_URL, SUPPORT_EMAIL } from "@/lib/site";
 
 const features = [
   {
@@ -16,7 +17,7 @@ const features = [
     title: "Your subjects, sorted for you.",
     body: "Pick your course and semester once. Every subject shows up with its code and type, and opens straight to its papers, notes and syllabus.",
     points: ["Search notes and PYQs from one bar", "Subjects grouped by your semester", "Bookmark anything for later"],
-    src: "/screens/subjects.png",
+    src: "/screens/subjects.webp",
     alt: "SemesterForge Resources tab listing the student's subjects for the semester",
     glow: "bg-brand/45",
     accent: "text-[#8fb0ff]",
@@ -27,7 +28,7 @@ const features = [
     title: "Add what helped you, from anywhere.",
     body: "Upload a PDF, pick photos from your gallery, snap a page with the camera or paste a Drive link. Everything is reviewed by an admin before others see it.",
     points: ["Files, photos, camera or link", "Reviewed before it goes public", "Earn credit when it helps others"],
-    src: "/screens/add.png",
+    src: "/screens/add.webp",
     alt: "Add Document screen with Files, Photos, Camera and Link options",
     glow: "bg-violet/40",
     accent: "text-[#b69cff]",
@@ -38,7 +39,7 @@ const features = [
     title: "Tagged right, found fast.",
     body: "Give it a title, pick the subject and mark it as a PYQ, notes, syllabus, reference book, assignment or lab manual. Clean tags are what keep the Vault easy to search.",
     points: ["PYQ, notes, syllabus, lab manual and more", "Linked to the exact subject", "Optional description for exam year or unit"],
-    src: "/screens/form.png",
+    src: "/screens/form.webp",
     alt: "Add Document form with title, subject and category fields",
     glow: "bg-teal/35",
     accent: "text-[#5eead4]",
@@ -49,7 +50,7 @@ const features = [
     title: "Your course, your college, your credit.",
     body: "Your profile keeps your course, semester and college in one place, with your uploads, posts and likes counted. Requests and contributor badges are coming right behind it.",
     points: ["Uploads, posts and likes at a glance", "Resource requests", "Contributor badges"],
-    src: "/screens/profile.png",
+    src: "/screens/profile.webp",
     alt: "Profile screen showing course, semester, college and upload stats",
     glow: "bg-pink/35",
     accent: "text-[#f9a8d4]",
@@ -61,7 +62,24 @@ const duCourses = ["B.A. (Hons)", "B.Com (Hons)", "B.Sc. (Hons)", "B.Voc", "B.Te
 const jsonLd = {
   "@context": "https://schema.org",
   "@graph": [
-    { "@type": "WebSite", "@id": `${SITE_URL}/#website`, url: SITE_URL, name: SITE_NAME, description: SITE_DESCRIPTION, inLanguage: "en-IN" },
+    {
+      "@type": "Organization",
+      "@id": `${SITE_URL}/#organization`,
+      name: SITE_NAME,
+      url: SITE_URL,
+      logo: { "@type": "ImageObject", url: `${SITE_URL}/apple-icon`, width: 180, height: 180 },
+      sameAs: [GITHUB_URL],
+      contactPoint: { "@type": "ContactPoint", contactType: "customer support", email: SUPPORT_EMAIL },
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${SITE_URL}/#website`,
+      url: SITE_URL,
+      name: SITE_NAME,
+      description: SITE_DESCRIPTION,
+      inLanguage: "en-IN",
+      publisher: { "@id": `${SITE_URL}/#organization` },
+    },
     {
       "@type": "SoftwareApplication",
       name: SITE_NAME,
@@ -70,6 +88,7 @@ const jsonLd = {
       description: SITE_DESCRIPTION,
       audience: { "@type": "EducationalAudience", educationalRole: "student" },
       url: SITE_URL,
+      publisher: { "@id": `${SITE_URL}/#organization` },
     },
     {
       "@type": "FAQPage",
@@ -140,36 +159,34 @@ export default function Home() {
         <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[900px] bg-[radial-gradient(60%_50%_at_30%_0%,rgba(79,70,229,0.3),transparent_70%),radial-gradient(40%_35%_at_90%_30%,rgba(190,24,93,0.18),transparent_70%),radial-gradient(35%_30%_at_5%_40%,rgba(13,148,136,0.15),transparent_70%)]" />
         <div className="mx-auto grid w-full max-w-6xl items-center gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-6">
           <div className="text-center lg:pl-14 lg:text-left">
-            <Reveal>
-              <p className="mb-6 inline-block rounded-full border border-white/20 bg-[#0d1030] px-4 py-1.5 text-xs font-medium text-white shadow-[0_8px_24px_-10px_rgba(0,0,0,0.8)]">
-                DU PYQs, notes &amp; syllabus in one app
-              </p>
-            </Reveal>
-            <Reveal delay={60}>
+            <div className="hero-in">
               <ShakeHeading className="max-w-3xl font-bold tracking-tight">
+                <span className="mx-auto mb-6 block w-fit rounded-full border border-white/20 bg-[#0d1030] px-4 py-1.5 text-xs font-medium tracking-normal text-white shadow-[0_8px_24px_-10px_rgba(0,0,0,0.8)] lg:mx-0">
+                  DU PYQs, notes &amp; syllabus in one app
+                </span>
                 <span className="grad-title block text-[2.06rem] leading-tight font-semibold sm:text-[2.475rem] lg:text-[2.86rem]">
                   Your whole semester.
                 </span>
                 <span className="grad-warm mt-1 block text-[4.05rem] leading-[0.95] sm:text-[5.4rem] lg:text-[6.75rem]">One app</span>
               </ShakeHeading>
-            </Reveal>
-            <Reveal delay={120}>
+            </div>
+            <div className="hero-in" style={{ "--d": "120ms" } as React.CSSProperties}>
               <p className="mx-auto mt-6 max-w-xl text-lg text-muted lg:mx-0">
                 Delhi University previous year question papers (PYQs), notes, syllabi and your own files, organised by course and subject, so exam week starts with opening the app.
               </p>
-            </Reveal>
-            <Reveal delay={180}>
+            </div>
+            <div className="hero-in" style={{ "--d": "180ms" } as React.CSSProperties}>
               <div id="get-app" className="mt-9 flex scroll-mt-32 flex-wrap items-center justify-center gap-3 lg:justify-start">
                 <StoreBadge sub="Download for" label="Android (APK)" />
                 <StoreBadge sub="Coming to" label="iPhone" />
               </div>
               <p className="mt-3 text-xs text-white/40">Download link going live soon</p>
-            </Reveal>
+            </div>
           </div>
 
-          <Reveal variant="fade" delay={250}>
+          <div className="hero-in" style={{ "--d": "250ms" } as React.CSSProperties}>
             <PhoneCarousel />
-          </Reveal>
+          </div>
         </div>
       </section>
 
@@ -334,6 +351,13 @@ export default function Home() {
             </Reveal>
           ))}
         </div>
+        <p className="mt-8 text-center text-sm text-muted">
+          More answers about uploads, XP and reports are in the{" "}
+          <Link href="/help" className="text-[#a5b4fc] underline-offset-4 hover:underline">
+            SemesterForge Help Center
+          </Link>
+          .
+        </p>
       </section>
 
       {/* CTA */}

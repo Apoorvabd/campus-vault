@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { LegalPage } from "@/components/LegalPage";
 import { HELP_FAQ } from "@/lib/legal";
 import { SUPPORT_EMAIL } from "@/lib/site";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Help Center",
-  description: "Answers about uploading resources, offline storage, XP, rejected documents and reporting content in SemesterForge.",
-  alternates: { canonical: "/help" },
-};
+  description:
+    "Answers about uploading resources, rejected documents, offline storage, XP and reporting content in the SemesterForge app, plus how to contact support.",
+  path: "/help",
+});
 
 const actions = [
   ["Contact Support", `mailto:${SUPPORT_EMAIL}`, "Questions, feedback or something not working."],

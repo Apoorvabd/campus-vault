@@ -6,8 +6,8 @@ import { useEffect, useState } from "react";
 
 const SCREENS = [
   { src: "/screens/home.webp", alt: "SemesterForge home screen with profile card and community feed", label: "Home" },
-  { src: "/screens/subjects.png", alt: "SemesterForge Resources tab listing the student's subjects", label: "Subjects" },
-  { src: "/screens/add.png", alt: "SemesterForge Add Document screen with Files, Photos, Camera and Link", label: "Add" },
+  { src: "/screens/subjects.webp", alt: "SemesterForge Resources tab listing the student's subjects", label: "Subjects" },
+  { src: "/screens/add.webp", alt: "SemesterForge Add Document screen with Files, Photos, Camera and Link", label: "Add" },
 ];
 const COUNT = SCREENS.length;
 
@@ -152,7 +152,7 @@ export function PhoneCarousel() {
         </div>
 
         {/* Three dots. The active one stretches into a pill and fills up while the screen is showing. */}
-        <div className="relative z-10 mt-6 flex items-center justify-center gap-2.5">
+        <div className="relative z-10 mt-4 flex items-center justify-center">
           {SCREENS.map((screen, i) => {
             const on = i === active;
             return (
@@ -162,19 +162,23 @@ export function PhoneCarousel() {
                 onClick={() => goTo(i)}
                 aria-label={`Show ${screen.label} screen`}
                 aria-current={on}
-                className={`relative h-2 cursor-pointer overflow-hidden rounded-full bg-white/25 transition-all duration-500 ${
-                  on ? "w-10" : "w-2 hover:bg-white/45"
-                }`}
+                className="group flex h-11 cursor-pointer items-center justify-center px-2.5"
               >
-                {on && (
-                  <motion.span
-                    key={index}
-                    className="absolute inset-0 origin-left rounded-full bg-gradient-to-r from-indigo-300 via-fuchsia-300 to-rose-300"
-                    initial={reduce ? false : { scaleX: 0 }}
-                    animate={{ scaleX: 1 }}
-                    transition={{ duration: reduce ? 0 : STEP_MS / 1000, ease: "linear" }}
-                  />
-                )}
+                <span
+                  className={`relative block h-2 overflow-hidden rounded-full bg-white/25 transition-all duration-500 ${
+                    on ? "w-10" : "w-2 group-hover:bg-white/45"
+                  }`}
+                >
+                  {on && (
+                    <motion.span
+                      key={index}
+                      className="absolute inset-0 origin-left rounded-full bg-gradient-to-r from-indigo-300 via-fuchsia-300 to-rose-300"
+                      initial={reduce ? false : { scaleX: 0 }}
+                      animate={{ scaleX: 1 }}
+                      transition={{ duration: reduce ? 0 : STEP_MS / 1000, ease: "linear" }}
+                    />
+                  )}
+                </span>
               </button>
             );
           })}

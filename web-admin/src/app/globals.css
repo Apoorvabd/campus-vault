@@ -21,7 +21,6 @@
   --color-teal: var(--teal);
   --color-pink: var(--pink);
   --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 }
 
 html {
@@ -44,6 +43,16 @@ body {
 
 ::selection {
   background: rgba(47, 111, 237, 0.4);
+}
+
+/* Hero entrance in plain CSS, so the headline is in the first paint and does not wait for JavaScript. */
+@keyframes hero-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
+.hero-in {
+  animation: hero-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--d, 0ms);
 }
 
 /* Gradient text helpers */
@@ -117,6 +126,6 @@ details[open] .faq-plus { transform: rotate(45deg); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-float, .marquee-track, .float-card { animation: none; }
+  .animate-float, .marquee-track, .float-card, .hero-in { animation: none; }
   html { scroll-behavior: auto; }
 }

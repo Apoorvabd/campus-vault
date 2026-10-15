@@ -35,7 +35,7 @@ export function Nav() {
 
   return (
     <motion.header
-      initial={{ y: -30, opacity: 0 }}
+      initial={false}
       animate={hidden ? { y: "-110%", opacity: 0 } : { y: 0, opacity: 1 }}
       transition={{ duration: hidden ? 0.45 : 0.55, ease: [0.22, 1, 0.36, 1] }}
       aria-hidden={hidden}
