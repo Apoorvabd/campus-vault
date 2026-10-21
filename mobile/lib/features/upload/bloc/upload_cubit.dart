@@ -1,5 +1,6 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../../core/data/resources_repository.dart';
 import '../../../core/data/subjects_repository.dart';
 import '../../../core/models/resource.dart';
@@ -97,7 +98,59 @@ class UploadCubit extends Cubit<UploadState> {
     }
   }
 
+  /// A photo from the gallery or the camera (a page snapped on the spot).
+  Future<void> pickPhoto(ImageSource source) async {
+    final XFile? photo;
+    try {
+      photo = await ImagePicker().pickImage(
+        source: source,
+        maxWidth: 2400,
+        imageQuality: 90,
+      );
+    } catch (_) {
+      if (!isClosed) {
+        emit(
+          state.copyWith(
+            error: source == ImageSource.camera
+                ? 'Could not open the camera. Check the camera permission.'
+                : 'Could not open your gallery.',
+          ),
+        );
+      }
+      return;
+    }
+    if (isClosed || photo == null) return; // user cancelled
+
+    final name = photo.name;
+    final dot = name.lastIndexOf('.');
+    final extension = dot > 0 ? name.substring(dot + 1).toLowerCase() : '';
+    final size = await photo.length();
+    if (isClosed) return;
+
+    if (!allowedExtensions.contains(extension)) {
+      emit(state.copyWith(error: 'Only PDF, JPG or PNG files are supported.'));
+    } else if (size > maxFileBytes) {
+      emit(
+        state.copyWith(error: 'File is too large. The maximum size is 15 MB.'),
+      );
+    } else {
+      emit(
+        state.copyWith(filePath: photo.path, fileName: name, fileSize: size),
+      );
+    }
+  }
+
   void removeFile() => emit(state.copyWith(clearFile: true));
+
+  /// What is missing on the "add the document" step: a file, or a valid link.
+  String? fileProblem({required String url}) {
+    if (state.source == ResourceSource.externalLink) {
+      return _isValidUrl(url.trim())
+          ? null
+          : 'Enter a valid link starting with http:// or https://';
+    }
+    return state.hasFile ? null : 'Pick a file or paste a link first.';
+  }
 
   /// The first thing wrong with the form, or null when it can be saved.
   /// Shared by the online upload and the save-on-device path.

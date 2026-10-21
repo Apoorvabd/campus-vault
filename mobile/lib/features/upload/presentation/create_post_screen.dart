@@ -53,14 +53,87 @@ class _PostComposerViewState extends State<_PostComposerView> {
     super.dispose();
   }
 
-  Future<void> _pickCover() async {
-    final picked = await ImagePicker().pickImage(
-      source: ImageSource.gallery,
-      maxWidth: 1600,
-      imageQuality: 85,
+  /// "Add+" opens a small menu: take a photo with the camera, or pick one
+  /// from the gallery.
+  Future<void> _showAddMenu() async {
+    final hasCover = context.read<CreatePostCubit>().state.coverPath != null;
+    final choice = await showModalBottomSheet<String>(
+      context: context,
+      useSafeArea: true,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: AppSpacing.sm),
+            ListTile(
+              leading: const Icon(
+                Icons.photo_camera_outlined,
+                color: AppColors.primary,
+              ),
+              title: const Text('Take a photo'),
+              onTap: () => Navigator.pop(sheetContext, 'camera'),
+            ),
+            ListTile(
+              leading: const Icon(
+                Icons.photo_library_outlined,
+                color: AppColors.primary,
+              ),
+              title: const Text('Choose from gallery'),
+              onTap: () => Navigator.pop(sheetContext, 'gallery'),
+            ),
+            if (hasCover)
+              ListTile(
+                leading: const Icon(
+                  Icons.delete_outline,
+                  color: AppColors.error,
+                ),
+                title: const Text('Remove photo'),
+                onTap: () => Navigator.pop(sheetContext, 'remove'),
+              ),
+            const SizedBox(height: AppSpacing.sm),
+          ],
+        ),
+      ),
     );
-    if (picked != null && mounted) {
-      context.read<CreatePostCubit>().setCover(picked.path);
+    if (!mounted || choice == null) return;
+    switch (choice) {
+      case 'camera':
+        await _pickCover(ImageSource.camera);
+      case 'gallery':
+        await _pickCover(ImageSource.gallery);
+      case 'remove':
+        context.read<CreatePostCubit>().removeCover();
+    }
+  }
+
+  Future<void> _pickCover(ImageSource source) async {
+    try {
+      final picked = await ImagePicker().pickImage(
+        source: source,
+        maxWidth: 1600,
+        imageQuality: 85,
+      );
+      if (picked != null && mounted) {
+        context.read<CreatePostCubit>().setCover(picked.path);
+      }
+    } catch (_) {
+      // No camera, or permission denied
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(
+              source == ImageSource.camera
+                  ? 'Could not open the camera. Check the camera permission.'
+                  : 'Could not open your gallery.',
+            ),
+          ),
+        );
     }
   }
 
@@ -241,13 +314,40 @@ class _PostComposerViewState extends State<_PostComposerView> {
           ),
           child: Row(
             children: [
-              IconButton(
-                tooltip: 'Add cover image',
-                icon: const Icon(
-                  Icons.image_outlined,
-                  color: AppColors.primary,
+              // Clearly visible "Add+" pill instead of a small bare icon
+              Material(
+                color: AppColors.primaryLight,
+                shape: const StadiumBorder(
+                  side: BorderSide(color: AppColors.primary, width: 1.2),
                 ),
-                onPressed: state.isSubmitting ? null : _pickCover,
+                child: InkWell(
+                  customBorder: const StadiumBorder(),
+                  onTap: state.isSubmitting ? null : _showAddMenu,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md,
+                      vertical: AppSpacing.sm,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.add_photo_alternate_outlined,
+                          color: AppColors.primary,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          'Add+',
+                          style: AppTextStyles.bodySemiBold.copyWith(
+                            color: AppColors.primary,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
               const SizedBox(width: AppSpacing.xs),
               Text(

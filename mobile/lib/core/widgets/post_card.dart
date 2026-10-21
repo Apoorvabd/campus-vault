@@ -4,6 +4,7 @@ import '../theme/app_spacing.dart';
 import '../theme/app_text_styles.dart';
 import 'app_card.dart';
 import 'avatar_circle.dart';
+import 'image_viewer.dart';
 
 /// Optional small attachment preview shown inside a [PostCard].
 class PostAttachment {
@@ -119,14 +120,18 @@ class PostCard extends StatelessWidget {
           Text(body, style: AppTextStyles.bodyMedium),
           if (coverImageUrl != null) ...[
             SizedBox(height: gap),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.network(
-                coverImageUrl!,
-                width: double.infinity,
-                height: 180,
-                fit: BoxFit.cover,
-                errorBuilder: (_, _, _) => const SizedBox.shrink(),
+            // Tap the photo to view it full screen inside the app
+            GestureDetector(
+              onTap: () => showImageViewer(context, coverImageUrl!),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.network(
+                  coverImageUrl!,
+                  width: double.infinity,
+                  height: 180,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                ),
               ),
             ),
           ],
