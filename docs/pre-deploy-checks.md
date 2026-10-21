@@ -48,7 +48,7 @@ section mein hai.
 - [ ] `/test` route production mein khula hai ([routes/index.ts](../backend/src/routes/index.ts), `router.use("/test", testRoutes)`). Ise hatao ya sirf non-production par chalao.
 - [ ] Database kaunsa use hoga tay karo. Abhi `DATABASE_URL` wahi Supabase hai jo local dev mein chalta hai, to testers ka data bhi usi mein jayega. Alag production DB chahiye to naya banake migrations aur seed chalani padegi.
 - [ ] Seed data check karo: universities, colleges, courses, subjects database mein hone chahiye.
-- [ ] Users ka `canPost` default `false` hai. Testers ko Create Post chalane ke liye `canPost = true` karna padega (Prisma Studio ya SQL).
+- [x] Register karte waqt `canPost: true` set hota hai ([auth.service.ts:41](../backend/src/modules/auth/auth.service.ts)), to naye users Create Post chala sakte hain. (Schema ka default `false` hai aur schema comment kehta hai ki admin grant kare, par signup usko override karta hai. Final release mein tay karo ki ye chahiye ya nahi.)
 - [ ] Resources `PENDING` bante hain aur sirf `APPROVED` dikhte hain. App mein approve karne ka admin screen nahi hai. Ek admin user banao aur resources ko API ya SQL se approve karo.
 - [ ] Ek SUPER_ADMIN ya admin user bana ke rakho.
 - [ ] Final ke liye (abhi zaroori nahi): rate limiting, `app.set("trust proxy", ...)`, helmet.
@@ -92,7 +92,7 @@ Phone par release APK install karke:
 - [ ] Home: Community aur Resources swipe aur tab tap, feed load hoti hai
 - [ ] Subject detail kholna aur resource open karna (in-app browser)
 - [ ] Add Document: file upload (Cloudinary) aur external link
-- [ ] Create Post (user ka `canPost` true karke), Comments add aur delete
+- [ ] Create Post, Comments add aur delete
 - [ ] Saved screen, bookmark add aur hatana
 - [ ] Profile: Curriculum aur semester badalna, My Subjects, Edit profile
 - [ ] Logout, phir wapas Welcome

@@ -316,6 +316,9 @@ model Resource {
 
   externalUrl String?
 
+  // Where the link came from: du-qb, drive-seed, du-academicaffairs, ramanujan-library, dupyq, college:<Name>, college:<Name>-loose ...
+  source String?
+
   subjectId String
   uploadId  String? @unique
 
@@ -346,6 +349,7 @@ model Resource {
   @@index([status])
   @@index([resourceType])
   @@index([sourceType])
+  @@index([source])
   @@index([subjectId, status])
 }
 
