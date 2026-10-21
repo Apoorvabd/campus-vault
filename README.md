@@ -29,6 +29,7 @@ This is built around **two pillars** that intentionally use different trust mode
   - **External link**: points elsewhere (Drive, another site)
   - **Reference only**: pure metadata, no file, for "I have this locally, ask me" or crowdsourcing demand before a real upload exists
 
+
 - **The Feed** (engagement, social, lower-trust). Students post updates and discussions; most people can react (comment, like, bookmark) but posting is a permission independent of role, so a trusted senior or club rep can post without being made an admin.
 
 The feature that differentiates this from a generic PYQ site is **local resource binding**: a student can point the app at a file already sitting on their own device (a note, a scanned page, anything) and bind it to a subject without ever uploading it anywhere. Combined with the Vault's own resources, this becomes **Exam Mode**: one screen per subject, showing everything the student collected across the whole semester in a single scroll. That screen is the actual pitch.
