@@ -78,6 +78,7 @@ class _SignupStep2ViewState extends State<_SignupStep2View> {
         lastName: draft.lastName,
         username: draft.username,
         email: draft.email,
+        emailProof: draft.emailProof,
         password: draft.password,
         universityId: catalog.selectedUniversity!.id,
         collegeId: catalog.selectedCollege!.id,

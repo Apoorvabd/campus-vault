@@ -6,6 +6,7 @@ class SignupDraft {
     this.lastName,
     this.username,
     required this.email,
+    required this.emailProof,
     required this.password,
   });
 
@@ -13,5 +14,6 @@ class SignupDraft {
   final String? lastName; // null when left empty (backend allows that)
   final String? username; // null -> backend generates one
   final String email;
+  final String emailProof; // from the email OTP check; register needs it
   final String password;
 }

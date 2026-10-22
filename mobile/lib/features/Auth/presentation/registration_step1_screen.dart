@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../core/utils/validators.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/app_card.dart';
@@ -9,6 +10,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../catalog/data/catalog_repository.dart';
 import '../data/signup_draft.dart';
+import './email_otp_section.dart';
 import './registration_step2_screen.dart';
 
 class SignupStep1Screen extends StatefulWidget {
@@ -26,6 +28,9 @@ class _SignupStep1ScreenState extends State<SignupStep1Screen> {
   final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+
+  // Set once the emailed code is confirmed; Next stays blocked until then
+  String? _emailProof;
 
   @override
   void initState() {
@@ -51,7 +56,6 @@ class _SignupStep1ScreenState extends State<SignupStep1Screen> {
   String? _validate() {
     final firstName = _firstNameController.text.trim();
     final username = _usernameController.text.trim();
-    final email = _emailController.text.trim();
     final password = _passwordController.text;
 
     if (firstName.length < 3) {
@@ -65,21 +69,33 @@ class _SignupStep1ScreenState extends State<SignupStep1Screen> {
         return 'Username can only have letters, numbers and underscores';
       }
     }
-    if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(email)) {
-      return 'Enter a valid email address';
-    }
     if (password.length < 8) {
       return 'Password must be at least 8 characters';
     }
     return null;
   }
 
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
+  }
+
   void _next() {
+    final proof = _emailProof;
+    if (proof == null) {
+      final email = _emailController.text.trim();
+      _showMessage(
+        email.isNotEmpty && !isValidEmail(email)
+            ? 'Fill correct email'
+            : 'Verify email first',
+      );
+      return;
+    }
+
     final error = _validate();
     if (error != null) {
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(SnackBar(content: Text(error)));
+      _showMessage(error);
       return;
     }
 
@@ -92,6 +108,7 @@ class _SignupStep1ScreenState extends State<SignupStep1Screen> {
       lastName: nullIfEmpty(_lastNameController.text),
       username: nullIfEmpty(_usernameController.text),
       email: _emailController.text.trim(),
+      emailProof: proof,
       password: _passwordController.text,
     );
 
@@ -143,11 +160,10 @@ class _SignupStep1ScreenState extends State<SignupStep1Screen> {
                   controller: _usernameController,
                 ),
                 const SizedBox(height: AppSpacing.md),
-                AppTextField(
-                  label: 'Email Address',
-                  hint: 'e.g. alex@university.edu',
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
+                EmailOtpSection(
+                  emailController: _emailController,
+                  onVerifiedChanged: (proof) =>
+                      setState(() => _emailProof = proof),
                 ),
                 const SizedBox(height: AppSpacing.md),
                 AppTextField(
@@ -162,12 +178,17 @@ class _SignupStep1ScreenState extends State<SignupStep1Screen> {
                       setState(() => _obscurePassword = !_obscurePassword),
                 ),
                 const SizedBox(height: AppSpacing.lg),
-                AppButton(
-                  label: 'Next Step',
-                  icon: Icons.arrow_forward,
-                  fontSize: 16,
-                  radius: 8,
-                  onPressed: _next,
+                // Looks disabled until the email is verified, but stays
+                // tappable so it can say why
+                Opacity(
+                  opacity: _emailProof == null ? 0.5 : 1,
+                  child: AppButton(
+                    label: 'Next Step',
+                    icon: Icons.arrow_forward,
+                    fontSize: 16,
+                    radius: 8,
+                    onPressed: _next,
+                  ),
                 ),
               ],
             ),
