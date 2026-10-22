@@ -226,19 +226,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: AppSpacing.md),
           _LogoutButton(onTap: _confirmLogout),
           const SizedBox(height: AppSpacing.lg),
-          Center(
-            child: Column(
-              children: [
-                Text(
-                  'Semester Forge v2.4.1 (Build 2024.11)',
-                  style: AppTextStyles.caption,
-                ),
-                const SizedBox(height: AppSpacing.xs),
-                if (profile != null)
-                  Text(profile.universityName, style: AppTextStyles.caption),
-              ],
+          if (profile != null)
+            Center(
+              child: Text(profile.universityName, style: AppTextStyles.caption),
             ),
-          ),
         ],
       ),
     );
