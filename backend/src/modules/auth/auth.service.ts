@@ -86,7 +86,12 @@ export const loginUser= async (email:string , password:string): Promise<{user:an
         throw new AppError('Invalid Credentials ', 401);
     }
 
-    const tokens: AuthTokens = { 
+    // Checked after the password so a stranger cannot learn which accounts exist
+    if (!user.isActive) {
+        throw new AppError('Account is deactivated', 403);
+    }
+
+    const tokens: AuthTokens = {
         accessToken: generateAccessToken(
             {email: user.email, userId: user.id, role: user.role},
         ),
