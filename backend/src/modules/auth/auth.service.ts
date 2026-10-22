@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import { Prisma } from '@prisma/client';
 import { randomInt } from 'node:crypto';
 import { generateRefreshToken, generateAccessToken ,verifyRefreshToken} from './../../config/jwt';
-import { findUserByEmail, createUser, findUserByUsername, findUserById } from './auth.repository';
+import { findUserByEmail, createUser, findUserByUsername, findUserById, findCollegeAndCourse } from './auth.repository';
 import { RegisterInput, AuthTokens } from './auth.types';
 import { AppError } from '../../utils';
 
@@ -17,6 +17,17 @@ export const registerUser = async (
   const requestedUsername = input.username?.trim().toLowerCase();
   if (requestedUsername && await findUserByUsername(requestedUsername)) {
     throw new AppError('User with this username already exists', 409);
+  }
+
+  const [college, course] = await findCollegeAndCourse(input.collegeId, input.courseId);
+  if (!college) {
+    throw new AppError('College not found', 404);
+  }
+  if (!course) {
+    throw new AppError('Course not found', 404);
+  }
+  if (college.universityId !== input.universityId || course.universityId !== input.universityId) {
+    throw new AppError('College and course must belong to the selected university', 400);
   }
 
   const hashedPassword = await bcrypt.hash(input.password, 10);

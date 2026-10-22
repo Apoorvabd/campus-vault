@@ -43,6 +43,13 @@ export const findUserByUsername = async (username: string) => {
 };
 
 
+export const findCollegeAndCourse = async (collegeId: string, courseId: string) => {
+  return Promise.all([
+    prisma.college.findUnique({ where: { id: collegeId }, select: { universityId: true } }),
+    prisma.course.findUnique({ where: { id: courseId }, select: { universityId: true } }),
+  ]);
+};
+
 export const createUser = async (
   userData: Omit<RegisterInput, "password" | "username"> & {
     username: string;
