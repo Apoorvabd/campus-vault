@@ -50,16 +50,12 @@ class _SignupStep1ScreenState extends State<SignupStep1Screen> {
   /// without a network call.
   String? _validate() {
     final firstName = _firstNameController.text.trim();
-    final lastName = _lastNameController.text.trim();
     final username = _usernameController.text.trim();
     final email = _emailController.text.trim();
     final password = _passwordController.text;
 
     if (firstName.length < 3) {
       return 'First name must be at least 3 characters';
-    }
-    if (lastName.isNotEmpty && lastName.length < 3) {
-      return 'Last name must be at least 3 characters';
     }
     if (username.isNotEmpty) {
       if (username.length < 3 || username.length > 30) {

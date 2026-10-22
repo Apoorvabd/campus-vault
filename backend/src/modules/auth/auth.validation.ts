@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const registerSchema = z.object({
   firstName: z.string().trim().min(3, "First name must be at least 3 characters"),
-  lastName: z.string().trim().min(3, "Last name must be at least 3 characters").optional(),
+  lastName: z.string().trim().min(1, "Last name cannot be empty").optional(),
   username: z
     .string()
     .trim()
