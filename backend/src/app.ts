@@ -10,6 +10,10 @@ import routes from "./routes";
 
 const app: Express = express();
 
+// Render sits behind one proxy; without this every client shares the proxy's IP
+// and the rate limiters would count them all together.
+app.set("trust proxy", 1);
+
 app.use(
   cors({
     origin: process.env.CLIENT_URL,
