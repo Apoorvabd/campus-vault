@@ -1,13 +1,14 @@
 import { FONT, escapeHtml } from "./blocks";
 
-// Cloudinary resizes on the fly (w_320): 320px is sharp enough for the 140px
-// logo on high-density screens, at ~15 KB instead of the 187 KB original. The
-// logo is a light square, so it gets rounded corners to look like a tile on the
+// Cloudinary resizes on the fly (w_320): 320px is sharp enough for the 160px
+// logo on high-density screens, at ~18 KB instead of the 136 KB original. The
+// original is 1378x1108, so the displayed size keeps that ratio (160x129). Its
+// background is white, so it gets rounded corners to look like a tile on the
 // dark-mode card.
 const LOGO_URL =
-  "https://res.cloudinary.com/dsbare0x9/image/upload/w_320,q_auto/v1792707159/dukestudent/resources/n1hwbmbieit2zblc0k8u.jpg";
+  "https://res.cloudinary.com/dsbare0x9/image/upload/w_320,q_auto/v1792707728/dukestudent/resources/ixejjcc0nyfwvl81ck3u.jpg";
 
-const LOGO = `<div style="text-align:center;margin-bottom:20px;"><img src="${LOGO_URL}" width="140" height="140" alt="Semester Forge" style="display:inline-block;width:140px;height:140px;border:0;border-radius:16px;background-color:#FFFFFF;"></div>`;
+const LOGO = `<div style="text-align:center;margin-bottom:20px;"><img src="${LOGO_URL}" width="160" height="129" alt="Semester Forge" style="display:inline-block;width:160px;height:129px;border:0;border-radius:16px;background-color:#FFFFFF;"></div>`;
 
 // The fixed top (brand) and bottom (footer) shared by every email. A template
 // only supplies the `content` that goes in the card between them.
