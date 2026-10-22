@@ -1,5 +1,14 @@
 import { FONT, escapeHtml } from "./blocks";
 
+// Cloudinary resizes on the fly (w_320): 320px is sharp enough for the 140px
+// logo on high-density screens, at ~15 KB instead of the 187 KB original. The
+// logo is a light square, so it gets rounded corners to look like a tile on the
+// dark-mode card.
+const LOGO_URL =
+  "https://res.cloudinary.com/dsbare0x9/image/upload/w_320,q_auto/v1792707159/dukestudent/resources/n1hwbmbieit2zblc0k8u.jpg";
+
+const LOGO = `<div style="text-align:center;margin-bottom:20px;"><img src="${LOGO_URL}" width="140" height="140" alt="Semester Forge" style="display:inline-block;width:140px;height:140px;border:0;border-radius:16px;background-color:#FFFFFF;"></div>`;
+
 // The fixed top (brand) and bottom (footer) shared by every email. A template
 // only supplies the `content` that goes in the card between them.
 export const renderLayout = ({
@@ -40,20 +49,10 @@ export const renderLayout = ({
       <td align="center" style="padding:32px 12px;">
         <table role="presentation" width="560" cellpadding="0" cellspacing="0" border="0" class="container" style="width:560px;max-width:560px;">
           <tr>
-            <td style="padding:0 4px 16px 4px;font-family:${FONT};">
-              <table role="presentation" cellpadding="0" cellspacing="0" border="0">
-                <tr>
-                  <td width="32" height="32" align="center" valign="middle" style="width:32px;height:32px;background-color:#2F6FED;border-radius:9px;color:#FFFFFF;font-size:15px;font-weight:700;line-height:32px;">SF</td>
-                  <td class="text-main" style="padding-left:10px;font-size:17px;font-weight:700;color:#0F172A;">Semester Forge</td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-          <tr>
             <td class="bg-card" style="background-color:#FFFFFF;border:1px solid #E2E8F0;border-radius:16px;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                 <tr>
-                  <td class="pad" style="padding:36px;">${content}</td>
+                  <td class="pad" style="padding:36px;">${LOGO}${content}</td>
                 </tr>
               </table>
             </td>
