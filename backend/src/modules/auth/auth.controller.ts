@@ -2,7 +2,7 @@
 
 import { Request, Response } from "express";
 import { asyncHandler, sendResponse } from "../../utils";
-import { loginUser, registerUser,refreshTokens ,getMeService} from "./auth.service";
+import { loginUser, registerUser,refreshTokens ,getMeService, logoutUser} from "./auth.service";
 
 export const register = asyncHandler(async (req: Request, res: Response) => {
   const { user, tokens } = await registerUser(req.body);
@@ -54,9 +54,9 @@ export const getMe = asyncHandler(async (req: Request, res: Response) => {
   );
 });
 
-export const logout = asyncHandler(async (_req: Request, res: Response) => {
-  // Stateless refresh hai abhi, DB me kuch invalidate nahi karna —
-  // bas client ko signal do ki token discard kar de
+export const logout = asyncHandler(async (req: Request, res: Response) => {
+  await logoutUser(req.user!.id);
+
   res.status(200).json(
     sendResponse(res, {
       statusCode: 200,

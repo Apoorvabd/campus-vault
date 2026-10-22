@@ -223,6 +223,10 @@ model User {
   isVerified Boolean @default(false)
   isActive   Boolean @default(true)
 
+  // Bumped on logout. A refresh token carries the value it was issued with,
+  // so every older refresh token stops working.
+  tokenVersion Int @default(0)
+
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
   lastSeenAt DateTime?

@@ -30,6 +30,22 @@ export const findUserById = async (id: string) => {
   });
 };
 
+export const findUserForRefresh = async (id: string) => {
+  return prisma.user.findUnique({
+    where: { id },
+    select: { id: true, email: true, role: true, isActive: true, tokenVersion: true },
+  });
+};
+
+// Invalidates every refresh token issued so far for this user
+export const bumpTokenVersion = async (id: string) => {
+  return prisma.user.update({
+    where: { id },
+    data: { tokenVersion: { increment: 1 } },
+    select: { id: true },
+  });
+};
+
 export const findUserByEmail = async (email: string) => {
   return prisma.user.findUnique({
     where: { email },
