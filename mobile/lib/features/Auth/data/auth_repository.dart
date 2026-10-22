@@ -28,11 +28,41 @@ class AuthRepository {
     }
   }
 
+  /// Emails a 6-digit code. Returns how many seconds must pass before the next send.
+  Future<int> sendEmailCode(String email) async {
+    try {
+      final res = await _dio.post(
+        '/auth/email-verification/send',
+        data: {'email': email},
+      );
+      return res.data['data']['cooldownSeconds'] as int;
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);
+    }
+  }
+
+  /// Checks the code and returns the proof that register requires.
+  Future<String> verifyEmailCode({
+    required String email,
+    required String code,
+  }) async {
+    try {
+      final res = await _dio.post(
+        '/auth/email-verification/verify',
+        data: {'email': email, 'code': code},
+      );
+      return res.data['data']['emailProof'] as String;
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);
+    }
+  }
+
   Future<UserModel> register({
     required String firstName,
     String? lastName,
     String? username,
     required String email,
+    required String emailProof,
     required String password,
     required String universityId,
     required String collegeId,
@@ -48,6 +78,7 @@ class AuthRepository {
           if (lastName != null && lastName.isNotEmpty) 'lastName': lastName,
           if (username != null && username.isNotEmpty) 'username': username,
           'email': email,
+          'emailProof': emailProof,
           'password': password,
           'universityId': universityId,
           'collegeId': collegeId,

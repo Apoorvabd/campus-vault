@@ -30,6 +30,22 @@ export const findUserById = async (id: string) => {
   });
 };
 
+export const findUserForRefresh = async (id: string) => {
+  return prisma.user.findUnique({
+    where: { id },
+    select: { id: true, email: true, role: true, isActive: true, tokenVersion: true },
+  });
+};
+
+// Invalidates every refresh token issued so far for this user
+export const bumpTokenVersion = async (id: string) => {
+  return prisma.user.update({
+    where: { id },
+    data: { tokenVersion: { increment: 1 } },
+    select: { id: true },
+  });
+};
+
 export const findUserByEmail = async (email: string) => {
   return prisma.user.findUnique({
     where: { email },
@@ -43,11 +59,28 @@ export const findUserByUsername = async (username: string) => {
 };
 
 
+export const findCollegeAndCourse = async (collegeId: string, courseId: string) => {
+  return Promise.all([
+    prisma.college.findUnique({ where: { id: collegeId }, select: { universityId: true } }),
+    prisma.course.findUnique({ where: { id: courseId }, select: { universityId: true } }),
+  ]);
+};
+
+// Case-insensitive, because accounts keep the email exactly as it was typed
+export const isEmailRegistered = async (email: string) => {
+  const user = await prisma.user.findFirst({
+    where: { email: { equals: email, mode: "insensitive" } },
+    select: { id: true },
+  });
+  return user !== null;
+};
+
 export const createUser = async (
-  userData: Omit<RegisterInput, "password" | "username"> & {
+  userData: Omit<RegisterInput, "password" | "username" | "emailProof"> & {
     username: string;
     passwordHash: string;
     canPost: boolean;
+    isVerified: boolean;
   }
 ) => {
   return prisma.user.create({

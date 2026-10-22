@@ -25,6 +25,9 @@ export type ResourceFilters = {
 // Who is asking (undefined = anonymous). Decides what they may see.
 export type ResourceViewer = { id: string; role: string };
 
+// An admin approving or rejecting; UNIVERSITY_ADMIN is limited to their university
+export type ResourceModerator = ResourceViewer & { universityId: string };
+
 export type RejectResourceInput = {
   rejectionReason: string;
 };

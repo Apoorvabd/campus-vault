@@ -7,7 +7,7 @@ export const usernameParamsSchema = z.object({
 export const updateProfileSchema = z
   .object({
     firstName: z.string().trim().min(3, "First name must be at least 3 characters").max(80).optional(),
-    lastName: z.string().trim().min(3, "Last name must be at least 3 characters").max(80).nullable().optional(),
+    lastName: z.string().trim().min(1, "Last name cannot be empty").max(80).nullable().optional(),
     username: z
       .string()
       .trim()

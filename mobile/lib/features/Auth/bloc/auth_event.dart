@@ -30,6 +30,7 @@ class RegisterSubmitted extends AuthEvent {
     this.lastName,
     this.username,
     required this.email,
+    required this.emailProof,
     required this.password,
     required this.universityId,
     required this.collegeId,
@@ -41,6 +42,7 @@ class RegisterSubmitted extends AuthEvent {
   final String? lastName;
   final String? username;
   final String email;
+  final String emailProof;
   final String password;
   final String universityId;
   final String collegeId;
@@ -53,6 +55,7 @@ class RegisterSubmitted extends AuthEvent {
     lastName,
     username,
     email,
+    emailProof,
     password,
     universityId,
     collegeId,

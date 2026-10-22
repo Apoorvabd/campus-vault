@@ -2,9 +2,21 @@ import bcrypt from 'bcrypt';
 import { Prisma } from '@prisma/client';
 import { randomInt } from 'node:crypto';
 import { generateRefreshToken, generateAccessToken ,verifyRefreshToken} from './../../config/jwt';
-import { findUserByEmail, createUser, findUserByUsername, findUserById } from './auth.repository';
+import { findUserByEmail, createUser, findUserByUsername, findUserById, findCollegeAndCourse, findUserForRefresh, bumpTokenVersion } from './auth.repository';
 import { RegisterInput, AuthTokens } from './auth.types';
+import { assertEmailProof, clearEmailProof } from './emailVerification.service';
 import { AppError } from '../../utils';
+
+const issueTokens = (
+  user: { id: string; email: string; role: string },
+  tokenVersion: number
+): AuthTokens => {
+  const payload = { email: user.email, userId: user.id, role: user.role };
+  return {
+    accessToken: generateAccessToken(payload),
+    refreshToken: generateRefreshToken({ ...payload, tokenVersion }),
+  };
+};
 
 export const registerUser = async (
   input: RegisterInput): Promise<{ user: any; tokens: AuthTokens }> => {
@@ -14,13 +26,26 @@ export const registerUser = async (
     throw new AppError('User with this email already exists', 409);
   }
 
+  await assertEmailProof(input.email, input.emailProof);
+
   const requestedUsername = input.username?.trim().toLowerCase();
   if (requestedUsername && await findUserByUsername(requestedUsername)) {
     throw new AppError('User with this username already exists', 409);
   }
 
+  const [college, course] = await findCollegeAndCourse(input.collegeId, input.courseId);
+  if (!college) {
+    throw new AppError('College not found', 404);
+  }
+  if (!course) {
+    throw new AppError('Course not found', 404);
+  }
+  if (college.universityId !== input.universityId || course.universityId !== input.universityId) {
+    throw new AppError('College and course must belong to the selected university', 400);
+  }
+
   const hashedPassword = await bcrypt.hash(input.password, 10);
-  const { password: _password, username: _username, ...userInput } = input;
+  const { password: _password, username: _username, emailProof: _emailProof, ...userInput } = input;
   const usernamePrefix = input.firstName
     .normalize('NFKD')
     .replace(/[\u0300-\u036f]/g, '')
@@ -39,6 +64,7 @@ export const registerUser = async (
         username,
         passwordHash: hashedPassword,
         canPost: true,
+        isVerified: true,
       });
       break;
     } catch (error) {
@@ -57,15 +83,12 @@ export const registerUser = async (
   if (!user) {
     throw new AppError('Could not generate a unique username. Please try again.', 503);
   }
-  
-  const tokens: AuthTokens = { 
-    accessToken: generateAccessToken(
-        {email: user.email, userId: user.id, role: user.role},
-    ),
-     refreshToken: generateRefreshToken(
-        {email: user.email, userId: user.id, role: user.role},
-    )
-  };
+
+  // The email is taken now, so a leftover proof is useless; failing here must not fail the signup
+  clearEmailProof(input.email).catch((error) => console.error(error));
+
+  // A new account starts at tokenVersion 0 (the schema default)
+  const tokens = issueTokens(user, 0);
 
   return {
     user,
@@ -86,17 +109,15 @@ export const loginUser= async (email:string , password:string): Promise<{user:an
         throw new AppError('Invalid Credentials ', 401);
     }
 
-    const tokens: AuthTokens = { 
-        accessToken: generateAccessToken(
-            {email: user.email, userId: user.id, role: user.role},
-        ),
-         refreshToken: generateRefreshToken(
-            {email: user.email, userId: user.id, role: user.role},
-        )
-      };
+    // Checked after the password so a stranger cannot learn which accounts exist
+    if (!user.isActive) {
+        throw new AppError('Account is deactivated', 403);
+    }
 
-    // passwordHash must never leave the server
-    const { passwordHash: _passwordHash, ...safeUser } = user;
+    const tokens = issueTokens(user, user.tokenVersion);
+
+    // passwordHash and tokenVersion must never leave the server
+    const { passwordHash: _passwordHash, tokenVersion: _tokenVersion, ...safeUser } = user;
 
     return {
         user: safeUser,
@@ -115,24 +136,25 @@ export const getMeService = async (userId: string): Promise<any> => {
 export const refreshTokens = async (refreshToken: string): Promise<{ tokens: AuthTokens }> => {
 
     const decoded = verifyRefreshToken(refreshToken);
-    const user = await findUserById(decoded.userId);
+    const user = await findUserForRefresh(decoded.userId);
     if (!user) {
         throw new AppError('User not found', 404);
     }
     if(user.isActive === false){
         throw new AppError('User is not active', 403);
     }
+    // Logout bumps tokenVersion, which retires every token issued before it
+    if ((decoded.tokenVersion ?? 0) !== user.tokenVersion) {
+        throw new AppError('Session expired. Please log in again.', 401);
+    }
 
-    const tokens: AuthTokens = { 
-        accessToken: generateAccessToken(
-            {email: user.email, userId: user.id, role: user.role},
-        ),
-         refreshToken: generateRefreshToken(
-            {email: user.email, userId: user.id, role: user.role},
-        )
-      };
+    const tokens = issueTokens(user, user.tokenVersion);
 
     return {
         tokens,
     };
+}
+
+export const logoutUser = async (userId: string): Promise<void> => {
+    await bumpTokenVersion(userId);
 }

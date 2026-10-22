@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const registerSchema = z.object({
   firstName: z.string().trim().min(3, "First name must be at least 3 characters"),
-  lastName: z.string().trim().min(3, "Last name must be at least 3 characters").optional(),
+  lastName: z.string().trim().min(1, "Last name cannot be empty").optional(),
   username: z
     .string()
     .trim()
@@ -16,6 +16,17 @@ export const registerSchema = z.object({
   collegeId: z.string().min(1, "College is required"),
   courseId: z.string().min(1, "Course is required"),
   currentSemester: z.number().int().min(1, "Current semester is required"),
+  // Handed out by POST /auth/email-verification/verify (32 random bytes, hex)
+  emailProof: z.string().length(64, "Verify your email first"),
+});
+
+export const sendEmailCodeSchema = z.object({
+  email: z.string().trim().email("Invalid email address"),
+});
+
+export const verifyEmailCodeSchema = z.object({
+  email: z.string().trim().email("Invalid email address"),
+  code: z.string().regex(/^\d{6}$/, "Code must be 6 digits"),
 });
 
 

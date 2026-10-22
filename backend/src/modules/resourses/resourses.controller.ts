@@ -71,7 +71,7 @@ export const recordDownload = asyncHandler(async (req: Request, res: Response) =
 });
 
 export const approveResource = asyncHandler(async (req: Request, res: Response) => {
-  const resource = await approveResourceService(req.params.id as string, req.user!.id);
+  const resource = await approveResourceService(req.params.id as string, req.user!);
 
   res.status(200).json(
     sendResponse(res, {
@@ -83,7 +83,11 @@ export const approveResource = asyncHandler(async (req: Request, res: Response) 
 });
 
 export const rejectResource = asyncHandler(async (req: Request, res: Response) => {
-  const resource = await rejectResourceService(req.params.id as string, req.body.rejectionReason);
+  const resource = await rejectResourceService(
+    req.params.id as string,
+    req.user!,
+    req.body.rejectionReason
+  );
 
   res.status(200).json(
     sendResponse(res, {

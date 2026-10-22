@@ -69,12 +69,8 @@ class _EditProfileSheetState extends State<_EditProfileSheet> {
   /// Same rules as the backend's updateProfileSchema.
   String? _validate() {
     final first = _firstName.text.trim();
-    final last = _lastName.text.trim();
     final username = _username.text.trim();
     if (first.length < 3) return 'First name must be at least 3 characters';
-    if (last.isNotEmpty && last.length < 3) {
-      return 'Last name must be at least 3 characters';
-    }
     if (username.length < 3 || username.length > 30) {
       return 'Username must be 3 to 30 characters';
     }

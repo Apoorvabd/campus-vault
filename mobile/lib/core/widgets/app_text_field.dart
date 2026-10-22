@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_text_styles.dart';
@@ -19,6 +20,8 @@ class AppTextField extends StatelessWidget {
     this.trailingLabel,
     this.onTrailingLabelTap,
     this.keyboardType,
+    this.inputFormatters,
+    this.enabled = true,
     this.compact = true,
   });
 
@@ -31,6 +34,8 @@ class AppTextField extends StatelessWidget {
   final String? trailingLabel;
   final VoidCallback? onTrailingLabelTap;
   final TextInputType? keyboardType;
+  final List<TextInputFormatter>? inputFormatters;
+  final bool enabled;
 
   /// Shorter field with tighter padding (used on the Sign In card).
   final bool compact;
@@ -66,6 +71,8 @@ class AppTextField extends StatelessWidget {
           controller: controller,
           obscureText: obscureText,
           keyboardType: keyboardType,
+          inputFormatters: inputFormatters,
+          enabled: enabled,
           style: AppTextStyles.bodySemiBold.copyWith(
             fontWeight: FontWeight.w400,
           ),

@@ -13,7 +13,7 @@ const REFRESH_TOKEN_EXPIRES_IN: string = process.env.JWT_REFRESH_EXPIRES_IN || "
 
 export const generateAccessToken = (payload: JwtPayload): string => {    return jwt.sign(payload, ACCESS_TOKEN_SECRET as Secret, { expiresIn: ACCESS_TOKEN_EXPIRES_IN } as SignOptions)};
 
-export const generateRefreshToken = (payload: JwtPayload): string => {
+export const generateRefreshToken = (payload: JwtPayload & { tokenVersion: number }): string => {
     return jwt.sign(payload, REFRESH_TOKEN_SECRET as Secret, { expiresIn: REFRESH_TOKEN_EXPIRES_IN } as SignOptions);
 }
 
@@ -21,6 +21,7 @@ export const verifyAccessToken = (token: string): JwtPayload => {
   return jwt.verify(token, ACCESS_TOKEN_SECRET) as JwtPayload;
 };
 
-export const verifyRefreshToken = (token: string): JwtPayload => {
-  return jwt.verify(token, REFRESH_TOKEN_SECRET) as JwtPayload;
+// tokenVersion is missing on refresh tokens issued before it existed
+export const verifyRefreshToken = (token: string): JwtPayload & { tokenVersion?: number } => {
+  return jwt.verify(token, REFRESH_TOKEN_SECRET) as JwtPayload & { tokenVersion?: number };
 };
