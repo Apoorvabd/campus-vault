@@ -4,6 +4,7 @@ import { uploadAndSave } from "../upload/upload.service";
 import {
   createResource,
   findResourceById,
+  findResourceUniversityId,
   findResources,
   findSubjectById,
   incrementDownloadCount,
@@ -12,6 +13,7 @@ import {
 import {
   CreateResourceInput,
   ResourceFilters,
+  ResourceModerator,
   ResourceViewer,
 } from "./resourses.types";
 
@@ -136,18 +138,26 @@ export const recordDownloadService = async (
   return incrementDownloadCount(id);
 };
 
-export const approveResourceService = async (id: string, approvedById: string) => {
-  const existing = await findResourceById(id);
-  if (!existing) {
+const assertCanModerate = async (id: string, moderator: ResourceModerator) => {
+  const universityId = await findResourceUniversityId(id);
+  if (!universityId) {
     throw new AppError("Resource not found.", 404);
   }
-  return updateResourceStatus(id, "APPROVED", approvedById);
+  if (moderator.role !== "SUPER_ADMIN" && moderator.universityId !== universityId) {
+    throw new AppError("You can only moderate resources of your own university.", 403);
+  }
 };
 
-export const rejectResourceService = async (id: string, rejectionReason: string) => {
-  const existing = await findResourceById(id);
-  if (!existing) {
-    throw new AppError("Resource not found.", 404);
-  }
+export const approveResourceService = async (id: string, moderator: ResourceModerator) => {
+  await assertCanModerate(id, moderator);
+  return updateResourceStatus(id, "APPROVED", moderator.id);
+};
+
+export const rejectResourceService = async (
+  id: string,
+  moderator: ResourceModerator,
+  rejectionReason: string
+) => {
+  await assertCanModerate(id, moderator);
   return updateResourceStatus(id, "REJECTED", undefined, rejectionReason);
 };

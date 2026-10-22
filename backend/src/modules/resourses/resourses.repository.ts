@@ -43,6 +43,15 @@ export const findResourceById = async (id: string, viewerId?: string) => {
   });
 };
 
+// The university a resource belongs to, reached through its subject's course
+export const findResourceUniversityId = async (id: string) => {
+  const resource = await prisma.resource.findUnique({
+    where: { id },
+    select: { subject: { select: { course: { select: { universityId: true } } } } },
+  });
+  return resource?.subject.course.universityId;
+};
+
 export const findResources = async (filters: {
   subjectId?: string;
   courseId?: string;
