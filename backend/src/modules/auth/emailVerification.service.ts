@@ -13,7 +13,7 @@ import {
 } from "./emailVerification.repository";
 
 const CODE_TTL_MINUTES = 5;
-const RESEND_COOLDOWN_SECONDS = 5;
+const RESEND_COOLDOWN_SECONDS = 30;
 const MAX_ATTEMPTS = 4;
 // How long the app may take between verifying the email and finishing signup
 const PROOF_TTL_MS = 30 * 60 * 1000;

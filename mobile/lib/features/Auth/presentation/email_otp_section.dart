@@ -12,6 +12,10 @@ import '../data/auth_repository.dart';
 
 enum _Phase { idle, sending, codeSent, verifying, verified }
 
+// "Resend OTP" opens this many seconds after the server's own cooldown, so a
+// slow network never trips the server's limit
+const _networkBufferSeconds = 15;
+
 /// The signup email field with its OTP check built in: a valid email shows
 /// "Send OTP", the code box appears below it, and typing the 6th digit
 /// verifies on its own. Once verified the email is locked (until "Change").
@@ -107,7 +111,7 @@ class _EmailOtpSectionState extends State<EmailOtpSection> {
       final cooldown = await repository.sendEmailCode(_email);
       if (!mounted) return;
       setState(() => _phase = _Phase.codeSent);
-      _startCooldown(cooldown);
+      _startCooldown(cooldown + _networkBufferSeconds);
     } catch (e) {
       if (!mounted) return;
       setState(() => _phase = previous);
