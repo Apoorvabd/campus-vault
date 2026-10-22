@@ -4,6 +4,7 @@ import { randomInt } from 'node:crypto';
 import { generateRefreshToken, generateAccessToken ,verifyRefreshToken} from './../../config/jwt';
 import { findUserByEmail, createUser, findUserByUsername, findUserById, findCollegeAndCourse, findUserForRefresh, bumpTokenVersion } from './auth.repository';
 import { RegisterInput, AuthTokens } from './auth.types';
+import { assertEmailProof, clearEmailProof } from './emailVerification.service';
 import { AppError } from '../../utils';
 
 const issueTokens = (
@@ -25,6 +26,8 @@ export const registerUser = async (
     throw new AppError('User with this email already exists', 409);
   }
 
+  await assertEmailProof(input.email, input.emailProof);
+
   const requestedUsername = input.username?.trim().toLowerCase();
   if (requestedUsername && await findUserByUsername(requestedUsername)) {
     throw new AppError('User with this username already exists', 409);
@@ -42,7 +45,7 @@ export const registerUser = async (
   }
 
   const hashedPassword = await bcrypt.hash(input.password, 10);
-  const { password: _password, username: _username, ...userInput } = input;
+  const { password: _password, username: _username, emailProof: _emailProof, ...userInput } = input;
   const usernamePrefix = input.firstName
     .normalize('NFKD')
     .replace(/[\u0300-\u036f]/g, '')
@@ -61,6 +64,7 @@ export const registerUser = async (
         username,
         passwordHash: hashedPassword,
         canPost: true,
+        isVerified: true,
       });
       break;
     } catch (error) {
@@ -79,7 +83,10 @@ export const registerUser = async (
   if (!user) {
     throw new AppError('Could not generate a unique username. Please try again.', 503);
   }
-  
+
+  // The email is taken now, so a leftover proof is useless; failing here must not fail the signup
+  clearEmailProof(input.email).catch((error) => console.error(error));
+
   // A new account starts at tokenVersion 0 (the schema default)
   const tokens = issueTokens(user, 0);
 

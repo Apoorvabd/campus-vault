@@ -21,11 +21,21 @@ const createLimiter = (
   });
 
 // Keyed by IP + email so one campus Wi-Fi does not lock out everyone together
-export const loginLimiter = createLimiter(15 * MINUTE, 10, (req) => {
+const ipAndEmail = (req: Request) => {
   const email = String(req.body?.email ?? "").toLowerCase();
   return `${ipKeyGenerator(req.ip ?? "")}:${email}`;
-});
+};
+
+export const loginLimiter = createLimiter(15 * MINUTE, 10, ipAndEmail);
 
 export const registerLimiter = createLimiter(60 * MINUTE, 5);
 
 export const refreshTokenLimiter = createLimiter(15 * MINUTE, 30);
+
+// Every send costs an email (Resend has a daily quota), so there is also a
+// per-IP cap on top of the per-email one
+export const emailCodeSendLimiter = createLimiter(60 * MINUTE, 5, ipAndEmail);
+
+export const emailCodeSendIpLimiter = createLimiter(60 * MINUTE, 20);
+
+export const emailCodeVerifyLimiter = createLimiter(15 * MINUTE, 10, ipAndEmail);

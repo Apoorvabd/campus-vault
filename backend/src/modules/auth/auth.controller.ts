@@ -3,6 +3,7 @@
 import { Request, Response } from "express";
 import { asyncHandler, sendResponse } from "../../utils";
 import { loginUser, registerUser,refreshTokens ,getMeService, logoutUser} from "./auth.service";
+import { sendEmailCode, verifyEmailCode } from "./emailVerification.service";
 
 export const register = asyncHandler(async (req: Request, res: Response) => {
   const { user, tokens } = await registerUser(req.body);
@@ -12,6 +13,30 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
       statusCode: 201,
       message: "Registered successfully.",
       data: { user, tokens },
+    })
+  );
+});
+
+export const sendEmailVerificationCode = asyncHandler(async (req: Request, res: Response) => {
+  const result = await sendEmailCode(req.body.email);
+
+  res.status(200).json(
+    sendResponse(res, {
+      statusCode: 200,
+      message: "Verification code sent.",
+      data: result,
+    })
+  );
+});
+
+export const verifyEmailVerificationCode = asyncHandler(async (req: Request, res: Response) => {
+  const result = await verifyEmailCode(req.body.email, req.body.code);
+
+  res.status(200).json(
+    sendResponse(res, {
+      statusCode: 200,
+      message: "Email verified.",
+      data: result,
     })
   );
 });

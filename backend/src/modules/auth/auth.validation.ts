@@ -16,6 +16,17 @@ export const registerSchema = z.object({
   collegeId: z.string().min(1, "College is required"),
   courseId: z.string().min(1, "Course is required"),
   currentSemester: z.number().int().min(1, "Current semester is required"),
+  // Handed out by POST /auth/email-verification/verify (32 random bytes, hex)
+  emailProof: z.string().length(64, "Verify your email first"),
+});
+
+export const sendEmailCodeSchema = z.object({
+  email: z.string().trim().email("Invalid email address"),
+});
+
+export const verifyEmailCodeSchema = z.object({
+  email: z.string().trim().email("Invalid email address"),
+  code: z.string().regex(/^\d{6}$/, "Code must be 6 digits"),
 });
 
 

@@ -66,11 +66,21 @@ export const findCollegeAndCourse = async (collegeId: string, courseId: string) 
   ]);
 };
 
+// Case-insensitive, because accounts keep the email exactly as it was typed
+export const isEmailRegistered = async (email: string) => {
+  const user = await prisma.user.findFirst({
+    where: { email: { equals: email, mode: "insensitive" } },
+    select: { id: true },
+  });
+  return user !== null;
+};
+
 export const createUser = async (
-  userData: Omit<RegisterInput, "password" | "username"> & {
+  userData: Omit<RegisterInput, "password" | "username" | "emailProof"> & {
     username: string;
     passwordHash: string;
     canPost: boolean;
+    isVerified: boolean;
   }
 ) => {
   return prisma.user.create({
