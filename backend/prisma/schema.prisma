@@ -65,6 +65,10 @@ enum CollegeGender {
   CO_ED
 }
 
+enum OtpPurpose {
+  EMAIL_VERIFY // Signup: proves the email is real before the account exists
+}
+
 model University {
   id String @id @default(cuid())
 
@@ -502,4 +506,28 @@ model Bookmark {
   @@index([userId])
   @@index([postId])
   @@index([resourceId])
+}
+
+// One-time code sent to an email address. Keyed by email, not by user, because
+// signup verifies the email before the User row exists. One row per
+// (email, purpose): sending a new code replaces the old one.
+model EmailOtp {
+  id String @id @default(cuid())
+
+  // Always stored lowercase
+  email   String
+  purpose OtpPurpose
+
+  // bcrypt hash of the 6-digit code
+  codeHash  String
+  expiresAt DateTime
+  attempts  Int      @default(0)
+  sentAt    DateTime
+
+  // Set once the code is entered correctly. The app then holds the random
+  // proof (only its sha256 is stored here) and sends it back with register.
+  verifiedAt DateTime?
+  proofHash  String?
+
+  @@unique([email, purpose])
 }
