@@ -50,7 +50,7 @@ the `EmailOtp` table, keyed by lowercase email.
 
 1. `POST /auth/email-verification/send` `{ email }`
    - 409 if an account with this email already exists (nothing is sent)
-   - 429 if the last code was sent less than 30 seconds ago (the app waits 45 s
+   - 429 if the last code was sent less than 30 seconds ago (the app waits 35 s
      before it offers "Resend OTP", to leave room for a slow network)
    - 200 `{ cooldownSeconds }`
 2. `POST /auth/email-verification/verify` `{ email, code }`

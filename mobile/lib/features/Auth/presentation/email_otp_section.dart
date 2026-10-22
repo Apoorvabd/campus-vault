@@ -14,7 +14,7 @@ enum _Phase { idle, sending, codeSent, verifying, verified }
 
 // "Resend OTP" opens this many seconds after the server's own cooldown, so a
 // slow network never trips the server's limit
-const _networkBufferSeconds = 15;
+const _networkBufferSeconds = 5;
 
 /// The signup email field with its OTP check built in: a valid email shows
 /// "Send OTP", the code box appears below it, and typing the 6th digit
