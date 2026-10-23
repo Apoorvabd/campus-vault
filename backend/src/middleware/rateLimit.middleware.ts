@@ -32,6 +32,10 @@ export const registerLimiter = createLimiter(60 * MINUTE, 5);
 
 export const refreshTokenLimiter = createLimiter(15 * MINUTE, 30);
 
+// Google verifies the token itself, so this only guards the endpoint from
+// floods. It is per IP, hence generous (a campus shares one IP).
+export const googleAuthLimiter = createLimiter(15 * MINUTE, 60);
+
 // Every send costs an email (Resend has a daily quota), so there is also a
 // per-IP cap on top of the per-email one
 export const emailCodeSendLimiter = createLimiter(60 * MINUTE, 5, ipAndEmail);

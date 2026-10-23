@@ -7,7 +7,7 @@ import { RegisterInput, AuthTokens } from './auth.types';
 import { assertEmailProof, clearEmailProof } from './emailVerification.service';
 import { AppError } from '../../utils';
 
-const issueTokens = (
+export const issueTokens = (
   user: { id: string; email: string; role: string },
   tokenVersion: number
 ): AuthTokens => {
@@ -16,6 +16,69 @@ const issueTokens = (
     accessToken: generateAccessToken(payload),
     refreshToken: generateRefreshToken({ ...payload, tokenVersion }),
   };
+};
+
+// passwordHash, tokenVersion and googleId must never leave the server
+export const toPublicUser = <
+  T extends { passwordHash: string | null; tokenVersion: number; googleId: string | null }
+>(
+  user: T
+) => {
+  const { passwordHash: _passwordHash, tokenVersion: _tokenVersion, googleId: _googleId, ...publicUser } = user;
+  return publicUser;
+};
+
+export const assertCollegeAndCourseMatchUniversity = async (ids: {
+  universityId: string;
+  collegeId: string;
+  courseId: string;
+}) => {
+  const [college, course] = await findCollegeAndCourse(ids.collegeId, ids.courseId);
+  if (!college) {
+    throw new AppError('College not found', 404);
+  }
+  if (!course) {
+    throw new AppError('Course not found', 404);
+  }
+  if (college.universityId !== ids.universityId || course.universityId !== ids.universityId) {
+    throw new AppError('College and course must belong to the selected university', 400);
+  }
+};
+
+type NewUser = Omit<Parameters<typeof createUser>[0], 'username'>;
+
+/**
+ * Creates the user with the requested username, or with a generated one
+ * (first three letters of the name + 4 digits), retrying on a collision.
+ */
+export const createUserWithUsername = async (data: NewUser, requestedUsername?: string) => {
+  const usernamePrefix = data.firstName
+    .normalize('NFKD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-zA-Z]/g, '')
+    .slice(0, 3)
+    .toLowerCase()
+    .padEnd(3, 'x');
+
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    const username =
+      requestedUsername ?? `${usernamePrefix}${randomInt(1000, 10000)}`;
+    try {
+      return await createUser({ ...data, username });
+    } catch (error) {
+      const isUsernameCollision =
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2002' &&
+        String(error.meta?.target).toLowerCase().includes('username');
+      if (requestedUsername || !isUsernameCollision) {
+        if (isUsernameCollision) {
+          throw new AppError('User with this username already exists', 409);
+        }
+        throw error;
+      }
+    }
+  }
+  throw new AppError('Could not generate a unique username. Please try again.', 503);
 };
 
 export const registerUser = async (
@@ -33,56 +96,15 @@ export const registerUser = async (
     throw new AppError('User with this username already exists', 409);
   }
 
-  const [college, course] = await findCollegeAndCourse(input.collegeId, input.courseId);
-  if (!college) {
-    throw new AppError('College not found', 404);
-  }
-  if (!course) {
-    throw new AppError('Course not found', 404);
-  }
-  if (college.universityId !== input.universityId || course.universityId !== input.universityId) {
-    throw new AppError('College and course must belong to the selected university', 400);
-  }
+  await assertCollegeAndCourseMatchUniversity(input);
 
   const hashedPassword = await bcrypt.hash(input.password, 10);
   const { password: _password, username: _username, emailProof: _emailProof, ...userInput } = input;
-  const usernamePrefix = input.firstName
-    .normalize('NFKD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-zA-Z]/g, '')
-    .slice(0, 3)
-    .toLowerCase()
-    .padEnd(3, 'x');
 
-  let user;
-  for (let attempt = 0; attempt < 20; attempt += 1) {
-    const username =
-      requestedUsername ?? `${usernamePrefix}${randomInt(1000, 10000)}`;
-    try {
-      user = await createUser({
-        ...userInput,
-        username,
-        passwordHash: hashedPassword,
-        canPost: true,
-        isVerified: true,
-      });
-      break;
-    } catch (error) {
-      const isUsernameCollision =
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2002' &&
-        String(error.meta?.target).toLowerCase().includes('username');
-      if (requestedUsername || !isUsernameCollision || attempt === 19) {
-        if (isUsernameCollision) {
-          throw new AppError('User with this username already exists', 409);
-        }
-        throw error;
-      }
-    }
-  }
-  if (!user) {
-    throw new AppError('Could not generate a unique username. Please try again.', 503);
-  }
+  const user = await createUserWithUsername(
+    { ...userInput, passwordHash: hashedPassword, canPost: true, isVerified: true },
+    requestedUsername
+  );
 
   // The email is taken now, so a leftover proof is useless; failing here must not fail the signup
   clearEmailProof(input.email).catch((error) => console.error(error));
@@ -120,11 +142,8 @@ export const loginUser= async (email:string , password:string): Promise<{user:an
 
     const tokens = issueTokens(user, user.tokenVersion);
 
-    // passwordHash, tokenVersion and googleId must never leave the server
-    const { passwordHash: _passwordHash, tokenVersion: _tokenVersion, googleId: _googleId, ...safeUser } = user;
-
     return {
-        user: safeUser,
+        user: toPublicUser(user),
         tokens,
     };
 }

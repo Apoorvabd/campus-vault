@@ -67,18 +67,45 @@ export const findCollegeAndCourse = async (collegeId: string, courseId: string) 
 };
 
 // Case-insensitive, because accounts keep the email exactly as it was typed
-export const isEmailRegistered = async (email: string) => {
-  const user = await prisma.user.findFirst({
+export const findUserByEmailInsensitive = async (email: string) => {
+  return prisma.user.findFirst({
     where: { email: { equals: email, mode: "insensitive" } },
-    select: { id: true },
   });
-  return user !== null;
+};
+
+export const isEmailRegistered = async (email: string) => {
+  return (await findUserByEmailInsensitive(email)) !== null;
+};
+
+export const findUserByGoogleId = async (googleId: string) => {
+  return prisma.user.findUnique({ where: { googleId } });
+};
+
+/**
+ * Attaches a Google account to an existing user. For an account whose email was
+ * never verified, the password is dropped and its sessions are ended too: the
+ * person who set that password may not be the real owner of the email.
+ */
+export const linkGoogleAccount = async (
+  id: string,
+  googleId: string,
+  isUnverified: boolean
+) => {
+  return prisma.user.update({
+    where: { id },
+    data: {
+      googleId,
+      isVerified: true,
+      ...(isUnverified && { passwordHash: null, tokenVersion: { increment: 1 } }),
+    },
+  });
 };
 
 export const createUser = async (
   userData: Omit<RegisterInput, "password" | "username" | "emailProof"> & {
     username: string;
-    passwordHash: string;
+    passwordHash: string | null;
+    googleId?: string;
     canPost: boolean;
     isVerified: boolean;
   }
