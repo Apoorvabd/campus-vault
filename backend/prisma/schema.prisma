@@ -197,8 +197,12 @@ model User {
 
   username String @unique
 
-  email        String @unique
-  passwordHash String
+  email        String  @unique
+  // null for accounts created with Google sign-in (they have no password)
+  passwordHash String?
+
+  // Google's stable account id (the `sub` claim). The email can change, this cannot.
+  googleId String? @unique
 
   bio      String?
   headline String?

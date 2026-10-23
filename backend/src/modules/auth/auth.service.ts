@@ -104,6 +104,10 @@ export const loginUser= async (email:string , password:string): Promise<{user:an
         throw new AppError('Invalid Credentials ', 401);
     }
 
+    if (!user.passwordHash) {
+        throw new AppError('This account uses Google sign-in. Please use "Login with Google".', 400);
+    }
+
     const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
     if (!isPasswordValid) {
         throw new AppError('Invalid Credentials ', 401);
@@ -116,8 +120,8 @@ export const loginUser= async (email:string , password:string): Promise<{user:an
 
     const tokens = issueTokens(user, user.tokenVersion);
 
-    // passwordHash and tokenVersion must never leave the server
-    const { passwordHash: _passwordHash, tokenVersion: _tokenVersion, ...safeUser } = user;
+    // passwordHash, tokenVersion and googleId must never leave the server
+    const { passwordHash: _passwordHash, tokenVersion: _tokenVersion, googleId: _googleId, ...safeUser } = user;
 
     return {
         user: safeUser,
