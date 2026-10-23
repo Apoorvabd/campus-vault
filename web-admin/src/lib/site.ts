@@ -36,5 +36,5 @@ export const FAQ = [
 ];
 
 /** Same support address the app's Help Center shows. */
-export const SUPPORT_EMAIL = "support@semesterforge.app";
+export const SUPPORT_EMAIL = "support@semesterforge.in";
 export const GITHUB_URL = "https://github.com/Apoorvabd/campus-vault";

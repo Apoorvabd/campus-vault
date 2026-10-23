@@ -2,24 +2,28 @@
 
 export type Section = { title: string; body: string };
 
-export const LAST_UPDATED = "September 2026";
+export const LAST_UPDATED = "October 2026";
 
 export const PRIVACY: Section[] = [
   {
     title: "What we collect",
-    body: "Your name, college email, course, semester and college are used to personalize your feed and verify your academic standing. Documents you upload are stored either privately on your device (Save Locally) or shared to SemesterForge, depending on the option you choose at upload time.",
+    body: "Your name, email, course, semester and college are used to personalize your feed and verify your academic standing. If you sign up or log in with Google, Google gives us your name, email address and Google account ID, and nothing else: we never see your Google password, and we do not access your Gmail, Drive, contacts or any other Google data. When you sign up with email, we send a one-time code to that address to confirm it. Documents you upload are stored either privately on your device (Save Locally) or shared to SemesterForge, depending on the option you choose at upload time.",
   },
   {
     title: "How we use it",
-    body: "Academic details help match you with the right subjects and batchmates. Uploaded resources shared to SemesterForge are shown to other verified students from your course and semester.",
+    body: "Academic details help match you with the right subjects and batchmates. Your name and email are used to create your account, log you in, and send you verification codes and important account notices. Uploaded resources shared to SemesterForge are shown to other verified students from your course and semester.",
   },
   {
     title: "Sharing",
-    body: "We never sell your personal data. Resources you save locally never leave your device unless you explicitly choose to share them to SemesterForge.",
+    body: "We never sell your personal data, and information from your Google account is never shared with advertisers or used for advertising. We use service providers to run the app (hosting and database, file storage, and email delivery); they handle data only on our behalf. Resources you save locally never leave your device unless you explicitly choose to share them to SemesterForge. SemesterForge's use of information received from Google follows the Google API Services User Data Policy, including its Limited Use requirements.",
   },
   {
     title: "Your controls",
-    body: "You can delete any resource you've uploaded, clear your local vault cache from Settings, and request full account deletion at any time from Account Settings.",
+    body: "You can delete any resource you've uploaded, clear your local vault cache from Settings, and request full account deletion at any time from Account Settings. If you signed in with Google, you can also remove SemesterForge's access from your Google Account settings at myaccount.google.com/permissions.",
+  },
+  {
+    title: "Contact",
+    body: "Questions about your data? Email support@semesterforge.in.",
   },
 ];
 

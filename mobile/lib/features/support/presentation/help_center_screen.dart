@@ -81,7 +81,7 @@ class HelpCenterScreen extends StatelessWidget {
                 Text('Still need help?', style: AppTextStyles.bodySemiBold),
                 const SizedBox(height: 4),
                 Text(
-                  'Email us at support@semesterforge.app',
+                  'Email us at support@semesterforge.in',
                   style: AppTextStyles.caption,
                 ),
               ],
