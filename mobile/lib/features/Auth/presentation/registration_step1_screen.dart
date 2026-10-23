@@ -11,6 +11,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../catalog/data/catalog_repository.dart';
 import '../data/signup_draft.dart';
 import './email_otp_section.dart';
+import './google_sign_in_button.dart';
 import './registration_step2_screen.dart';
 
 class SignupStep1Screen extends StatefulWidget {
@@ -193,6 +194,10 @@ class _SignupStep1ScreenState extends State<SignupStep1Screen> {
               ],
             ),
           ),
+          const SizedBox(height: AppSpacing.md),
+          Center(child: Text('or', style: AppTextStyles.bodyMedium)),
+          const SizedBox(height: AppSpacing.md),
+          const GoogleSignInButton(),
           const SizedBox(height: AppSpacing.xl),
           Center(
             child: GestureDetector(

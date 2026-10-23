@@ -2,6 +2,8 @@ import 'package:dio/dio.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_exception.dart';
 import '../../../core/network/token_storage.dart';
+import 'google_login_result.dart';
+import 'google_sign_in_service.dart';
 import 'user_model.dart';
 
 class AuthRepository {
@@ -9,6 +11,8 @@ class AuthRepository {
 
   final ApiClient _apiClient;
   final TokenStorage _tokenStorage;
+
+  final _googleSignIn = GoogleSignInService();
 
   // Shortcut so we don't write _apiClient.dio everywhere
   Dio get _dio => _apiClient.dio;
@@ -92,6 +96,51 @@ class AuthRepository {
     }
   }
 
+  /// Null when the user closes Google's account picker.
+  Future<String?> getGoogleIdToken() => _googleSignIn.getIdToken();
+
+  /// Logs in when this Google account has an account here (tokens are saved),
+  /// otherwise says that it still has to sign up.
+  Future<GoogleLoginResult> loginWithGoogle(String idToken) async {
+    try {
+      final res = await _dio.post('/auth/google', data: {'idToken': idToken});
+      final data = res.data['data'] as Map<String, dynamic>;
+      if (data['needsSignup'] == true) {
+        return GoogleLoginResult.needsSignup(
+          GoogleProfile.fromJson(data['profile'] as Map<String, dynamic>),
+        );
+      }
+      return GoogleLoginResult.loggedIn(await _saveSessionAndGetUser(data));
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);
+    }
+  }
+
+  /// Name and email come from the Google token; only the academic details are sent.
+  Future<UserModel> registerWithGoogle({
+    required String idToken,
+    required String universityId,
+    required String collegeId,
+    required String courseId,
+    required int currentSemester,
+  }) async {
+    try {
+      final res = await _dio.post(
+        '/auth/google/register',
+        data: {
+          'idToken': idToken,
+          'universityId': universityId,
+          'collegeId': collegeId,
+          'courseId': courseId,
+          'currentSemester': currentSemester,
+        },
+      );
+      return await _saveSessionAndGetUser(res.data['data']);
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);
+    }
+  }
+
   // Used when the app starts: tokens are saved, so who is the user?
   Future<UserModel> getMe() async {
     try {
@@ -113,6 +162,7 @@ class AuthRepository {
       // Even if the server call fails, the user must still be logged out locally
     } finally {
       await _tokenStorage.clear();
+      await _googleSignIn.signOut();
     }
   }
 

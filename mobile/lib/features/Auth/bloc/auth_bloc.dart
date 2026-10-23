@@ -12,6 +12,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthStarted>(_onStarted);
     on<LoginSubmitted>(_onLoginSubmitted);
     on<RegisterSubmitted>(_onRegisterSubmitted);
+    on<GoogleLoggedIn>((event, emit) => emit(Authenticated(event.user)));
+    on<GoogleRegisterSubmitted>(_onGoogleRegisterSubmitted);
     on<LogoutRequested>(_onLogoutRequested);
     on<SessionExpired>(_onSessionExpired);
 
@@ -74,6 +76,28 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         email: event.email,
         emailProof: event.emailProof,
         password: event.password,
+        universityId: event.universityId,
+        collegeId: event.collegeId,
+        courseId: event.courseId,
+        currentSemester: event.currentSemester,
+      );
+      justRegistered = true;
+      emit(Authenticated(user));
+    } on ApiException catch (e) {
+      emit(AuthFailure(e.message));
+    } catch (_) {
+      emit(const AuthFailure('Something went wrong. Please try again.'));
+    }
+  }
+
+  Future<void> _onGoogleRegisterSubmitted(
+    GoogleRegisterSubmitted event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(const AuthLoading());
+    try {
+      final user = await _repository.registerWithGoogle(
+        idToken: event.idToken,
         universityId: event.universityId,
         collegeId: event.collegeId,
         courseId: event.courseId,
