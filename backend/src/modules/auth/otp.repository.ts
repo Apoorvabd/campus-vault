@@ -1,48 +1,55 @@
+import { OtpPurpose } from "@prisma/client";
 import prisma from "../../config/prisma";
 
-const purpose = "EMAIL_VERIFY" as const;
-const byEmail = (email: string) => ({ email_purpose: { email, purpose } });
+const byEmail = (email: string, purpose: OtpPurpose) => ({
+  email_purpose: { email, purpose },
+});
 
-export const findEmailOtp = async (email: string) => {
-  return prisma.emailOtp.findUnique({ where: byEmail(email) });
+export const findOtp = async (email: string, purpose: OtpPurpose) => {
+  return prisma.emailOtp.findUnique({ where: byEmail(email, purpose) });
 };
 
-export const saveEmailOtp = async (data: {
+export const saveOtp = async (data: {
   email: string;
+  purpose: OtpPurpose;
   codeHash: string;
   expiresAt: Date;
   sentAt: Date;
 }) => {
-  const { email, ...code } = data;
+  const { email, purpose, ...code } = data;
   return prisma.emailOtp.upsert({
-    where: byEmail(email),
+    where: byEmail(email, purpose),
     create: { email, purpose, ...code },
     // A fresh code starts clean: no wrong attempts, nothing verified yet
     update: { ...code, attempts: 0, verifiedAt: null, proofHash: null },
   });
 };
 
-export const addEmailOtpAttempt = async (email: string) => {
+export const addOtpAttempt = async (email: string, purpose: OtpPurpose) => {
   return prisma.emailOtp.update({
-    where: byEmail(email),
+    where: byEmail(email, purpose),
     data: { attempts: { increment: 1 } },
     select: { attempts: true },
   });
 };
 
-export const markEmailOtpVerified = async (email: string, proofHash: string) => {
+export const markOtpVerified = async (
+  email: string,
+  purpose: OtpPurpose,
+  proofHash: string
+) => {
   return prisma.emailOtp.update({
-    where: byEmail(email),
+    where: byEmail(email, purpose),
     data: { verifiedAt: new Date(), proofHash },
   });
 };
 
-export const deleteEmailOtp = async (email: string) => {
+export const deleteOtp = async (email: string, purpose: OtpPurpose) => {
   return prisma.emailOtp.deleteMany({ where: { email, purpose } });
 };
 
 // Anything sent over a day ago is dead: its code and its proof have both expired
-export const deleteStaleEmailOtps = async () => {
+export const deleteStaleOtps = async () => {
   return prisma.emailOtp.deleteMany({
     where: { sentAt: { lt: new Date(Date.now() - 24 * 60 * 60 * 1000) } },
   });
