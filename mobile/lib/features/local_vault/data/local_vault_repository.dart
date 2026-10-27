@@ -88,6 +88,13 @@ class LocalVaultRepository {
     return item;
   }
 
+  /// Deletes every saved file and forgets them all.
+  Future<void> clearAll() async {
+    final vault = Directory('${(await _root).path}/vault');
+    if (await vault.exists()) await vault.delete(recursive: true);
+    await _write([]);
+  }
+
   Future<void> delete(LocalVaultItem item) async {
     final file = await fileFor(item);
     if (await file.exists()) await file.delete();

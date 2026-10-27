@@ -3,9 +3,10 @@ import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_spacing.dart';
 
-/// Profile summary shown at the top of Home — identical across the
-/// Community and Resources tabs. Dark card: avatar + name on top, then the
-/// course in large type and the semester / college as small chips.
+/// Profile summary card, shown at the top of Account Settings. Dark card:
+/// avatar + name on top, then the course in large type and the semester /
+/// college as small chips. Account Settings adds its own bits through
+/// [action] (next to the name), [headline] / [bio], [onAvatarTap] and [footer].
 class ProfileHeaderCard extends StatelessWidget {
   const ProfileHeaderCard({
     super.key,
@@ -16,6 +17,11 @@ class ProfileHeaderCard extends StatelessWidget {
     required this.semester,
     required this.college,
     this.avatarUrl,
+    this.headline,
+    this.bio,
+    this.onAvatarTap,
+    this.action,
+    this.footer = const [],
   });
 
   final String name;
@@ -25,6 +31,11 @@ class ProfileHeaderCard extends StatelessWidget {
   final int semester;
   final String college;
   final String? avatarUrl;
+  final String? headline;
+  final String? bio;
+  final VoidCallback? onAvatarTap;
+  final Widget? action;
+  final List<Widget> footer;
 
   String get _initials {
     final parts = name.trim().split(RegExp(r'\s+'));
@@ -65,22 +76,25 @@ class ProfileHeaderCard extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      CircleAvatar(
-                        radius: 22,
-                        backgroundColor: Colors.white,
-                        backgroundImage: avatarUrl != null
-                            ? NetworkImage(avatarUrl!)
-                            : null,
-                        child: avatarUrl == null
-                            ? Text(
-                                _initials,
-                                style: const TextStyle(
-                                  color: AppColors.profileCard,
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 16,
-                                ),
-                              )
-                            : null,
+                      GestureDetector(
+                        onTap: onAvatarTap,
+                        child: CircleAvatar(
+                          radius: 22,
+                          backgroundColor: Colors.white,
+                          backgroundImage: avatarUrl != null
+                              ? NetworkImage(avatarUrl!)
+                              : null,
+                          child: avatarUrl == null
+                              ? Text(
+                                  _initials,
+                                  style: const TextStyle(
+                                    color: AppColors.profileCard,
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 16,
+                                  ),
+                                )
+                              : null,
+                        ),
                       ),
                       const SizedBox(width: AppSpacing.md),
                       Expanded(
@@ -111,9 +125,32 @@ class ProfileHeaderCard extends StatelessWidget {
                           ],
                         ),
                       ),
+                      ?action,
                     ],
                   ),
                   const SizedBox(height: AppSpacing.md),
+                  if (headline != null && headline!.isNotEmpty) ...[
+                    Text(
+                      headline!,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                  ],
+                  if (bio != null && bio!.isNotEmpty) ...[
+                    Text(
+                      bio!,
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.8),
+                        fontWeight: FontWeight.w500,
+                        fontSize: 13,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                  ],
                   Text(
                     degree,
                     maxLines: 2,
@@ -143,6 +180,10 @@ class ProfileHeaderCard extends StatelessWidget {
                       ),
                     ],
                   ),
+                  if (footer.isNotEmpty) ...[
+                    const SizedBox(height: AppSpacing.lg),
+                    ...footer,
+                  ],
                 ],
               ),
             ),

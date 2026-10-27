@@ -60,6 +60,15 @@ class LocalVaultCubit extends Cubit<LocalVaultState> {
     }
   }
 
+  Future<void> clearAll() async {
+    try {
+      await _repo.clearAll();
+      emit(const LocalVaultState());
+    } catch (_) {
+      emit(state.copyWith(error: 'Could not delete your files.'));
+    }
+  }
+
   Future<String> pathOf(LocalVaultItem item) async =>
       (await _repo.fileFor(item)).path;
 }
