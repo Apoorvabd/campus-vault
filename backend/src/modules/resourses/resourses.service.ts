@@ -1,4 +1,4 @@
-import { ResourceStatus } from "@prisma/client";
+import { ResourceStatus, ResourceType } from "@prisma/client";
 import { AppError } from "../../utils";
 import { uploadAndSave } from "../upload/upload.service";
 import {
@@ -21,16 +21,44 @@ const ADMIN_ROLES = ["SUPER_ADMIN", "UNIVERSITY_ADMIN"];
 const isAdmin = (viewer?: ResourceViewer) =>
   !!viewer && ADMIN_ROLES.includes(viewer.role);
 
-// Turns the per-user `bookmarks` array (0 or 1 rows) into a boolean
-export const presentResource = <T extends { bookmarks?: { id: string }[] }>(
-  resource: T
-) => {
-  const { bookmarks, ...data } = resource;
-  return {
-    ...data,
-    ...(bookmarks ? { isBookmarked: bookmarks.length > 0 } : {}),
-  };
+// What the database row holds that presentResource needs
+type ResourceRecord = {
+  id: string;
+  title: string;
+  description: string | null;
+  resourceType: ResourceType;
+  status: ResourceStatus;
+  rejectionReason: string | null;
+  downloadCount: number;
+  createdAt: Date;
+  externalUrl: string | null;
+  upload: object | null;
+  subject: unknown;
+  uploadedBy: unknown;
+  bookmarks?: { id: string }[];
 };
+
+/**
+ * The only shape a resource leaves the server in: a whitelist, not the whole row.
+ * The link (our hosted file or the external one), where a resource came from
+ * (`source`) and the storage ids stay on the server; the link is handed out by
+ * POST /resources/:id/download, one resource at a time.
+ */
+export const presentResource = (resource: ResourceRecord) => ({
+  id: resource.id,
+  title: resource.title,
+  description: resource.description,
+  resourceType: resource.resourceType,
+  status: resource.status,
+  rejectionReason: resource.rejectionReason,
+  downloadCount: resource.downloadCount,
+  createdAt: resource.createdAt,
+  subject: resource.subject,
+  uploadedBy: resource.uploadedBy,
+  hasFile: resource.upload !== null || resource.externalUrl !== null,
+  // The per-user `bookmarks` array holds 0 or 1 rows
+  isBookmarked: (resource.bookmarks?.length ?? 0) > 0,
+});
 
 // Non-approved resources are visible only to their uploader and to admins
 const canView = (
@@ -127,6 +155,10 @@ export const getResourceByIdService = async (
   return presentResource(resource);
 };
 
+/**
+ * Called when a user opens a resource: counts the open and hands out the link.
+ * This is the only place the link leaves the server.
+ */
 export const recordDownloadService = async (
   id: string,
   viewer: ResourceViewer
@@ -135,7 +167,12 @@ export const recordDownloadService = async (
   if (!resource || !canView(resource, viewer)) {
     throw new AppError("Resource not found.", 404);
   }
-  return incrementDownloadCount(id);
+  const fileUrl = resource.upload?.secureUrl ?? resource.externalUrl;
+  if (!fileUrl) {
+    throw new AppError("This resource has no file attached.", 404);
+  }
+  const { downloadCount } = await incrementDownloadCount(id);
+  return { fileUrl, downloadCount };
 };
 
 const assertCanModerate = async (id: string, moderator: ResourceModerator) => {
