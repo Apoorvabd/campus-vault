@@ -2,36 +2,33 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/data/resources_repository.dart';
 import '../../core/models/resource.dart';
+import '../../core/network/api_exception.dart';
 
-/// Opens a resource's file/link in the browser or a viewer app, then tells
-/// the backend (fire-and-forget) so the download count goes up.
+/// Opens a resource's file/link in the browser or a viewer app. The link is
+/// asked from the backend at this moment (which also counts the view), because
+/// resources do not carry their link.
 Future<void> openResource(
   BuildContext context,
   ResourcesRepository repository,
   Resource resource,
 ) async {
   final messenger = ScaffoldMessenger.of(context);
-  final url = resource.fileUrl;
-  if (url == null) {
-    messenger.showSnackBar(const SnackBar(content: Text('No file attached')));
+  void say(String message) => messenger
+    ..hideCurrentSnackBar()
+    ..showSnackBar(SnackBar(content: Text(message)));
+
+  if (!resource.hasFile) {
+    say('No file attached');
     return;
   }
   try {
-    final ok = await openLinkInApp(url);
-    if (!ok) {
-      messenger.showSnackBar(
-        const SnackBar(content: Text('Could not open file')),
-      );
-      return;
-    }
+    final link = await repository.openLink(resource.id);
+    if (!await openLinkInApp(link.url)) say('Could not open file');
+  } on ApiException catch (e) {
+    say(e.message);
   } catch (_) {
-    messenger.showSnackBar(
-      const SnackBar(content: Text('Could not open file')),
-    );
-    return;
+    say('Could not open file');
   }
-  // Counting the view is best effort, so errors are ignored
-  repository.recordDownload(resource.id).then((_) {}, onError: (_) {});
 }
 
 /// Opens a link in an in-app browser tab (the user stays inside the app and

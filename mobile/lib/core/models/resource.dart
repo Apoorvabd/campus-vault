@@ -17,9 +17,9 @@ enum ResourceType {
   final String label; // what the user sees
 
   static ResourceType fromApi(String value) => ResourceType.values.firstWhere(
-        (t) => t.apiValue == value,
-        orElse: () => ResourceType.other,
-      );
+    (t) => t.apiValue == value,
+    orElse: () => ResourceType.other,
+  );
 }
 
 enum ResourceStatus {
@@ -49,30 +49,6 @@ enum ResourceSource {
       .firstWhere((s) => s.apiValue == value, orElse: () => referenceOnly);
 }
 
-class UploadedFile extends Equatable {
-  const UploadedFile({
-    required this.secureUrl,
-    required this.originalName,
-    required this.mimeType,
-    required this.size,
-  });
-
-  final String secureUrl;
-  final String originalName;
-  final String mimeType;
-  final int size; // bytes
-
-  factory UploadedFile.fromJson(Map<String, dynamic> json) => UploadedFile(
-        secureUrl: json['secureUrl'] as String,
-        originalName: json['originalName'] as String? ?? 'file',
-        mimeType: json['mimeType'] as String? ?? '',
-        size: (json['size'] as num?)?.toInt() ?? 0,
-      );
-
-  @override
-  List<Object?> get props => [secureUrl, originalName, mimeType, size];
-}
-
 class Uploader extends Equatable {
   const Uploader({
     required this.id,
@@ -92,11 +68,11 @@ class Uploader extends Equatable {
       : '$firstName ${lastName![0]}.';
 
   factory Uploader.fromJson(Map<String, dynamic> json) => Uploader(
-        id: json['id'] as String,
-        firstName: json['firstName'] as String,
-        lastName: json['lastName'] as String?,
-        username: json['username'] as String,
-      );
+    id: json['id'] as String,
+    firstName: json['firstName'] as String,
+    lastName: json['lastName'] as String?,
+    username: json['username'] as String,
+  );
 
   @override
   List<Object?> get props => [id, firstName, lastName, username];
@@ -111,11 +87,9 @@ class Resource extends Equatable {
     required this.status,
     this.rejectionReason,
     required this.downloadCount,
-    required this.source,
-    this.externalUrl,
+    required this.hasFile,
     required this.subjectId,
     required this.createdAt,
-    this.upload,
     this.subject,
     this.uploadedBy,
     this.isBookmarked = false,
@@ -127,82 +101,72 @@ class Resource extends Equatable {
   final ResourceType type;
   final ResourceStatus status;
   final String? rejectionReason;
+
+  /// How many times it was opened ("views").
   final int downloadCount;
-  final ResourceSource source;
-  final String? externalUrl;
+
+  /// Whether there is something to open. The link itself is never part of a
+  /// resource: the backend hands it out when the user taps Open.
+  final bool hasFile;
   final String subjectId;
   final DateTime createdAt;
-  final UploadedFile? upload;
   final Subject? subject;
   final Uploader? uploadedBy;
   final bool isBookmarked;
 
-  /// The link to open: our hosted file, else the external link, else nothing.
-  String? get fileUrl => upload?.secureUrl ?? externalUrl;
-
-  bool get isPdf =>
-      upload?.mimeType == 'application/pdf' ||
-      (fileUrl?.toLowerCase().contains('.pdf') ?? false);
-
   String get uploaderName => uploadedBy?.shortName ?? 'Unknown';
 
-  /// "4.2 MB" for hosted files, "External link" / "Reference" otherwise.
-  String get sizeLabel {
-    final file = upload;
-    if (file == null) {
-      return source == ResourceSource.externalLink ? 'External link' : 'Reference';
-    }
-    final mb = file.size / (1024 * 1024);
-    if (mb >= 1) return '${mb.toStringAsFixed(1)} MB';
-    return '${(file.size / 1024).ceil()} KB';
-  }
-
   Resource copyWith({bool? isBookmarked, int? downloadCount}) => Resource(
-        id: id,
-        title: title,
-        description: description,
-        type: type,
-        status: status,
-        rejectionReason: rejectionReason,
-        downloadCount: downloadCount ?? this.downloadCount,
-        source: source,
-        externalUrl: externalUrl,
-        subjectId: subjectId,
-        createdAt: createdAt,
-        upload: upload,
-        subject: subject,
-        uploadedBy: uploadedBy,
-        isBookmarked: isBookmarked ?? this.isBookmarked,
-      );
+    id: id,
+    title: title,
+    description: description,
+    type: type,
+    status: status,
+    rejectionReason: rejectionReason,
+    downloadCount: downloadCount ?? this.downloadCount,
+    hasFile: hasFile,
+    subjectId: subjectId,
+    createdAt: createdAt,
+    subject: subject,
+    uploadedBy: uploadedBy,
+    isBookmarked: isBookmarked ?? this.isBookmarked,
+  );
 
-  factory Resource.fromJson(Map<String, dynamic> json) => Resource(
-        id: json['id'] as String,
-        title: json['title'] as String,
-        description: json['description'] as String?,
-        type: ResourceType.fromApi(json['resourceType'] as String),
-        status: ResourceStatus.fromApi(json['status'] as String),
-        rejectionReason: json['rejectionReason'] as String?,
-        downloadCount: (json['downloadCount'] as num?)?.toInt() ?? 0,
-        source: ResourceSource.fromApi(json['sourceType'] as String),
-        externalUrl: json['externalUrl'] as String?,
-        subjectId: json['subjectId'] as String,
-        createdAt: DateTime.parse(json['createdAt'] as String),
-        upload: json['upload'] == null
-            ? null
-            : UploadedFile.fromJson(json['upload'] as Map<String, dynamic>),
-        subject: json['subject'] == null
-            ? null
-            : Subject.fromJson(json['subject'] as Map<String, dynamic>),
-        uploadedBy: json['uploadedBy'] == null
-            ? null
-            : Uploader.fromJson(json['uploadedBy'] as Map<String, dynamic>),
-        isBookmarked: json['isBookmarked'] as bool? ?? false,
-      );
+  factory Resource.fromJson(Map<String, dynamic> json) {
+    final subject = json['subject'] as Map<String, dynamic>?;
+    return Resource(
+      id: json['id'] as String,
+      title: json['title'] as String,
+      description: json['description'] as String?,
+      type: ResourceType.fromApi(json['resourceType'] as String),
+      status: ResourceStatus.fromApi(json['status'] as String),
+      rejectionReason: json['rejectionReason'] as String?,
+      downloadCount: (json['downloadCount'] as num?)?.toInt() ?? 0,
+      hasFile: json['hasFile'] as bool? ?? false,
+      subjectId: subject?['id'] as String? ?? '',
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      subject: subject == null ? null : Subject.fromJson(subject),
+      uploadedBy: json['uploadedBy'] == null
+          ? null
+          : Uploader.fromJson(json['uploadedBy'] as Map<String, dynamic>),
+      isBookmarked: json['isBookmarked'] as bool? ?? false,
+    );
+  }
 
   @override
   List<Object?> get props => [
-        id, title, description, type, status, rejectionReason, downloadCount,
-        source, externalUrl, subjectId, createdAt, upload, subject, uploadedBy,
-        isBookmarked,
-      ];
+    id,
+    title,
+    description,
+    type,
+    status,
+    rejectionReason,
+    downloadCount,
+    hasFile,
+    subjectId,
+    createdAt,
+    subject,
+    uploadedBy,
+    isBookmarked,
+  ];
 }

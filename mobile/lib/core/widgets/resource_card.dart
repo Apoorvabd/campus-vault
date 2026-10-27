@@ -2,38 +2,47 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_text_styles.dart';
+import '../utils/formatters.dart';
 import 'app_button.dart';
 import 'app_card.dart';
 import 'avatar_circle.dart';
 import 'status_chip.dart';
 
-/// Card used for feed posts, PYQ/Notes listings and search results:
-/// badge row → title → meta line → uploader row with an action button.
+/// Card used for PYQ/Notes listings, saved resources and search results:
+/// badge + bookmark → title → subject · semester → uploader · views + Open.
 class ResourceCard extends StatelessWidget {
   const ResourceCard({
     super.key,
     required this.badgeLabel,
     required this.badgeVariant,
     required this.title,
-    required this.meta,
+    this.subject,
+    this.semester,
     required this.uploaderName,
+    this.views = 0,
     required this.actionLabel,
     this.onAction,
     this.onBookmark,
     this.bookmarked = false,
-    this.verified = false,
   });
 
   final String badgeLabel;
   final StatusChipVariant badgeVariant;
   final String title;
-  final String meta;
+  final String? subject;
+  final int? semester;
   final String uploaderName;
+  final int views;
   final String actionLabel;
   final VoidCallback? onAction;
   final VoidCallback? onBookmark;
   final bool bookmarked;
-  final bool verified;
+
+  /// "Calculus · Sem 5", or whichever part exists.
+  String get _subjectLine => [
+    if (subject != null && subject!.isNotEmpty) subject!,
+    if (semester != null) 'Sem $semester',
+  ].join(' · ');
 
   @override
   Widget build(BuildContext context) {
@@ -47,10 +56,13 @@ class ResourceCard extends StatelessWidget {
               StatusChip(label: badgeLabel, variant: badgeVariant),
               IconButton(
                 onPressed: onBookmark,
+                // Saved is black and filled; unsaved is a darker outline
                 icon: Icon(
                   bookmarked ? Icons.bookmark : Icons.bookmark_border,
-                  color: AppColors.textMuted,
-                  size: 20,
+                  color: bookmarked
+                      ? AppColors.textPrimary
+                      : AppColors.textSecondary,
+                  size: 22,
                 ),
                 visualDensity: VisualDensity.compact,
                 padding: EdgeInsets.zero,
@@ -60,8 +72,16 @@ class ResourceCard extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(title, style: AppTextStyles.h2.copyWith(fontSize: 15)),
-          const SizedBox(height: 4),
-          Text(meta, style: AppTextStyles.caption),
+          if (_subjectLine.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Text(
+              _subjectLine,
+              style: AppTextStyles.bodySemiBold.copyWith(
+                fontSize: 13,
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ],
           const SizedBox(height: AppSpacing.md),
           Row(
             children: [
@@ -79,13 +99,11 @@ class ResourceCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    if (verified) ...[
-                      const SizedBox(width: 6),
-                      const StatusChip(
-                        label: '✓',
-                        variant: StatusChipVariant.verified,
+                    if (views > 0)
+                      Text(
+                        ' · ${compactCount(views)} views',
+                        style: AppTextStyles.caption,
                       ),
-                    ],
                   ],
                 ),
               ),

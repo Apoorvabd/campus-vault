@@ -77,9 +77,14 @@ class ResourcesRepository {
         return Resource.fromJson(res.data['data']['resource']);
       });
 
-  /// Call when the user opens/downloads a resource. Returns the new count.
-  Future<int> recordDownload(String id) => guardApi(() async {
+  /// Call when the user taps Open: the backend counts the open and hands out the
+  /// link (it is never part of a list or detail response).
+  Future<({String url, int views})> openLink(String id) => guardApi(() async {
         final res = await _api.dio.post('/resources/$id/download');
-        return (res.data['data']['downloadCount'] as num).toInt();
+        final data = res.data['data'];
+        return (
+          url: data['fileUrl'] as String,
+          views: (data['downloadCount'] as num).toInt(),
+        );
       });
 }

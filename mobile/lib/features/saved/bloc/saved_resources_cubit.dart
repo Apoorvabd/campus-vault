@@ -1,17 +1,14 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/data/bookmarks_repository.dart';
-import '../../../core/data/resources_repository.dart';
 import '../../../core/models/resource.dart';
 import '../../../core/network/api_exception.dart';
 import 'saved_list_state.dart';
 
 /// Bookmarked resources (first tab of the Saved screen).
 class SavedResourcesCubit extends Cubit<SavedListState<Resource>> {
-  SavedResourcesCubit(this._bookmarks, this._resources)
-    : super(const SavedListState());
+  SavedResourcesCubit(this._bookmarks) : super(const SavedListState());
 
   final BookmarksRepository _bookmarks;
-  final ResourcesRepository _resources;
 
   /// Loads the first page (also used for pull-to-refresh and retry).
   Future<void> load() async {
@@ -71,13 +68,6 @@ class SavedResourcesCubit extends Cubit<SavedListState<Resource>> {
       if (isClosed) return;
       emit(before.copyWith(actionError: e.message));
     }
-  }
-
-  /// Counts the open as a download. Failures are ignored on purpose.
-  Future<void> recordOpen(Resource resource) async {
-    try {
-      await _resources.recordDownload(resource.id);
-    } catch (_) {}
   }
 
   // Everything on this screen is saved, so make sure the card shows that
