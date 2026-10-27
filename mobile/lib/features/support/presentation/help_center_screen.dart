@@ -3,6 +3,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_radius.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/utils/coming_soon.dart';
 import '../../../core/widgets/app_card.dart';
 
 class _Faq {
@@ -54,7 +55,7 @@ class HelpCenterScreen extends StatelessWidget {
                 child: _ContactAction(
                   icon: Icons.chat_bubble_outline,
                   label: 'Contact Support',
-                  onTap: () {},
+                  onTap: () => showComingSoon(context),
                 ),
               ),
               const SizedBox(width: AppSpacing.md),
@@ -62,7 +63,7 @@ class HelpCenterScreen extends StatelessWidget {
                 child: _ContactAction(
                   icon: Icons.bug_report_outlined,
                   label: 'Report an Issue',
-                  onTap: () {},
+                  onTap: () => showComingSoon(context),
                 ),
               ),
             ],

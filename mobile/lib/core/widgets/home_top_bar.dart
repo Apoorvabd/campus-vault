@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_spacing.dart';
+import '../utils/coming_soon.dart';
 import 'app_logo.dart';
 
 /// Top bar used on Home/Resources-style screens: hamburger menu,
@@ -131,7 +132,7 @@ class HomeTopBar extends StatelessWidget implements PreferredSizeWidget {
               Icons.notifications,
               color: AppColors.textPrimary,
             ),
-            onPressed: onNotificationsTap,
+            onPressed: onNotificationsTap ?? () => showComingSoon(context),
           ),
         ),
       ],

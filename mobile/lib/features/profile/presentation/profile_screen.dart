@@ -9,6 +9,7 @@ import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_shell_scaffold.dart';
 import '../../../core/models/profile.dart';
+import '../../../core/utils/coming_soon.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/avatar_circle.dart';
 import '../../../core/widgets/state_views.dart';
@@ -19,10 +20,8 @@ import '../bloc/profile_cubit.dart';
 import 'edit_profile_sheet.dart';
 import '../../support/presentation/help_center_screen.dart';
 import 'change_password_screen.dart';
-import 'contributor_badges_screen.dart';
 import 'curriculum_screen.dart';
 import 'honor_code_screen.dart';
-import 'my_requests_screen.dart';
 import 'storage_cache_screen.dart';
 import '../../support/presentation/privacy_terms_screen.dart';
 import '../../../core/widgets/skeleton.dart';
@@ -127,25 +126,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _SettingsTile(
             icon: Icons.assignment_outlined,
             label: 'My Resource Requests',
-            trailing: const _PendingBadge(count: 2),
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const MyRequestsScreen()),
-            ),
+            trailing: const _SoonBadge(),
+            onTap: () => showComingSoon(context),
           ),
           _SettingsTile(
             icon: Icons.workspace_premium_outlined,
             label: 'Contributor Badges',
-            trailing: const Icon(
-              Icons.chevron_right,
-              color: AppColors.textMuted,
-            ),
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const ContributorBadgesScreen(),
-              ),
-            ),
+            trailing: const _SoonBadge(),
+            onTap: () => showComingSoon(context),
           ),
           const SizedBox(height: AppSpacing.md),
           const _SectionLabel('SETTINGS & PREFERENCES'),
@@ -194,7 +182,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _SettingsTile(
             icon: Icons.sd_storage_outlined,
             label: 'Storage & Cache',
-            trailing: Text('142 MB', style: AppTextStyles.bodyMedium),
+            trailing: const Icon(
+              Icons.chevron_right,
+              color: AppColors.textMuted,
+            ),
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(
@@ -507,10 +498,8 @@ class _SetupBadge extends StatelessWidget {
   }
 }
 
-class _PendingBadge extends StatelessWidget {
-  const _PendingBadge({required this.count});
-
-  final int count;
+class _SoonBadge extends StatelessWidget {
+  const _SoonBadge();
 
   @override
   Widget build(BuildContext context) {
@@ -524,7 +513,7 @@ class _PendingBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppRadius.pill),
       ),
       child: Text(
-        '$count Pending',
+        'Soon',
         style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w700,

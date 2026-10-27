@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'core/navigation/tab_shell.dart';
+import 'core/utils/coming_soon.dart';
 import 'features/search/presentation/search_screen.dart';
 
-/// Switches the bottom-nav tab (Exam Mode isn't built yet, so index 1 no-ops).
+/// Switches the bottom-nav tab (Exam Mode isn't built yet, so index 1 says "Coming soon").
 /// Inside the shell it just changes the tab. From a screen pushed on top of
 /// the shell (e.g. Subject Detail) it first closes back to the shell.
 void goToTab(BuildContext context, int index) {
-  if (index == 1) return;
+  if (index == 1) {
+    showComingSoon(context);
+    return;
+  }
   mainTabIndex.value = index;
   if (!TabShellScope.isInside(context)) {
     Navigator.of(context).popUntil((route) => route.isFirst);
