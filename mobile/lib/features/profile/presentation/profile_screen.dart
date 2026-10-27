@@ -12,6 +12,7 @@ import '../../../core/models/profile.dart';
 import '../../../core/utils/coming_soon.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/avatar_circle.dart';
+import '../../../core/widgets/profile_card.dart';
 import '../../../core/widgets/state_views.dart';
 import '../../Auth/bloc/auth_bloc.dart';
 import '../../Auth/bloc/auth_event.dart';
@@ -255,126 +256,62 @@ class _ProfileCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        color: AppColors.primaryLight.withValues(alpha: 0.3),
-        borderRadius: BorderRadius.circular(AppRadius.card),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Tap the photo to change it (opens the same sheet as Edit)
-              GestureDetector(
-                onTap: () => showEditProfileSheet(context),
-                child: AvatarCircle(
-                  name: profile.fullName,
-                  size: 72,
-                  imageUrl: profile.avatarUrl,
-                ),
-              ),
-              const Spacer(),
-              OutlinedButton.icon(
-                onPressed: () => showEditProfileSheet(context),
-                icon: const Icon(Icons.edit_outlined, size: 16),
-                label: const Text('Edit'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.textPrimary,
-                  side: const BorderSide(color: AppColors.border),
-                  backgroundColor: AppColors.surface,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.md,
-                    vertical: AppSpacing.xs,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppRadius.pill),
-                  ),
-                ),
-              ),
-            ],
+    return ProfileHeaderCard(
+      name: profile.fullName,
+      role: profile.roleLabel,
+      username: profile.username,
+      avatarUrl: profile.avatarUrl,
+      degree: profile.courseName,
+      semester: profile.currentSemester,
+      college: profile.collegeLabel,
+      headline: profile.headline,
+      bio: profile.bio,
+      // Tap the photo to change it (opens the same sheet as Edit)
+      onAvatarTap: () => showEditProfileSheet(context),
+      action: OutlinedButton.icon(
+        onPressed: () => showEditProfileSheet(context),
+        icon: const Icon(Icons.edit_outlined, size: 16),
+        label: const Text('Edit'),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: Colors.white,
+          side: BorderSide(color: Colors.white.withValues(alpha: 0.5)),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.xs,
           ),
-          const SizedBox(height: AppSpacing.md),
-          Text(profile.fullName, style: AppTextStyles.h1),
-          const SizedBox(height: 2),
-          Text('@${profile.username}', style: AppTextStyles.bodyMedium),
-          if (profile.headline != null && profile.headline!.isNotEmpty) ...[
-            const SizedBox(height: AppSpacing.xs),
-            Text(profile.headline!, style: AppTextStyles.bodySemiBold),
-          ],
-          if (profile.bio != null && profile.bio!.isNotEmpty) ...[
-            const SizedBox(height: AppSpacing.xs),
-            Text(profile.bio!, style: AppTextStyles.bodyMedium),
-          ],
-          const SizedBox(height: AppSpacing.md),
-          Wrap(
-            spacing: AppSpacing.sm,
-            runSpacing: AppSpacing.sm,
-            children: [
-              _InfoBadge(profile.courseShortName ?? profile.courseName),
-              _InfoBadge('Semester ${profile.currentSemester}'),
-            ],
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.pill),
           ),
-          const SizedBox(height: AppSpacing.sm),
-          _InfoBadge(profile.collegeLabel),
-          const SizedBox(height: AppSpacing.lg),
-          // Real counts from the API (approved uploads, own posts, likes received)
-          Row(
-            children: [
-              Expanded(
-                child: _StatBox(
-                  value: compactCount(profile.stats?.approvedResources ?? 0),
-                  label: 'Uploads',
-                ),
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                child: _StatBox(
-                  value: compactCount(profile.stats?.posts ?? 0),
-                  label: 'Posts',
-                ),
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                child: _StatBox(
-                  value: compactCount(profile.stats?.postLikes ?? 0),
-                  label: 'Likes',
-                  icon: Icons.favorite_rounded,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _InfoBadge extends StatelessWidget {
-  const _InfoBadge(this.label);
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: 6,
-      ),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppRadius.pill),
-      ),
-      child: Text(
-        label,
-        style: AppTextStyles.bodyMedium.copyWith(
-          fontWeight: FontWeight.w600,
-          color: AppColors.textPrimary,
         ),
       ),
+      // Real counts from the API (approved uploads, own posts, likes received)
+      footer: [
+        Row(
+          children: [
+            Expanded(
+              child: _StatBox(
+                value: compactCount(profile.stats?.approvedResources ?? 0),
+                label: 'Uploads',
+              ),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: _StatBox(
+                value: compactCount(profile.stats?.posts ?? 0),
+                label: 'Posts',
+              ),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: _StatBox(
+                value: compactCount(profile.stats?.postLikes ?? 0),
+                label: 'Likes',
+                icon: Icons.favorite_rounded,
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
@@ -391,7 +328,7 @@ class _StatBox extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: Colors.white.withValues(alpha: 0.14),
         borderRadius: BorderRadius.circular(AppRadius.input),
       ),
       child: Column(
@@ -405,12 +342,20 @@ class _StatBox extends StatelessWidget {
               ],
               Text(
                 value,
-                style: AppTextStyles.bodySemiBold.copyWith(fontSize: 16),
+                style: AppTextStyles.bodySemiBold.copyWith(
+                  fontSize: 16,
+                  color: Colors.white,
+                ),
               ),
             ],
           ),
           const SizedBox(height: 2),
-          Text(label, style: AppTextStyles.caption),
+          Text(
+            label,
+            style: AppTextStyles.caption.copyWith(
+              color: Colors.white.withValues(alpha: 0.7),
+            ),
+          ),
         ],
       ),
     );
