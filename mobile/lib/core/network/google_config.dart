@@ -8,7 +8,7 @@
 /// `--dart-define=GOOGLE_SERVER_CLIENT_ID=your-id`
 const String googleServerClientId = String.fromEnvironment(
   'GOOGLE_SERVER_CLIENT_ID',
-  defaultValue: 'PASTE_WEB_CLIENT_ID_HERE',
+  defaultValue: '426798021123-bkjlup0bpb3hgo5bk0tjtu3pvba7jsto.apps.googleusercontent.com',
 );
 
 bool get isGoogleSignInConfigured =>
