@@ -16,3 +16,14 @@ String compactCount(int n) {
   if (n >= 1000) return '${(n / 1000).toStringAsFixed(1)}k';
   return '$n';
 }
+
+/// "512 KB", "4.2 MB" or "1.25 GB".
+String formatBytes(int bytes) {
+  const kb = 1024;
+  const mb = kb * 1024;
+  const gb = mb * 1024;
+  if (bytes >= gb) return '${(bytes / gb).toStringAsFixed(2)} GB';
+  if (bytes >= mb) return '${(bytes / mb).toStringAsFixed(1)} MB';
+  if (bytes >= kb) return '${(bytes / kb).ceil()} KB';
+  return '$bytes B';
+}

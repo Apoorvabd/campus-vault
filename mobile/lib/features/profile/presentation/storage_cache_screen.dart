@@ -5,10 +5,13 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_radius.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/utils/device_storage.dart';
+import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/app_card.dart';
 
-/// Storage & Cache — how much device space the vault uses, per category,
-/// with a clear-cache action and two download preferences.
+/// Storage & Cache: how much space the app uses on this phone, from the real
+/// folders: the files the user saved, temporary files, and the app's own data.
+/// The two preferences are only switches for now; nothing reads them yet.
 class StorageCacheScreen extends StatefulWidget {
   const StorageCacheScreen({super.key});
 
@@ -17,31 +20,50 @@ class StorageCacheScreen extends StatefulWidget {
 }
 
 class _StorageCacheScreenState extends State<StorageCacheScreen> {
-  static const _capacityMb = 2048;
-  static const _downloadedMb = 98;
+  static const _capacityBytes = 4 * 1024 * 1024 * 1024; // 4 GB
 
-  int _cacheMb = 40;
+  // null until measured
+  int? _cacheBytes;
+  int? _appDataBytes;
   bool _wifiOnly = true;
   bool _autoClear = false;
+  bool _showAdvanced = false;
 
-  /// Real size of the files saved on this device (rounded up to whole MB).
-  int get _localMb =>
-      (context.read<LocalVaultCubit>().state.totalBytes / (1024 * 1024)).ceil();
+  @override
+  void initState() {
+    super.initState();
+    _measure();
+  }
 
-  int get _totalMb => _localMb + _downloadedMb + _cacheMb;
+  Future<void> _measure() async {
+    final cache = await DeviceStorage.cacheBytes();
+    final appData = await DeviceStorage.appDataBytes();
+    if (!mounted) return;
+    setState(() {
+      _cacheBytes = cache;
+      _appDataBytes = appData;
+    });
+  }
 
-  String _format(int mb) =>
-      mb >= 1024 ? '${(mb / 1024).toStringAsFixed(2)} GB' : '$mb MB';
+  String _size(int? bytes) => bytes == null ? '...' : formatBytes(bytes);
 
-  Future<void> _confirmClearCache() async {
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  Future<bool> _confirm({
+    required String title,
+    required String message,
+    required String action,
+    Color? actionColor,
+  }) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Clear cache?'),
-        content: Text(
-          'This frees ${_format(_cacheMb)} of thumbnails and temporary files. '
-          'Your saved and downloaded documents are not affected.',
-        ),
+        title: Text(title),
+        content: Text(message),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
@@ -49,21 +71,56 @@ class _StorageCacheScreenState extends State<StorageCacheScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text('Clear'),
+            child: Text(action, style: TextStyle(color: actionColor)),
           ),
         ],
       ),
     );
-    if (confirmed == true && mounted) {
-      setState(() => _cacheMb = 0);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Cache cleared')));
-    }
+    return confirmed == true && mounted;
+  }
+
+  Future<void> _confirmClearCache() async {
+    final confirmed = await _confirm(
+      title: 'Clear cache?',
+      message:
+          'This frees ${_size(_cacheBytes)} of temporary files, such as copies '
+          'of photos and files you picked. Your saved documents are not '
+          'affected.',
+      action: 'Clear',
+    );
+    if (!confirmed) return;
+    await DeviceStorage.clearCache();
+    await _measure();
+    if (mounted) _showMessage('Cache cleared');
+  }
+
+  Future<void> _confirmClearAll(int fileCount, int fileBytes) async {
+    final vault = context.read<LocalVaultCubit>();
+    final files = fileCount == 1 ? '1 file' : '$fileCount files';
+    final confirmed = await _confirm(
+      title: 'Delete all saved files?',
+      message:
+          'This permanently deletes the $files (${formatBytes(fileBytes)}) you '
+          'saved locally on this phone, and clears the cache. This cannot be '
+          'undone.\n\nYour account, posts and bookmarks are not affected.',
+      action: 'Delete everything',
+      actionColor: AppColors.error,
+    );
+    if (!confirmed) return;
+    await vault.clearAll();
+    await DeviceStorage.clearCache();
+    await _measure();
+    if (mounted) _showMessage('Storage cleared');
   }
 
   @override
   Widget build(BuildContext context) {
+    final vault = context.watch<LocalVaultCubit>().state;
+    final localBytes = vault.totalBytes;
+    final fileCount = vault.items.length;
+    final totalBytes = localBytes + (_cacheBytes ?? 0) + (_appDataBytes ?? 0);
+    final canClearAll = fileCount > 0 || (_cacheBytes ?? 0) > 0;
+
     return Scaffold(
       appBar: AppBar(
         leading: const BackButton(),
@@ -85,9 +142,9 @@ class _StorageCacheScreenState extends State<StorageCacheScreen> {
                       color: AppColors.primary,
                     ),
                     children: [
-                      TextSpan(text: _format(_totalMb)),
+                      TextSpan(text: formatBytes(totalBytes)),
                       TextSpan(
-                        text: '  / 2.0 GB',
+                        text: '  / 4.0 GB',
                         style: AppTextStyles.bodyMedium,
                       ),
                     ],
@@ -97,7 +154,7 @@ class _StorageCacheScreenState extends State<StorageCacheScreen> {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(AppRadius.pill),
                   child: LinearProgressIndicator(
-                    value: _totalMb / _capacityMb,
+                    value: (totalBytes / _capacityBytes).clamp(0.0, 1.0),
                     minHeight: 8,
                     backgroundColor: AppColors.primaryLight,
                     valueColor: const AlwaysStoppedAnimation(AppColors.primary),
@@ -105,7 +162,7 @@ class _StorageCacheScreenState extends State<StorageCacheScreen> {
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 Text(
-                  '${_format(_capacityMb - _totalMb)} free offline headroom',
+                  '${formatBytes((_capacityBytes - totalBytes).clamp(0, _capacityBytes))} free offline headroom',
                   style: AppTextStyles.caption,
                 ),
               ],
@@ -123,32 +180,32 @@ class _StorageCacheScreenState extends State<StorageCacheScreen> {
               children: [
                 _UsageRow(
                   color: AppColors.primary,
-                  label: 'Locally saved files',
-                  size: _format(_localMb),
+                  label: 'Locally saved files ($fileCount)',
+                  size: formatBytes(localBytes),
                 ),
                 const Divider(height: 1, color: AppColors.border),
                 _UsageRow(
                   color: AppColors.accentPurple,
-                  label: 'Downloaded PDFs',
-                  size: _format(_downloadedMb),
+                  label: 'App data & settings',
+                  size: _size(_appDataBytes),
                 ),
                 const Divider(height: 1, color: AppColors.border),
                 _UsageRow(
                   color: AppColors.accentOrange,
-                  label: 'Cache & thumbnails',
-                  size: _format(_cacheMb),
+                  label: 'Cache & temporary files',
+                  size: _size(_cacheBytes),
                 ),
               ],
             ),
           ),
           const SizedBox(height: AppSpacing.md),
           OutlinedButton.icon(
-            onPressed: _cacheMb == 0 ? null : _confirmClearCache,
+            onPressed: (_cacheBytes ?? 0) == 0 ? null : _confirmClearCache,
             icon: const Icon(Icons.delete_outline, size: 18),
             label: Text(
-              _cacheMb == 0
+              (_cacheBytes ?? 0) == 0
                   ? 'Cache is empty'
-                  : 'Clear Cache (${_format(_cacheMb)})',
+                  : 'Clear Cache (${_size(_cacheBytes)})',
             ),
           ),
           const SizedBox(height: AppSpacing.xl),
@@ -193,6 +250,37 @@ class _StorageCacheScreenState extends State<StorageCacheScreen> {
               ],
             ),
           ),
+          const SizedBox(height: AppSpacing.lg),
+          InkWell(
+            onTap: () => setState(() => _showAdvanced = !_showAdvanced),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+              child: Row(
+                children: [
+                  Text('Advanced', style: AppTextStyles.bodyMedium),
+                  const Spacer(),
+                  Icon(
+                    _showAdvanced ? Icons.expand_less : Icons.expand_more,
+                    color: AppColors.textMuted,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          if (_showAdvanced)
+            OutlinedButton.icon(
+              onPressed: canClearAll
+                  ? () => _confirmClearAll(fileCount, localBytes)
+                  : null,
+              icon: const Icon(Icons.warning_amber_rounded, size: 18),
+              label: const Text('Clear all storage'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.error,
+                side: BorderSide(
+                  color: canClearAll ? AppColors.error : AppColors.border,
+                ),
+              ),
+            ),
         ],
       ),
     );
