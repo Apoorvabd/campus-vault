@@ -67,6 +67,7 @@ enum CollegeGender {
 
 enum OtpPurpose {
   EMAIL_VERIFY // Signup: proves the email is real before the account exists
+  PASSWORD_RESET // Forgot password: proves the user owns the account's email
 }
 
 model University {

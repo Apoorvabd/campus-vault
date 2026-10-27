@@ -43,3 +43,15 @@ export const emailCodeSendLimiter = createLimiter(60 * MINUTE, 5, ipAndEmail);
 export const emailCodeSendIpLimiter = createLimiter(60 * MINUTE, 20);
 
 export const emailCodeVerifyLimiter = createLimiter(15 * MINUTE, 10, ipAndEmail);
+
+// Forgot password: same shape as the signup limits above
+export const passwordResetSendLimiter = createLimiter(60 * MINUTE, 5, ipAndEmail);
+
+export const passwordResetSendIpLimiter = createLimiter(60 * MINUTE, 20);
+
+export const passwordResetVerifyLimiter = createLimiter(15 * MINUTE, 10, ipAndEmail);
+
+export const passwordResetLimiter = createLimiter(15 * MINUTE, 10, ipAndEmail);
+
+// Per user, so guessing the current password is slow wherever the attacker is
+export const changePasswordLimiter = createLimiter(15 * MINUTE, 10, (req) => req.user!.id);

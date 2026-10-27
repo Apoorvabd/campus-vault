@@ -38,6 +38,18 @@ export const sendEmailCodeSchema = z.object({
   email: z.string().trim().email("Invalid email address"),
 });
 
+export const resetPasswordSchema = z.object({
+  email: z.string().trim().email("Invalid email address"),
+  // Handed out by POST /auth/forgot-password/verify (32 random bytes, hex)
+  resetProof: z.string().length(64, "Verify your email first"),
+  newPassword: z.string().min(8, "Password must be at least 8 characters long"),
+});
+
+export const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1, "Current password is required"),
+  newPassword: z.string().min(8, "Password must be at least 8 characters long"),
+});
+
 export const verifyEmailCodeSchema = z.object({
   email: z.string().trim().email("Invalid email address"),
   code: z.string().regex(/^\d{6}$/, "Code must be 6 digits"),

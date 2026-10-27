@@ -141,6 +141,75 @@ class AuthRepository {
     }
   }
 
+  /// Emails a reset code (the backend answers the same for unknown emails).
+  /// Returns how many seconds must pass before the next send.
+  Future<int> sendPasswordResetCode(String email) async {
+    try {
+      final res = await _dio.post(
+        '/auth/forgot-password/send',
+        data: {'email': email},
+      );
+      return res.data['data']['cooldownSeconds'] as int;
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);
+    }
+  }
+
+  /// Checks the code and returns the proof that the reset step requires.
+  Future<String> verifyPasswordResetCode({
+    required String email,
+    required String code,
+  }) async {
+    try {
+      final res = await _dio.post(
+        '/auth/forgot-password/verify',
+        data: {'email': email, 'code': code},
+      );
+      return res.data['data']['resetProof'] as String;
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);
+    }
+  }
+
+  Future<void> resetPassword({
+    required String email,
+    required String resetProof,
+    required String newPassword,
+  }) async {
+    try {
+      await _dio.post(
+        '/auth/forgot-password/reset',
+        data: {
+          'email': email,
+          'resetProof': resetProof,
+          'newPassword': newPassword,
+        },
+      );
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);
+    }
+  }
+
+  /// Other devices are logged out by the backend; this one gets fresh tokens.
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    try {
+      final res = await _dio.post(
+        '/auth/change-password',
+        data: {'currentPassword': currentPassword, 'newPassword': newPassword},
+      );
+      final tokens = res.data['data']['tokens'];
+      await _tokenStorage.saveTokens(
+        accessToken: tokens['accessToken'] as String,
+        refreshToken: tokens['refreshToken'] as String,
+      );
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);
+    }
+  }
+
   // Used when the app starts: tokens are saved, so who is the user?
   Future<UserModel> getMe() async {
     try {
