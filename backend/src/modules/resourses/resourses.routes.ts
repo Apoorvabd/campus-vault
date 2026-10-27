@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   authenticate,
   authorize,
+  openResourceLimiter,
   optionalAuthenticate,
   validate,
 } from "../../middleware";
@@ -39,7 +40,7 @@ router.get(
   listResources
 );
 router.get("/:id", optionalAuthenticate, getResource);
-router.post("/:id/download", authenticate, recordDownload);
+router.post("/:id/download", authenticate, openResourceLimiter, recordDownload);
 
 router.patch(
   "/:id/approve",

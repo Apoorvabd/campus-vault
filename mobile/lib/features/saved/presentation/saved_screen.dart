@@ -53,10 +53,8 @@ class _SavedScreenState extends State<SavedScreen> {
   @override
   void initState() {
     super.initState();
-    _resourcesCubit = SavedResourcesCubit(
-      context.read<BookmarksRepository>(),
-      context.read<ResourcesRepository>(),
-    )..load();
+    _resourcesCubit = SavedResourcesCubit(context.read<BookmarksRepository>())
+      ..load();
     _postsCubit = SavedPostsCubit(
       context.read<BookmarksRepository>(),
       context.read<PostsRepository>(),
@@ -86,20 +84,8 @@ class _SavedScreenState extends State<SavedScreen> {
       ..showSnackBar(SnackBar(content: Text(message)));
   }
 
-  Future<void> _openResource(Resource resource) async {
-    final url = resource.fileUrl;
-    if (url == null) {
-      _showMessage('No file attached');
-      return;
-    }
-    final opened = await openLinkInApp(url);
-    if (!mounted) return;
-    if (opened) {
-      _resourcesCubit.recordOpen(resource);
-    } else {
-      _showMessage('Could not open this file');
-    }
-  }
+  Future<void> _openResource(Resource resource) =>
+      openResource(context, context.read<ResourcesRepository>(), resource);
 
   void _setMain(_MainFilter value) => setState(() {
     _main = value;
@@ -247,7 +233,7 @@ class _SavedScreenState extends State<SavedScreen> {
       ],
       for (final resource in bookmarkedShown) ...[
         const _SourceTag(icon: Icons.bookmark, label: 'Bookmarked resource'),
-        savedResourceCardFor(
+        resourceCardFor(
           resource,
           onAction: () => _openResource(resource),
           onBookmark: () => _resourcesCubit.unsave(resource),

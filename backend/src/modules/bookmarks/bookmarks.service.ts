@@ -1,5 +1,6 @@
 import { AppError } from "../../utils";
 import { presentPost } from "../posts/posts.service";
+import { presentResource } from "../resourses/resourses.service";
 import {
   addPostBookmark,
   addResourceBookmark,
@@ -85,7 +86,10 @@ export const listBookmarkedResourcesService = async (
   const { resources, total } = await findBookmarkedResources(userId, page, limit);
   // Everything in this list is bookmarked by definition
   return {
-    resources: resources.map((resource) => ({ ...resource, isBookmarked: true })),
+    resources: resources.map((resource) => ({
+      ...presentResource(resource),
+      isBookmarked: true,
+    })),
     meta: pageMeta(page, limit, total),
   };
 };

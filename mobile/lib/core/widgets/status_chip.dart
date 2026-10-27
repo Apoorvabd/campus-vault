@@ -14,14 +14,17 @@ class StatusChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Resource type badges (PYQ, Notes, Lab Manual, Syllabus, Reference) are
-    // solid blue with white text; only "Verified" keeps its green outline.
+    // Resource type badges are solid with white text: PYQ orange, Notes green,
+    // the rest (Syllabus, Lab Manual, Reference) blue. "Verified" keeps its
+    // green outline.
     final (Color bg, Color fg, Border? border) = switch (variant) {
       StatusChipVariant.verified => (
         AppColors.success.withValues(alpha: 0.08),
         AppColors.success,
         Border.all(color: AppColors.success),
       ),
+      StatusChipVariant.pyq => (AppColors.accentOrange, Colors.white, null),
+      StatusChipVariant.notes => (AppColors.success, Colors.white, null),
       _ => (AppColors.primary, Colors.white, null),
     };
 

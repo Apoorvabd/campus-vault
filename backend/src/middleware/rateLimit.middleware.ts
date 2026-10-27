@@ -55,3 +55,7 @@ export const passwordResetLimiter = createLimiter(15 * MINUTE, 10, ipAndEmail);
 
 // Per user, so guessing the current password is slow wherever the attacker is
 export const changePasswordLimiter = createLimiter(15 * MINUTE, 10, (req) => req.user!.id);
+
+// Opening a resource hands out its link, so it is capped per user: nobody can
+// walk the whole catalogue and collect the links
+export const openResourceLimiter = createLimiter(20 * MINUTE, 30, (req) => req.user!.id);
