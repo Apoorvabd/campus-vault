@@ -72,14 +72,28 @@ class _SignupStep2ViewState extends State<_SignupStep2View> {
     }
 
     final draft = widget.draft;
-    context.read<AuthBloc>().add(
+    final bloc = context.read<AuthBloc>();
+    final googleIdToken = draft.googleIdToken;
+    if (googleIdToken != null) {
+      bloc.add(
+        GoogleRegisterSubmitted(
+          idToken: googleIdToken,
+          universityId: catalog.selectedUniversity!.id,
+          collegeId: catalog.selectedCollege!.id,
+          courseId: course.id,
+          currentSemester: semester,
+        ),
+      );
+      return;
+    }
+    bloc.add(
       RegisterSubmitted(
         firstName: draft.firstName,
         lastName: draft.lastName,
         username: draft.username,
         email: draft.email,
-        emailProof: draft.emailProof,
-        password: draft.password,
+        emailProof: draft.emailProof!,
+        password: draft.password!,
         universityId: catalog.selectedUniversity!.id,
         collegeId: catalog.selectedCollege!.id,
         courseId: course.id,
@@ -138,9 +152,17 @@ class _SignupStep2ViewState extends State<_SignupStep2View> {
         ? _selectedSemester
         : null;
 
+    final draft = widget.draft;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        if (draft.isGoogle) ...[
+          Text(
+            'Signing up as ${[draft.firstName, draft.lastName].whereType<String>().join(' ')} (${draft.email})',
+            style: AppTextStyles.bodyMedium,
+          ),
+          const SizedBox(height: AppSpacing.md),
+        ],
         AppCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -246,7 +268,10 @@ class _SignupStep2ViewState extends State<_SignupStep2View> {
                   color: AppColors.textMuted,
                 ),
                 const SizedBox(width: 4),
-                Text('Back to Step 1', style: AppTextStyles.bodyMedium),
+                Text(
+                  draft.isGoogle ? 'Go back' : 'Back to Step 1',
+                  style: AppTextStyles.bodyMedium,
+                ),
               ],
             ),
           ),

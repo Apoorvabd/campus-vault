@@ -24,7 +24,7 @@ Bank URL.** Full analysis, numbers, options and the plan are in
 | Privacy & Terms | `features/support/presentation/privacy_terms_screen.dart` | Static text (fine). |
 | Notification bell in the top bar | `core/widgets/home_top_bar.dart` | No-op. No notifications model or API in the backend. |
 | Exam Mode tab in the bottom bar | `app_navigation.dart` | Not built. |
-| "Forgot password?", "Google Workspace SSO" on Login | `features/Auth/presentation/loginscreen.dart` | No-op. No reset-password or OAuth endpoints. |
+| "Forgot password?" on Login | `features/Auth/presentation/loginscreen.dart` | No-op. No reset-password endpoint. (Google login is done: see `docs/google-login.md`.) |
 | Profile footer version line ("v2.4.1 (Build ...)") | `profile_screen.dart` | Hard-coded. Use `package_info_plus` later. |
 
 ## 2. Decisions made for this release

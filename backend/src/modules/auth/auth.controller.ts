@@ -4,9 +4,36 @@ import { Request, Response } from "express";
 import { asyncHandler, sendResponse } from "../../utils";
 import { loginUser, registerUser,refreshTokens ,getMeService, logoutUser} from "./auth.service";
 import { sendEmailCode, verifyEmailCode } from "./emailVerification.service";
+import { loginWithGoogle, registerWithGoogle } from "./googleAuth.service";
 
 export const register = asyncHandler(async (req: Request, res: Response) => {
   const { user, tokens } = await registerUser(req.body);
+
+  res.status(201).json(
+    sendResponse(res, {
+      statusCode: 201,
+      message: "Registered successfully.",
+      data: { user, tokens },
+    })
+  );
+});
+
+export const googleLogin = asyncHandler(async (req: Request, res: Response) => {
+  const result = await loginWithGoogle(req.body.idToken);
+
+  res.status(200).json(
+    sendResponse(res, {
+      statusCode: 200,
+      message: result.needsSignup
+        ? "Google account verified. Finish signing up."
+        : "Logged in successfully.",
+      data: result,
+    })
+  );
+});
+
+export const googleRegister = asyncHandler(async (req: Request, res: Response) => {
+  const { user, tokens } = await registerWithGoogle(req.body);
 
   res.status(201).json(
     sendResponse(res, {

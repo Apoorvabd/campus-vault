@@ -11,6 +11,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
+import 'google_sign_in_button.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -195,16 +196,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ],
                 ),
                 const SizedBox(height: AppSpacing.xl),
-                AppButton(
-                  label: 'Google Workspace SSO',
-                  variant: AppButtonVariant.outline,
-                  icon: Icons.g_mobiledata,
-                  fontSize: 15,
-                  radius: 8,
-                  onPressed: () {
-                    // TODO: Google SSO flow
-                  },
-                ),
+                const GoogleSignInButton(),
                 const SizedBox(height: 30),
                 Center(
                   child: GestureDetector(

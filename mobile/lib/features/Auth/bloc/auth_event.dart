@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import '../data/user_model.dart';
 
 // "sealed" means all events must be defined in this file,
 // so Dart can check we handled every one of them.
@@ -57,6 +58,42 @@ class RegisterSubmitted extends AuthEvent {
     email,
     emailProof,
     password,
+    universityId,
+    collegeId,
+    courseId,
+    currentSemester,
+  ];
+}
+
+// Google sign-in found an existing account (the repository already saved the tokens)
+class GoogleLoggedIn extends AuthEvent {
+  const GoogleLoggedIn(this.user);
+
+  final UserModel user;
+
+  @override
+  List<Object?> get props => [user];
+}
+
+// A new Google user finished step 2; name and email come from the Google token
+class GoogleRegisterSubmitted extends AuthEvent {
+  const GoogleRegisterSubmitted({
+    required this.idToken,
+    required this.universityId,
+    required this.collegeId,
+    required this.courseId,
+    required this.currentSemester,
+  });
+
+  final String idToken;
+  final String universityId;
+  final String collegeId;
+  final String courseId;
+  final int currentSemester;
+
+  @override
+  List<Object?> get props => [
+    idToken,
     universityId,
     collegeId,
     courseId,
