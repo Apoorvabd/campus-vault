@@ -2,6 +2,8 @@
 // in templates/index.ts. sendEmail() then type-checks the data for that name.
 export type EmailTemplates = {
   verifyEmail: { code: string; expiresInMinutes: number };
+  passwordReset: { code: string; expiresInMinutes: number };
+  passwordChanged: Record<string, never>;
 };
 
 export type TemplateName = keyof EmailTemplates;

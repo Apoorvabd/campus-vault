@@ -23,9 +23,9 @@ export const findUserById = async (id: string) => {
       collegeId: true,
       courseId: true,
       currentSemester: true,
-      // passwordHash jaan-boojh kar nahi liya —
-      // ye function "current user" jaisi jagah use hoga (Day 5 ka getMe),
-      // wahan password hash kabhi bahar nahi jaana chahiye
+      // Only used to tell the app whether the account has a password (the
+      // service turns it into `hasPassword`); the hash itself never leaves
+      passwordHash: true,
     },
   });
 };
@@ -43,6 +43,33 @@ export const bumpTokenVersion = async (id: string) => {
     where: { id },
     data: { tokenVersion: { increment: 1 } },
     select: { id: true },
+  });
+};
+
+export const findUserForPasswordChange = async (id: string) => {
+  return prisma.user.findUnique({
+    where: { id },
+    select: { id: true, email: true, passwordHash: true },
+  });
+};
+
+/**
+ * Sets a new password and bumps tokenVersion, which ends the refresh tokens of
+ * every device. A reset also proves the user owns the email, so it verifies it.
+ */
+export const updatePassword = async (
+  id: string,
+  passwordHash: string,
+  verifyEmail: boolean
+) => {
+  return prisma.user.update({
+    where: { id },
+    data: {
+      passwordHash,
+      tokenVersion: { increment: 1 },
+      ...(verifyEmail && { isVerified: true }),
+    },
+    select: { id: true, email: true, role: true, tokenVersion: true },
   });
 };
 

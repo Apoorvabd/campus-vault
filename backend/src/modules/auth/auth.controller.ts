@@ -5,6 +5,12 @@ import { asyncHandler, sendResponse } from "../../utils";
 import { loginUser, registerUser,refreshTokens ,getMeService, logoutUser} from "./auth.service";
 import { sendEmailCode, verifyEmailCode } from "./emailVerification.service";
 import { loginWithGoogle, registerWithGoogle } from "./googleAuth.service";
+import {
+  changePassword,
+  resetPassword,
+  sendPasswordResetCode,
+  verifyPasswordResetCode,
+} from "./password.service";
 
 export const register = asyncHandler(async (req: Request, res: Response) => {
   const { user, tokens } = await registerUser(req.body);
@@ -63,6 +69,57 @@ export const verifyEmailVerificationCode = asyncHandler(async (req: Request, res
     sendResponse(res, {
       statusCode: 200,
       message: "Email verified.",
+      data: result,
+    })
+  );
+});
+
+export const forgotPasswordSend = asyncHandler(async (req: Request, res: Response) => {
+  const result = await sendPasswordResetCode(req.body.email);
+
+  res.status(200).json(
+    sendResponse(res, {
+      statusCode: 200,
+      message: "If this email has an account, a code is on its way.",
+      data: result,
+    })
+  );
+});
+
+export const forgotPasswordVerify = asyncHandler(async (req: Request, res: Response) => {
+  const result = await verifyPasswordResetCode(req.body.email, req.body.code);
+
+  res.status(200).json(
+    sendResponse(res, {
+      statusCode: 200,
+      message: "Code verified.",
+      data: result,
+    })
+  );
+});
+
+export const forgotPasswordReset = asyncHandler(async (req: Request, res: Response) => {
+  await resetPassword(req.body.email, req.body.resetProof, req.body.newPassword);
+
+  res.status(200).json(
+    sendResponse(res, {
+      statusCode: 200,
+      message: "Password updated. Please log in with your new password.",
+    })
+  );
+});
+
+export const changePasswordRequest = asyncHandler(async (req: Request, res: Response) => {
+  const result = await changePassword(
+    req.user!.id,
+    req.body.currentPassword,
+    req.body.newPassword
+  );
+
+  res.status(200).json(
+    sendResponse(res, {
+      statusCode: 200,
+      message: "Password changed.",
       data: result,
     })
   );

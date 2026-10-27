@@ -18,14 +18,15 @@ export const issueTokens = (
   };
 };
 
-// passwordHash, tokenVersion and googleId must never leave the server
+// passwordHash, tokenVersion and googleId must never leave the server; the app
+// only learns whether there is a password (Google-only accounts have none)
 export const toPublicUser = <
   T extends { passwordHash: string | null; tokenVersion: number; googleId: string | null }
 >(
   user: T
 ) => {
-  const { passwordHash: _passwordHash, tokenVersion: _tokenVersion, googleId: _googleId, ...publicUser } = user;
-  return publicUser;
+  const { passwordHash, tokenVersion: _tokenVersion, googleId: _googleId, ...publicUser } = user;
+  return { ...publicUser, hasPassword: passwordHash !== null };
 };
 
 export const assertCollegeAndCourseMatchUniversity = async (ids: {
@@ -113,7 +114,7 @@ export const registerUser = async (
   const tokens = issueTokens(user, 0);
 
   return {
-    user,
+    user: { ...user, hasPassword: true },
     tokens,
   };
 
@@ -153,7 +154,8 @@ export const getMeService = async (userId: string): Promise<any> => {
     if (!user) {
         throw new AppError('User not found', 404);
     }
-    return user;
+    const { passwordHash, ...publicUser } = user;
+    return { ...publicUser, hasPassword: passwordHash !== null };
 }
 
 export const refreshTokens = async (refreshToken: string): Promise<{ tokens: AuthTokens }> => {

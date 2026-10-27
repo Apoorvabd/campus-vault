@@ -93,5 +93,5 @@ export const registerWithGoogle = async (input: GoogleRegisterInput) => {
   });
 
   // A new account starts at tokenVersion 0 (the schema default)
-  return { user, tokens: issueTokens(user, 0) };
+  return { user: { ...user, hasPassword: false }, tokens: issueTokens(user, 0) };
 };
