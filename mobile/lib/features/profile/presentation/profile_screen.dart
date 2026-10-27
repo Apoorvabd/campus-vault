@@ -14,9 +14,11 @@ import '../../../core/widgets/avatar_circle.dart';
 import '../../../core/widgets/state_views.dart';
 import '../../Auth/bloc/auth_bloc.dart';
 import '../../Auth/bloc/auth_event.dart';
+import '../../Auth/bloc/auth_state.dart';
 import '../bloc/profile_cubit.dart';
 import 'edit_profile_sheet.dart';
 import '../../support/presentation/help_center_screen.dart';
+import 'change_password_screen.dart';
 import 'contributor_badges_screen.dart';
 import 'curriculum_screen.dart';
 import 'honor_code_screen.dart';
@@ -71,6 +73,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     // Rebuilds whenever the ProfileCubit emits (load, edit, new avatar)
     final profileState = context.watch<ProfileCubit>().state;
     final profile = profileState.profile;
+    final authState = context.watch<AuthBloc>().state;
+    final hasPassword =
+        authState is Authenticated && authState.user.hasPassword;
 
     return AppShellScaffold(
       currentIndex: _navIndex,
@@ -170,6 +175,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
           ),
+          // Google-only accounts have no password to change
+          if (hasPassword)
+            _SettingsTile(
+              icon: Icons.lock_outline,
+              label: 'Change Password',
+              trailing: const Icon(
+                Icons.chevron_right,
+                color: AppColors.textMuted,
+              ),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ChangePasswordScreen(),
+                ),
+              ),
+            ),
           _SettingsTile(
             icon: Icons.sd_storage_outlined,
             label: 'Storage & Cache',

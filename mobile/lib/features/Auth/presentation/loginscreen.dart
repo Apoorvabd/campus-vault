@@ -11,6 +11,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
+import 'forgot_password_screen.dart';
 import 'google_sign_in_button.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -53,6 +54,17 @@ class _LoginScreenState extends State<LoginScreen> {
     context.read<AuthBloc>().add(
       LoginSubmitted(email: email, password: password),
     );
+  }
+
+  Future<void> _openForgotPassword() async {
+    final wasReset = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(builder: (context) => const ForgotPasswordScreen()),
+    );
+    if (wasReset == true && mounted) {
+      _passwordController.clear();
+      _showMessage('Password updated. Please log in with your new password.');
+    }
   }
 
   void _showMessage(String message) {
@@ -133,9 +145,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             () => _obscurePassword = !_obscurePassword,
                           ),
                           trailingLabel: 'Forgot password?',
-                          onTrailingLabelTap: () {
-                            // TODO: navigate to forgot password screen
-                          },
+                          onTrailingLabelTap: _openForgotPassword,
                         ),
                         const SizedBox(height: AppSpacing.sm),
                         Row(

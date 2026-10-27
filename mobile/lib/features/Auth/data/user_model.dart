@@ -14,6 +14,7 @@ class UserModel extends Equatable {
     required this.collegeId,
     required this.courseId,
     required this.currentSemester,
+    this.hasPassword = true,
   });
 
   final String id;
@@ -28,6 +29,7 @@ class UserModel extends Equatable {
   final String collegeId;
   final String courseId;
   final int currentSemester;
+  final bool hasPassword; // false for Google-only accounts
 
   // Handy for the UI: "Alex Sharma", or just "Alex" if there is no last name
   String get fullName => lastName == null || lastName!.isEmpty
@@ -49,6 +51,7 @@ class UserModel extends Equatable {
       collegeId: json['collegeId'] as String,
       courseId: json['courseId'] as String,
       currentSemester: json['currentSemester'] as int,
+      hasPassword: json['hasPassword'] as bool? ?? true,
     );
   }
 
@@ -68,5 +71,6 @@ class UserModel extends Equatable {
     collegeId,
     courseId,
     currentSemester,
+    hasPassword,
   ];
 }
