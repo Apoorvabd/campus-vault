@@ -86,10 +86,19 @@ jobs:
       - name: Notify Backend App Update API
         env:
           BACKEND_UPDATE_URL: ${{ secrets.BACKEND_UPDATE_URL }}
+          BACKEND_APP_VERSION_SECRET: ${{ secrets.BACKEND_APP_VERSION_SECRET }}
           BACKEND_UPDATE_SECRET: ${{ secrets.BACKEND_UPDATE_SECRET }}
           RELEASE_BODY: ${{ github.event.release.body }}
         run: |
           TARGET_URL="${BACKEND_UPDATE_URL:-https://semester-forge.onrender.com/api/admin/app-update}"
+          API_SECRET="${BACKEND_APP_VERSION_SECRET:-$BACKEND_UPDATE_SECRET}"
+
+          if [ -z "$API_SECRET" ]; then
+            echo "::error::Neither BACKEND_APP_VERSION_SECRET nor BACKEND_UPDATE_SECRET found in GitHub Secrets!"
+            exit 1
+          fi
+
+          echo "Backend secret detected (length: ${#API_SECRET} chars)."
 
           python3 -c '
           import json, os
@@ -112,8 +121,8 @@ jobs:
           echo "Notifying Backend App Update API at $TARGET_URL..."
           curl --fail-with-body -s -S -X POST "$TARGET_URL" \
             -H "Content-Type: application/json" \
-            -H "Authorization: Bearer $BACKEND_UPDATE_SECRET" \
-            -H "x-app-version-secret: $BACKEND_UPDATE_SECRET" \
+            -H "Authorization: Bearer $API_SECRET" \
+            -H "x-app-version-secret: $API_SECRET" \
             -d @payload.json
 
       - name: Clean up Signing Credentials
