@@ -31,3 +31,4 @@ jobs:
         with:
           name: semester-forge-apk
           path: mobile/build/app/outputs/flutter-apk/app-release.apk
+
