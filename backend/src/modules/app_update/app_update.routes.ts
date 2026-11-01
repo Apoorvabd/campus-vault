@@ -20,6 +20,7 @@ export const adminOrCiAuth = async (
 ) => {
   const ciSecret =
     process.env.BACKEND_APP_VERSION_SECRET ||
+    process.env.BACKEND_UPDATE_SECRET ||
     process.env.APP_UPDATE_SECRET ||
     process.env.ADMIN_API_KEY;
 

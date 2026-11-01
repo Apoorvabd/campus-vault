@@ -1,16 +1,25 @@
-name: Build Android APK
+name: Build and Release Android APK
 
 on:
   release:
     types: [published]
 
+permissions:
+  contents: write
+
 jobs:
-  build-apk:
+  build-and-publish:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -22,13 +31,94 @@ jobs:
         working-directory: mobile
         run: flutter pub get
 
-      - name: Build APK
+      - name: Extract version from pubspec.yaml
+        id: get_version
+        run: |
+          FULL_VERSION=$(grep -E '^version:' mobile/pubspec.yaml | sed -E 's/version:[[:space:]]*//' | tr -d '[:space:]')
+          VERSION_NAME="${FULL_VERSION%+*}"
+          VERSION_CODE="${FULL_VERSION#*+}"
+          echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_ENV
+          echo "VERSION_CODE=$VERSION_CODE" >> $GITHUB_ENV
+          echo "Extracted App Version: $VERSION_NAME (versionCode: $VERSION_CODE)"
+
+      - name: Configure Keystore and Signing
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          mkdir -p mobile/android/app
+          echo "$KEYSTORE_BASE64" | base64 --decode > mobile/android/app/upload-keystore.jks
+
+          echo "storePassword=$KEYSTORE_PASSWORD" > mobile/android/key.properties
+          echo "keyPassword=$KEY_PASSWORD" >> mobile/android/key.properties
+          echo "keyAlias=$KEY_ALIAS" >> mobile/android/key.properties
+          echo "storeFile=app/upload-keystore.jks" >> mobile/android/key.properties
+
+      - name: Build Signed Release APK (Optimized for arm64)
         working-directory: mobile
-        run: flutter build apk --release
+        run: |
+          flutter build apk --release --target-platform android-arm64
 
-      - name: Upload APK as workflow artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: semester-forge-apk
-          path: mobile/build/app/outputs/flutter-apk/app-release.apk
+      - name: Prepare Release Asset
+        run: |
+          if [ -f "mobile/build/app/outputs/flutter-apk/app-arm64-v8a-release.apk" ]; then
+            SRC="mobile/build/app/outputs/flutter-apk/app-arm64-v8a-release.apk"
+          else
+            SRC="mobile/build/app/outputs/flutter-apk/app-release.apk"
+          fi
 
+          ASSET_NAME="SemesterForge-v${VERSION_NAME}.apk"
+          cp "$SRC" "$ASSET_NAME"
+
+          echo "ASSET_NAME=$ASSET_NAME" >> $GITHUB_ENV
+          echo "ASSET_PATH=$(pwd)/$ASSET_NAME" >> $GITHUB_ENV
+          echo "DOWNLOAD_URL=https://github.com/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/$ASSET_NAME" >> $GITHUB_ENV
+
+      - name: Upload APK to GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Uploading $ASSET_NAME to GitHub Release ${{ github.event.release.tag_name }}..."
+          gh release upload "${{ github.event.release.tag_name }}" "$ASSET_PATH" --clobber
+
+      - name: Notify Backend App Update API
+        env:
+          BACKEND_UPDATE_URL: ${{ secrets.BACKEND_UPDATE_URL }}
+          BACKEND_UPDATE_SECRET: ${{ secrets.BACKEND_UPDATE_SECRET }}
+          RELEASE_BODY: ${{ github.event.release.body }}
+        run: |
+          TARGET_URL="${BACKEND_UPDATE_URL:-https://semester-forge.onrender.com/api/admin/app-update}"
+
+          python3 -c '
+          import json, os
+
+          body = {
+              "platform": "android",
+              "version_name": os.environ["VERSION_NAME"],
+              "version_code": int(os.environ["VERSION_CODE"]),
+              "minimum_version_code": int(os.environ.get("MINIMUM_VERSION_CODE") or os.environ["VERSION_CODE"]),
+              "download_url": os.environ["DOWNLOAD_URL"],
+              "release_notes": os.environ.get("RELEASE_BODY", "").strip() or "New version released with enhancements and fixes.",
+              "force_update": os.environ.get("FORCE_UPDATE", "false").lower() == "true",
+              "is_active": True
+          }
+
+          with open("payload.json", "w") as f:
+              json.dump(body, f)
+          '
+
+          echo "Notifying Backend App Update API at $TARGET_URL..."
+          curl --fail-with-body -s -S -X POST "$TARGET_URL" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $BACKEND_UPDATE_SECRET" \
+            -H "x-app-version-secret: $BACKEND_UPDATE_SECRET" \
+            -d @payload.json
+
+      - name: Clean up Signing Credentials
+        if: always()
+        run: |
+          rm -f mobile/android/key.properties
+          rm -f mobile/android/app/upload-keystore.jks
+          rm -f payload.json
