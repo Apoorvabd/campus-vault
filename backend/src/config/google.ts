@@ -5,8 +5,6 @@ import { AppError } from "../utils/appError";
 
 // The Web client ID from Google Cloud. The app asks Google for an ID token made
 // for this client (serverClientId), and only tokens made for it are accepted.
-const clientId = process.env.GOOGLE_CLIENT_ID;
-
 const client = new OAuth2Client();
 
 export type GoogleProfile = {
@@ -21,6 +19,7 @@ export type GoogleProfile = {
  * audience) and returns who it belongs to.
  */
 export const verifyGoogleIdToken = async (idToken: string): Promise<GoogleProfile> => {
+  const clientId = process.env.GOOGLE_CLIENT_ID;
   if (!clientId) {
     throw new AppError("Google sign-in is not configured.", 503);
   }
@@ -29,7 +28,8 @@ export const verifyGoogleIdToken = async (idToken: string): Promise<GoogleProfil
   try {
     const ticket = await client.verifyIdToken({ idToken, audience: clientId });
     payload = ticket.getPayload();
-  } catch {
+  } catch (error) {
+    console.error("Google token verification failed:", error);
     throw new AppError("Invalid Google token. Please try again.", 401);
   }
 
