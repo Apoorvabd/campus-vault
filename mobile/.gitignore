@@ -46,3 +46,8 @@ app.*.map.json
 
 # local test account written by tooling
 .test-account.local
+
+# Keystores & credentials
+*.jks
+*.keystore
+key.properties

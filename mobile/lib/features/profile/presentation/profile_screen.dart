@@ -25,6 +25,8 @@ import 'curriculum_screen.dart';
 import 'honor_code_screen.dart';
 import 'storage_cache_screen.dart';
 import '../../support/presentation/privacy_terms_screen.dart';
+import '../../../core/widgets/app_update_sheet.dart';
+import '../../../core/network/api_client.dart';
 import '../../../core/widgets/skeleton.dart';
 
 /// Account Settings screen — opened from the bottom nav's Profile tab.
@@ -235,6 +237,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 builder: (context) => const PrivacyTermsScreen(),
               ),
             ),
+          ),
+          _SettingsTile(
+            icon: Icons.system_update_alt_rounded,
+            label: 'Check for Updates',
+            trailing: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: AppColors.primaryLight,
+                borderRadius: BorderRadius.circular(AppRadius.pill),
+              ),
+              child: Text(
+                'v1.0.0',
+                style: AppTextStyles.caption.copyWith(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 12,
+                ),
+              ),
+            ),
+            onTap: () {
+              final api = context.read<ApiClient>();
+              checkForAppUpdate(
+                context,
+                apiClient: api,
+                currentVersionCode: 1,
+                currentVersionName: '1.0.0',
+                showUpToDateMessage: true,
+              );
+            },
           ),
           const SizedBox(height: AppSpacing.md),
           _LogoutButton(onTap: _confirmLogout),

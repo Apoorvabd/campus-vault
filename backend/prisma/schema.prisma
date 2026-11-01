@@ -536,3 +536,22 @@ model EmailOtp {
 
   @@unique([email, purpose])
 }
+
+model AppUpdate {
+  id                 String   @id @default(cuid())
+  platform           String   @default("android")
+  versionName        String   @map("version_name")
+  versionCode        Int      @map("version_code")
+  minimumVersionCode Int      @default(1) @map("minimum_version_code")
+  downloadUrl        String   @map("download_url")
+  releaseNotes       String?  @map("release_notes")
+  forceUpdate        Boolean  @default(false) @map("force_update")
+  isActive           Boolean  @default(true) @map("is_active")
+
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  @@index([platform, isActive, versionCode(sort: Desc)])
+  @@map("app_updates")
+}
+

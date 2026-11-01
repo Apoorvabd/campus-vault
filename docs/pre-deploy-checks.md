@@ -10,9 +10,9 @@ section mein hai.
 
 ## 0. Ab tak ka status
 
-- [x] Release APK compile hoti hai (dummy URL ke saath build check ki, koi error nahi, sirf 3 purani Java `source/target 8` warnings).
+- [x] Release APK Render default URL ke saath compile hoti hai (`flutter build apk --release`, 29 Oct 2026; 3 Java `source/target 8` warnings).
   - Ye sirf "build nahi toota" ka saboot hai. APK phone par chalakar nahi dekhi (R8/shrink ki runtime dikkat neeche section 5 mein dekhni hai).
-- [x] Backend ka health route: `GET /api/v1/health` ([routes/index.ts](../backend/src/routes/index.ts)), bina auth aur bina database ke.
+- [x] Backend ka health route: `GET /api/v1/health` ([routes/index.ts](../backend/src/routes/index.ts)), bina auth aur bina database ke; Render par 29 Oct 2026 ko `200 OK` mila.
 - [x] App landing screen par server ko jagane ka ping bhejti hai (`apiClient.wakeServer()`, [api_client.dart](../mobile/lib/core/network/api_client.dart), [main.dart](../mobile/lib/main.dart)).
 - [x] Normal request ka receive timeout 15s se 45s (Render cold start ke liye).
 - [x] Dev ke liye `mobile/scripts/dev.sh` (adb reverse + `flutter run`). Release APK mein iski zaroorat nahi.
@@ -45,7 +45,7 @@ section mein hai.
 
 ## 2. Backend code mein release se pehle
 
-- [ ] `/test` route production mein khula hai ([routes/index.ts](../backend/src/routes/index.ts), `router.use("/test", testRoutes)`). Ise hatao ya sirf non-production par chalao.
+- [x] `/test` route production router mein mounted nahi hai; `router.use("/test", testRoutes)` commented out hai ([routes/index.ts](../backend/src/routes/index.ts)).
 - [ ] Database kaunsa use hoga tay karo. Abhi `DATABASE_URL` wahi Supabase hai jo local dev mein chalta hai, to testers ka data bhi usi mein jayega. Alag production DB chahiye to naya banake migrations aur seed chalani padegi.
 - [ ] Seed data check karo: universities, colleges, courses, subjects database mein hone chahiye.
 - [x] Register karte waqt `canPost: true` set hota hai ([auth.service.ts:41](../backend/src/modules/auth/auth.service.ts)), to naye users Create Post chala sakte hain. (Schema ka default `false` hai aur schema comment kehta hai ki admin grant kare, par signup usko override karta hai. Final release mein tay karo ki ye chahiye ya nahi.)
@@ -55,17 +55,17 @@ section mein hai.
 
 ## 3. Mobile app (release build ke liye zaroori)
 
-- [ ] **API URL:** app ka default `http://localhost:5000/api/v1` hai ([api_config.dart](../mobile/lib/core/network/api_config.dart)). Release APK mein ye phone par kahin nahi pahunchega. Build mein URL dena zaroori hai:
+- [x] **API URL:** [api_config.dart](../mobile/lib/core/network/api_config.dart) mein `_deployedBackend` Render URL hai aur `_localBackend` development URL. Release build automatically Render use karta hai; debug build localhost use karta hai. `API_BASE_URL` compile-time define se dono override ho sakte hain.
 
   ```bash
-  cd mobile && flutter build apk --release --dart-define=API_BASE_URL=https://<naam>.onrender.com/api/v1
+  cd mobile && flutter build apk --release
   ```
 
-  - Ya Render ka URL milne ke baad `api_config.dart` ka default hi usi par kar do, taaki bhoolne par app na toote.
+  - Explicit override ki zaroorat ho to: `flutter build apk --release --dart-define=API_BASE_URL=https://semester-forge.onrender.com/api/v1`
 - [ ] **HTTPS hi chalega:** release manifest mein `usesCleartextTraffic` nahi hai (sirf debug manifest mein hai). Render ka URL https hai, to theek. Release APK ko local `http://192.168...` backend se test nahi kar paoge.
 - [ ] **Version badhao:** `mobile/pubspec.yaml` mein `version: 1.0.0+1`. Har naye test APK par build number badhao (`+2`, `+3`...), warna testers ke phone par update install nahi hoga.
 - [ ] **Signing:** abhi release APK debug key se sign hoti hai ([build.gradle.kts](../mobile/android/app/build.gradle.kts)). Sideload test ke liye chalega. Play Store ke liye apni keystore chahiye.
-- [ ] **Application ID:** `com.example.mobile` hai. Test ke liye theek, par Play Store se pehle badalna padega (baad mein badal nahi sakte).
+- [ ] **Application ID:** Android ka Play Store ID `in.semesterforge.app` hai; `com.example.mobile` sirf Android namespace hai. iOS bundle ID abhi `com.example.mobile` hai. Public store par pehli baar publish karne se pehle final IDs confirm karo; publish ke baad inhe badalna app ko nayi listing bana dega.
 - [x] INTERNET permission main manifest mein hai. App name "Semester Forge", icons aur assets (Lottie, images) theek hain.
 
 ## 4. Release APK mein jo confusing ya adhura dikhta hai
