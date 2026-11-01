@@ -80,6 +80,7 @@ class MyApp extends StatelessWidget {
     // Any screen can now do context.read<XRepository>()
     return MultiRepositoryProvider(
       providers: [
+        RepositoryProvider.value(value: apiClient),
         RepositoryProvider.value(value: authRepository),
         RepositoryProvider.value(value: catalogRepository),
         RepositoryProvider.value(value: profileRepository),

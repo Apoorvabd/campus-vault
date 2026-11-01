@@ -3,11 +3,8 @@ import cors from "cors";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import { globalErrorHandler, notFoundHandler } from "./middleware";
-import autroutes from "./routes";
-// app.ts me temporarily (ya routes/index.ts me)
-import { z } from "zod";
-import { validate } from "./middleware";
 import routes from "./routes";
+import appUpdateRoutes from "./modules/app_update/app_update.routes";
 
 const app: Express = express();
 
@@ -36,6 +33,7 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.use("/api/v1", routes);
+app.use("/api", appUpdateRoutes);
 
 
 app.use(notFoundHandler);
