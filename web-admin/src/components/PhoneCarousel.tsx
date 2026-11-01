@@ -113,9 +113,7 @@ export function PhoneCarousel() {
 
   return (
     <div className="relative mx-auto flex h-[470px] w-[310px] flex-col items-center justify-center sm:h-[560px] sm:w-[470px]">
-      <div className="pointer-events-none absolute top-1/2 left-1/2 h-80 w-80 -translate-x-1/2 -translate-y-[55%] rounded-full bg-indigo-600/35 blur-[120px]" />
-      <div className="pointer-events-none absolute top-1/4 left-1/4 h-52 w-52 rounded-full bg-pink-600/20 blur-[100px]" />
-      <div className="pointer-events-none absolute right-8 bottom-1/3 h-48 w-48 rounded-full bg-teal-500/15 blur-[100px]" />
+      <div className="pointer-events-none absolute top-1/2 left-1/2 h-80 w-80 -translate-x-1/2 -translate-y-[55%] rounded-full bg-white/[0.04] blur-[140px]" />
 
       <div className="relative origin-center scale-[0.72] sm:scale-100" style={{ width: PHONE_W }}>
         {/* Side phones: still frames showing the previous and next screens. */}

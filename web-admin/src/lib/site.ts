@@ -8,6 +8,9 @@ export const SITE_TITLE = "SemesterForge: DU Notes, PYQs & Syllabus App for Stud
 export const SITE_DESCRIPTION =
   "SemesterForge is a student app for University of Delhi: find PYQs, notes, syllabus and lab manuals by course and subject, and keep your own files for exam week.";
 
+export const APK_DOWNLOAD_URL =
+  "https://github.com/Apoorvabd/campus-vault/releases/download/v1.0.01/SemesterForge-v1.0.0.apk";
+
 export const FAQ = [
   {
     q: "Where can I find DU previous year question papers (PYQs)?",
@@ -31,7 +34,7 @@ export const FAQ = [
   },
   {
     q: "How do I get the app?",
-    a: "SemesterForge is available as an Android APK. The download link is going live soon, and the Play Store and iPhone versions are on the roadmap.",
+    a: "SemesterForge is available as an Android APK. You can download the latest version directly using the download buttons on this website. Play Store and iPhone versions are on the roadmap.",
   },
 ];
 

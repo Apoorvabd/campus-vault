@@ -1,11 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
-import { GITHUB_URL, SUPPORT_EMAIL } from "@/lib/site";
+import { APK_DOWNLOAD_URL, GITHUB_URL, SUPPORT_EMAIL } from "@/lib/site";
 
 const columns = [
   {
     title: "Product",
     links: [
+      ["Download APK", APK_DOWNLOAD_URL],
       ["Features", "/#features"],
       ["For DU students", "/#du"],
       ["Roadmap", "/#roadmap"],
@@ -22,10 +23,10 @@ const columns = [
   },
 ] as const;
 
-/** Site footer: a near-black card with the brand, links, help and contact details. */
+/** Site footer: a pure-black card with the brand, links, help and contact details. */
 export function Footer() {
   return (
-    <footer className="w-full border-t border-white/[0.08] bg-[#010102]">
+    <footer className="w-full border-t border-white/[0.08] bg-black">
       <div className="w-full px-4 py-12 sm:px-8 lg:px-12">
         <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
           <div>

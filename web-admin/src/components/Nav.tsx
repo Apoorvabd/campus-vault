@@ -4,6 +4,7 @@ import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { APK_DOWNLOAD_URL } from "@/lib/site";
 
 const links = [
   ["Features", "/#features"],
@@ -44,13 +45,13 @@ export function Nav() {
     >
       <nav
         aria-label="Main"
-        className="flex w-full items-center justify-between border-b border-white/[0.08] bg-[#010102]/95 px-4 py-2.5 shadow-lg shadow-black/40 backdrop-blur-xl sm:px-8 lg:px-12"
+        className="flex w-full items-center justify-between border-b border-white/[0.08] bg-black/80 px-4 py-2.5 shadow-lg shadow-black/60 backdrop-blur-xl sm:px-8 lg:px-12"
       >
         <Link href="/" className="flex items-center gap-2.5">
           <span className="grid h-10 w-10 place-items-center rounded-xl bg-white">
             <Image src="/logo.svg" alt="" width={34} height={31} />
           </span>
-          <span className="font-semibold tracking-tight">SemesterForge</span>
+          <span className="font-semibold tracking-tight text-white">SemesterForge</span>
         </Link>
         <div className="flex items-center gap-8">
           <div className="hidden items-center gap-7 text-sm text-muted md:flex">
@@ -60,12 +61,15 @@ export function Nav() {
               </a>
             ))}
           </div>
-          <Link
-            href="/#get-app"
-            className="rounded-xl bg-gradient-to-r from-[#6366f1] to-[#ec4899] px-4 py-2 text-sm font-medium text-white transition hover:brightness-110"
+          <a
+            href={APK_DOWNLOAD_URL}
+            className="flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-black transition hover:bg-white/90 active:scale-95 shadow-sm shadow-white/10"
           >
-            Get the app
-          </Link>
+            <span>Download APK</span>
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+          </a>
         </div>
       </nav>
     </motion.header>

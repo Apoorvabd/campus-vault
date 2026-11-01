@@ -8,7 +8,7 @@ import { Reveal } from "@/components/Reveal";
 import { ShakeHeading } from "@/components/ShakeHeading";
 import { Statement } from "@/components/Statement";
 import Link from "next/link";
-import { FAQ, GITHUB_URL, SITE_DESCRIPTION, SITE_NAME, SITE_URL, SUPPORT_EMAIL } from "@/lib/site";
+import { APK_DOWNLOAD_URL, FAQ, GITHUB_URL, SITE_DESCRIPTION, SITE_NAME, SITE_URL, SUPPORT_EMAIL } from "@/lib/site";
 
 const features = [
   {
@@ -133,12 +133,61 @@ const tagStyle: Record<string, string> = {
   Later: "bg-pink/20 text-[#f9a8d4]",
 };
 
-function StoreBadge({ label, sub }: { label: string; sub: string }) {
-  return (
-    <span className="inline-flex items-center gap-3 rounded-xl border border-white/15 bg-black/60 px-5 py-2.5 text-left backdrop-blur">
+function StoreBadge({
+  label,
+  sub,
+  href,
+  highlight = false,
+}: {
+  label: string;
+  sub: string;
+  href?: string;
+  highlight?: boolean;
+}) {
+  const content = (
+    <>
       <span className="text-[10px] leading-tight text-white/60">
         {sub}
         <span className="block text-base font-semibold text-white">{label}</span>
+      </span>
+      {href && (
+        <svg
+          className="h-5 w-5 text-white/80 transition-transform group-hover:translate-y-0.5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+          />
+        </svg>
+      )}
+    </>
+  );
+
+  if (href) {
+    return (
+      <a
+        href={href}
+        className={`group inline-flex items-center gap-3.5 rounded-xl border px-5 py-2.5 text-left transition-all active:scale-95 ${
+          highlight
+            ? "border-white/30 bg-white/10 hover:border-white/60 hover:bg-white/15 shadow-[0_0_25px_rgba(255,255,255,0.08)]"
+            : "border-white/15 bg-white/[0.04] hover:border-white/30 hover:bg-white/[0.08]"
+        }`}
+      >
+        {content}
+      </a>
+    );
+  }
+
+  return (
+    <span className="inline-flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.02] px-5 py-2.5 text-left opacity-70">
+      <span className="text-[10px] leading-tight text-white/40">
+        {sub}
+        <span className="block text-base font-semibold text-white/70">{label}</span>
       </span>
     </span>
   );
@@ -146,7 +195,7 @@ function StoreBadge({ label, sub }: { label: string; sub: string }) {
 
 export default function Home() {
   return (
-    <div id="top" className="relative overflow-x-clip">
+    <div id="top" className="relative overflow-x-clip bg-black">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
@@ -156,12 +205,12 @@ export default function Home() {
 
       {/* HERO */}
       <section className="relative flex min-h-[100svh] items-center px-6 pt-32 pb-16 lg:pt-24">
-        <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[900px] bg-[radial-gradient(60%_50%_at_30%_0%,rgba(79,70,229,0.3),transparent_70%),radial-gradient(40%_35%_at_90%_30%,rgba(190,24,93,0.18),transparent_70%),radial-gradient(35%_30%_at_5%_40%,rgba(13,148,136,0.15),transparent_70%)]" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[800px] bg-[radial-gradient(60%_40%_at_50%_0%,rgba(255,255,255,0.04),transparent_70%)]" />
         <div className="mx-auto grid w-full max-w-6xl items-center gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-6">
           <div className="text-center lg:pl-14 lg:text-left">
             <div className="hero-in">
               <ShakeHeading className="max-w-3xl font-bold tracking-tight">
-                <span className="mx-auto mb-6 block w-fit rounded-full border border-white/20 bg-[#0d1030] px-4 py-1.5 text-xs font-medium tracking-normal text-white shadow-[0_8px_24px_-10px_rgba(0,0,0,0.8)] lg:mx-0">
+                <span className="mx-auto mb-6 block w-fit rounded-full border border-white/15 bg-white/[0.06] px-4 py-1.5 text-xs font-medium tracking-normal text-white shadow-sm lg:mx-0">
                   DU PYQs, notes &amp; syllabus in one app
                 </span>
                 <span className="grad-title block text-[2.06rem] leading-tight font-semibold sm:text-[2.475rem] lg:text-[2.86rem]">
@@ -177,10 +226,13 @@ export default function Home() {
             </div>
             <div className="hero-in" style={{ "--d": "180ms" } as React.CSSProperties}>
               <div id="get-app" className="mt-9 flex scroll-mt-32 flex-wrap items-center justify-center gap-3 lg:justify-start">
-                <StoreBadge sub="Download for" label="Android (APK)" />
+                <StoreBadge sub="Download for" label="Android (APK)" href={APK_DOWNLOAD_URL} highlight />
                 <StoreBadge sub="Coming to" label="iPhone" />
               </div>
-              <p className="mt-3 text-xs text-white/40">Download link going live soon</p>
+              <p className="mt-3 text-xs text-white/50 flex items-center justify-center lg:justify-start gap-1.5">
+                <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+                Direct APK download • v1.0.0
+              </p>
             </div>
           </div>
 
@@ -192,7 +244,7 @@ export default function Home() {
 
       {/* STATEMENT */}
       <section className="relative mx-auto max-w-4xl px-6 py-28 text-center sm:py-40">
-        <div className="pointer-events-none absolute inset-x-0 top-1/2 -z-10 mx-auto h-72 max-w-2xl -translate-y-1/2 rounded-full bg-violet/20 blur-[120px]" />
+        <div className="pointer-events-none absolute inset-x-0 top-1/2 -z-10 mx-auto h-72 max-w-2xl -translate-y-1/2 rounded-full bg-white/[0.02] blur-[120px]" />
         <Statement
           parts={[
             { text: "The night before the exam, you don't need more apps. You need" },
@@ -362,15 +414,19 @@ export default function Home() {
 
       {/* CTA */}
       <section className="relative px-6 pb-28 text-center">
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-[500px] bg-[radial-gradient(50%_60%_at_50%_100%,rgba(109,40,217,0.3),transparent_70%)]" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-[500px] bg-[radial-gradient(50%_60%_at_50%_100%,rgba(255,255,255,0.03),transparent_70%)]" />
         <Reveal>
           <h2 className="grad-warm mx-auto max-w-3xl text-5xl leading-tight font-bold tracking-tight sm:text-6xl">
             Walk into exam week ready.
           </h2>
           <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
-            <StoreBadge sub="Download for" label="Android (APK)" />
+            <StoreBadge sub="Download for" label="Android (APK)" href={APK_DOWNLOAD_URL} highlight />
+            <StoreBadge sub="Coming to" label="iPhone" />
           </div>
-          <p className="mt-3 text-xs text-white/40">Download link going live soon</p>
+          <p className="mt-3 text-xs text-white/50 flex items-center justify-center gap-1.5">
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+            Direct APK download • v1.0.0
+          </p>
         </Reveal>
       </section>
 
